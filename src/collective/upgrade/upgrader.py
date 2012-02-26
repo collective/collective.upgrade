@@ -11,7 +11,7 @@ from collective.upgrade import interfaces
 from collective.upgrade import utils
 
 
-class Upgrader(utils.Upgrader):
+class PortalUpgrader(utils.Upgrader):
     interface.implements(interfaces.IPortalUpgrader)
     component.adapts(cmf_ifaces.ISiteRoot)
 
@@ -19,20 +19,19 @@ class Upgrader(utils.Upgrader):
         self.portal = portal = self.context
         self.setup = getToolByName(portal, 'portal_setup')
 
-        # May fix the profile version
-        migration = getToolByName(portal, 'portal_migration')
-        migration.getInstanceVersion()
-
-        # Do the core plone upgrade first
+        # Do the baseline profile upgrade first
         baseline = self.setup.getBaselineContextID()
         prof_type, profile_id = baseline.split('-', 1)
         self.upgradeProfile(profile_id)
 
-        # Upgrade installed add-ons
-        self.upgradeAddOns()
+        # Upgrade extension profiles
+        self.upgradeExtensions()
 
     def upgradeProfile(self, profile_id):
         upgrades = list(self.listUpgrades(profile_id))
+        if not upgrades:
+            self.log('Nothing to upgrade for profile %r' % profile_id)
+            return
         while upgrades:
             transaction.begin()
             self.doUpgrades(profile_id, upgrades)
@@ -63,10 +62,16 @@ class Upgrader(utils.Upgrader):
                 self.log("Ran upgrade step %s for profile %s"
                          % (step.title, profile_id))
 
+        self.log("Upgraded profile %r to %r" % (profile_id, step.dest))
         # We update the profile version to the last one we have reached
         # with running an upgrade step.
         if step and step.dest is not None and step.checker is None:
-            self.log("Upgraded profile %r to %r" % (profile_id, step.dest))
             self.setup.setLastVersionForProfile(profile_id, step.dest)
 
-    def upgradeAddOns(self):
+    def upgradeExtensions(self):
+        for profile_id in self.setup.listProfilesWithUpgrades():
+            if self.isProfileInstalled(profile_id):
+                self.upgradeProfile(profile_id)
+
+    def isProfileInstalled(self, profile_id):
+        return self.setup.getLastVersionForProfile(profile_id) != 'unknown'

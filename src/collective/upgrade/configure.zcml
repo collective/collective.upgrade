@@ -1,6 +1,8 @@
 <configure xmlns="http://namespaces.zope.org/zope">
 
-  <adapter factory=".upgrader.Upgrader" />
+  <adapter factory=".upgrader.PortalUpgrader" />
   <adapter factory=".portals.PortalsUpgrader" />
+
+  <adapter factory=".plone.PloneUpgrader" />
 
 </configure>
