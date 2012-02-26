@@ -5,6 +5,7 @@ import transaction
 
 class Upgrader(object):
 
+    logger = logging.getLogger('collective.upgrade')
     log_level = logging.INFO
     log_template = '{context}: {msg}'
 
