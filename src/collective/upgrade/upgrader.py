@@ -1,7 +1,3 @@
-import sys
-import logging
-import pdb
-
 from zope import interface
 from zope import component
 
