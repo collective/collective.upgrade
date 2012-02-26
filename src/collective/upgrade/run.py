@@ -11,7 +11,7 @@ import zodbupdate.main
 
 from AccessControl import SpecialUsers
 from AccessControl.SecurityManagement import newSecurityManager
-from Testing.ZopeTestCase.utils import makerequest
+from Testing.makerequest import makerequest
 
 from collective.upgrade import interfaces
 from collective.upgrade import utils
