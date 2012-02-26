@@ -19,7 +19,8 @@ class Upgrader(object):
         migration.getInstanceVersion()
 
         # Do the core plone upgrade first
-        profile_id = 'Products.CMFPlone:plone'
+        baseline = self.setup.getBaselineContextID()
+        prof_type, profile_id = baseline.split('-', 1)
         self.upgradeProfile(profile_id)
 
         # Upgrade installed add-ons
