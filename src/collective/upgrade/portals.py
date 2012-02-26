@@ -33,4 +33,5 @@ class PortalsUpgrader(utils.Upgrader):
             yield upgrader
         elif ofs_ifaces.IObjectManager.providedBy(context):
             for obj in context.objectValues():
-                for upgrader in self.walkUpgraders(obj)
+                for upgrader in self.walkUpgraders(obj):
+                    yield upgrader
