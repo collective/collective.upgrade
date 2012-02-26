@@ -22,7 +22,7 @@ class PortalsUpgrader(utils.Upgrader):
                             
         for upgrader in upgraders:
             portal = upgrader.context
-            hooks.setPortal(portal)
+            hooks.setSite(portal)
             self.log('Upgrading {0}'.format(portal))
             upgrader()
             self.log('Upgraded {0}'.format(portal))
