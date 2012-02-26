@@ -25,5 +25,5 @@ class IPortalUpgrader(IUpgrader):
     """Upgrade a individual portal."""
 
 
-class IMultiPortalUpgrader(IUpgrader)):
+class IMultiPortalUpgrader(IUpgrader):
     """Upgrade multiple portals."""
