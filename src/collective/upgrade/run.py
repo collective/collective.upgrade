@@ -3,7 +3,7 @@ import sys
 import logging
 import pdb
 
-from zodbupdate import main
+import zodbupdate.main
 
 from AccessControl import SpecialUsers
 from AccessControl.SecurityManagement import newSecurityManager
@@ -29,7 +29,7 @@ def main():
     root.setLevel(logging.INFO)
     stdout_handler = root.handlers[0]
     stdout_handler.setLevel(logging.INFO)
-    stdout_handler.addFilter(main.duplicate_filter)
+    stdout_handler.addFilter(zodbupdate.main.duplicate_filter)
     root.addHandler(logging.FileHandler(
         os.path.join('var', 'log', 'upgrade.log'), mode='w'))
     runner = UpgradeRunner(app)
