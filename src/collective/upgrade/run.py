@@ -3,6 +3,7 @@ import sys
 import logging
 import time
 import pprint
+import optparse
 import pdb
 
 import ZODB.serialize
@@ -15,6 +16,12 @@ from Testing.ZopeTestCase.utils import makerequest
 
 from collective.upgrade import interfaces
 from collective.upgrade import utils
+
+
+parser = optparse.OptionParser()
+parser.add_option(
+    "-l", "--log-file", metavar="FILE", default='upgrade.log',
+    help="Log upgrade messages, filterd for duplicates to FILE")
 
 
 class UpgradeRunner(utils.Upgrader):
@@ -44,14 +51,16 @@ class UpgradeRunner(utils.Upgrader):
                  pprint.pformat(implicit_renames))
 
 
-def main():
+def main(args=None):
+    options, args = parser.parse_args()
+    
     root = logging.getLogger()
     root.setLevel(logging.INFO)
     stdout_handler = root.handlers[0]
     stdout_handler.setLevel(logging.INFO)
     stdout_handler.addFilter(zodbupdate.main.duplicate_filter)
-    root.addHandler(logging.FileHandler(
-        os.path.join('var', 'log', 'upgrade.log'), mode='w'))
+    root.addHandler(logging.FileHandler(options.log_file, mode='w'))
+
     runner = UpgradeRunner(app)
     try:
         runner()
