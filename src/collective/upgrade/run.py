@@ -21,6 +21,10 @@ parser = optparse.OptionParser()
 parser.add_option(
     "-l", "--log-file", metavar="FILE", default='upgrade.log',
     help="Log upgrade messages, filterd for duplicates to FILE")
+parser.add_option(
+    "-p", "--portal-path", metavar="PATH", action="append",
+    help="Run upgrades for the portals at the given paths only.  "
+    "May be given multiple times to specify multiple portals.")
 
 
 class UpgradeRunner(utils.Upgrader):
@@ -32,7 +36,7 @@ class UpgradeRunner(utils.Upgrader):
 
     def __call__(self):
         newSecurityManager(None, SpecialUsers.system)
-        self.upgrader()
+        self.upgrader(self.options.portal_path)
         self.updateZODB()
 
     def updateZODB(self):

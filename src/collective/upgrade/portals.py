@@ -6,8 +6,8 @@ from collective.upgrade import interfaces
 class PortalsUpgrader(object):
     """Upgrades multiple portals in an instance."""
 
-    def __call__(self, paths=None):
-        if paths is not None:
+    def __call__(self, paths=[]):
+        if paths:
             upgraders = (
                 interfaces.IUpgrader(self.app.restrictedTraverse(path))
                 for path in paths)
