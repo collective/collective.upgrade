@@ -26,9 +26,10 @@ parser.add_option(
 
 class UpgradeRunner(utils.Upgrader):
 
-    def __init__(self, app):
+    def __init__(self, app, options):
         self.app = app = makerequest(app)
         self.upgrader = interfaces.IUpgrader(app)
+        self.options = options
 
     def __call__(self):
         newSecurityManager(None, SpecialUsers.system)
@@ -53,6 +54,8 @@ class UpgradeRunner(utils.Upgrader):
 
 def main(args=None):
     options, args = parser.parse_args()
+    if args:
+        parser.error('Unrecognized args given: %r' % args)
     
     root = logging.getLogger()
     root.setLevel(logging.INFO)
