@@ -1,8 +1,12 @@
 import os
 import sys
 import logging
+import time
+import pprint
 import pdb
 
+import ZODB.serialize
+from zodbupdate import update
 import zodbupdate.main
 
 from AccessControl import SpecialUsers
@@ -22,6 +26,22 @@ class UpgradeRunner(utils.Upgrader):
     def __call__(self):
         newSecurityManager(None, SpecialUsers.system)
         self.upgrader()
+        self.updateZODB()
+
+    def updateZODB(self):
+        """Use zodbupdate to update persistent objects from module aliases"""
+        self.commit(self.app)
+        storage = self.app._p_jar.db().storage
+
+        self.log('Packing ZODB in %r' % storage)
+        storage.pack(time.time(), ZODB.serialize.referencesf)
+
+        updater = update.Updater(storage)
+        self.log('Updating ZODB in %r' % storage)
+        updater()
+        implicit_renames = updater.processor.get_found_implicit_rules()
+        self.log('zodbupdate found new rules: %s' %
+                 pprint.pformat(implicit_renames))
 
 
 def main():
