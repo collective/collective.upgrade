@@ -5,6 +5,7 @@ import pprint
 import optparse
 import pdb
 
+import transaction
 import ZODB.serialize
 from zodbupdate import update
 import zodbupdate.main
@@ -98,6 +99,7 @@ def main(app=None, args=None):
     try:
         runner()
     except:
+        transaction.abort()
         runner.logger.exception('Exception running the upgrades.')
         pdb.post_mortem(sys.exc_info()[2])
         raise

@@ -34,14 +34,9 @@ class Upgrader(utils.Upgrader):
     def upgradeProfile(self, profile_id):
         upgrades = list(self.listUpgrades(profile_id))
         while upgrades:
-            try:
-                transaction.begin()
-                self.doUpgrades(profile_id, upgrades)
-                self.commit()
-            except:
-                self.logger.exception('Exception upgrading %r' % profile_id)
-                transaction.abort()
-                raise
+            transaction.begin()
+            self.doUpgrades(profile_id, upgrades)
+            self.commit()
             upgrades = list(self.listUpgrades(profile_id))
         else:
             self.log('Finished upgrading %r profile' % profile_id)
