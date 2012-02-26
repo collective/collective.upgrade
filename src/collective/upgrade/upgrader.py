@@ -62,8 +62,8 @@ class PortalUpgrader(utils.Upgrader):
         for step in steps_to_run:
             step = _upgrade_registry.getUpgradeStep(profile_id, step['id'])
             if step is not None:
-                self.log("Running upgrade step %s for profile %s"
-                         % (step.title, profile_id))
+                self.log("Running upgrade step %s for profile %s: %r"
+                         % (step.title, profile_id, step.__dict__))
                 step.doStep(self.setup)
                 self.log("Ran upgrade step %s for profile %s"
                          % (step.title, profile_id))
