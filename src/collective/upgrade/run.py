@@ -60,27 +60,39 @@ class UpgradeRunner(utils.Upgrader):
                  pprint.pformat(implicit_renames))
 
 
-def main(args=None):
-    options, args = parser.parse_args()
+def main(app=None, args=None):
+    options, args = parser.parse_args(args)
     if args:
         parser.error('Unrecognized args given: %r' % args)
-    try:
-        app
-    except NameError:
-        if not options.zope_conf:
-            parser.error(
-                'Must give the "--zope-conf" option when not used as a '
-                'zopectl "run" script.')
+
+    if app is None:
         import Zope2
-        Zope2.configure(options.zope_conf)
+        from App import config
+        if config._config is None:
+            if not options.zope_conf:
+                parser.error(
+                    'Must give the "--zope-conf" option when not used as a '
+                    'zopectl "run" script.')
+            Zope2.configure(options.zope_conf)
         app = Zope2.app()
-    
+    elif options.zope_conf:
+        parser.error(
+            'Do not give the "--zope-conf" option when used as a '
+            'zopectl "run" script.')
+
     root = logging.getLogger()
     root.setLevel(logging.INFO)
-    stdout_handler = root.handlers[0]
-    stdout_handler.setLevel(logging.INFO)
-    stdout_handler.addFilter(zodbupdate.main.duplicate_filter)
-    root.addHandler(logging.FileHandler(options.log_file, mode='w'))
+    stderr_handler, = [h for h in root.handlers
+                       if getattr(h, 'stream', None) is sys.__stderr__]
+    stderr_handler.setLevel(logging.INFO)
+    stderr_handler.addFilter(zodbupdate.main.duplicate_filter)
+
+    log_file = logging.FileHandler(options.log_file)
+    formatter = logging.Formatter(
+            "%(asctime)s %(levelname)s %(name)s %(message)s",
+            "%Y-%m-%d %H:%M:%S")
+    log_file.setFormatter(formatter)
+    root.addHandler(log_file)
 
     runner = UpgradeRunner(app, options)
     try:
@@ -92,5 +104,7 @@ def main(args=None):
 
 
 if __name__ == '__main__':
-    main()
-        
+    try:
+        main(app)
+    except NameError:
+        main()
