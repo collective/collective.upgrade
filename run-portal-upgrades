@@ -1,0 +1,5 @@
+#!/usr/bin/env python
+
+import pdb; pdb.set_trace()
+from collective.upgrade import run
+run.main(app)

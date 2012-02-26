@@ -36,6 +36,7 @@ setup(name='collective.upgrade',
       tests_require=tests_require,
       extras_require=dict(test=tests_require),
       test_suite = 'collective.upgrade.tests.test_suite',
+      scripts=['run-portal-upgrades'],
       entry_points="""
       # -*- Entry points: -*-
       [console_scripts]
