@@ -5,8 +5,26 @@ import pdb
 
 from zodbupdate import main
 
+from AccessControl import SpecialUsers
+from AccessControl.SecurityManagement import newSecurityManager
+from Testing.ZopeTestCase.utils import makerequest
 
-if __name__ == '__main__':
+from collective.upgrade import interfaces
+from collective.upgrade import utils
+
+
+class UpgradeRunner(utils.Upgrader):
+
+    def __init__(self, app):
+        self.app = app = makerequest(app)
+        self.upgrader = interfaces.IUpgrader(app)
+
+    def __call__(self):
+        newSecurityManager(None, SpecialUsers.system)
+        self.upgrader()
+
+
+def main():
     root = logging.getLogger()
     root.setLevel(logging.INFO)
     stdout_handler = root.handlers[0]
@@ -14,10 +32,15 @@ if __name__ == '__main__':
     stdout_handler.addFilter(main.duplicate_filter)
     root.addHandler(logging.FileHandler(
         os.path.join('var', 'log', 'upgrade.log'), mode='w'))
-    upgrader = Upgrader(makerequest(app))
+    runner = UpgradeRunner(app)
     try:
-        upgrader()
+        runner()
     except:
-        upgrader.logger.exception('Exception running the upgrades.')
+        runner.logger.exception('Exception running the upgrades.')
         pdb.post_mortem(sys.exc_info()[2])
         raise
+
+
+if __name__ == '__main__':
+    main()
+        
