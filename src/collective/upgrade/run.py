@@ -46,7 +46,7 @@ class UpgradeRunner(utils.Upgrader):
 
     def updateZODB(self):
         """Use zodbupdate to update persistent objects from module aliases"""
-        self.commit(self.app)
+        self.commit()
         storage = self.app._p_jar.db().storage
 
         self.log('Packing ZODB in %r' % storage)
