@@ -2,14 +2,21 @@ import sys
 import logging
 import pdb
 
+from zope import interface
+from zope import component
+
 import transaction
 
+from Products.CMFCore import interfaces as cmf_ifaces
 from Products.CMFCore.utils import getToolByName
 
+from collective.upgrade import interfaces
 from collective.upgrade import utils
 
 
 class Upgrader(utils.Upgrader):
+    interface.implements(interfaces.IUpgrader)
+    component.adapts(cmf_ifaces.ISiteRoot)
 
     def __call__(self):
         self.portal = portal = self.context

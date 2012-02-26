@@ -1,11 +1,16 @@
 from zope.component import hooks
 
+from OFS import interfaces as ofs_ifaces
+
 from collective.upgrade import interfaces
 from collective.upgrade import utils
 
 
 class PortalsUpgrader(utils.Upgrader):
     """Upgrades multiple portals in an instance."""
+
+    interface.implements(interfaces.IUpgrader)
+    component.adapts(ofs_ifaces.IObjectManager)
 
     def __call__(self, paths=[]):
         if paths:

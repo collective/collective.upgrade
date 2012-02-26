@@ -1,0 +1,6 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <adapter factory=".upgrader.Upgrader" />
+  <adapter factory=".portals.PortalsUpgrader" />
+
+</configure>
