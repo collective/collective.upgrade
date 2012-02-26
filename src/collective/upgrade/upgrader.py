@@ -41,7 +41,7 @@ class Upgrader(utils.Upgrader):
             except:
                 self.logger.exception('Exception upgrading %r' % profile_id)
                 transaction.abort()
-                break
+                raise
             upgrades = list(self.listUpgrades(profile_id))
         else:
             self.log('Finished upgrading %r profile' % profile_id)
