@@ -5,6 +5,7 @@ import transaction
 
 from Products.CMFCore import interfaces as cmf_ifaces
 from Products.CMFCore.utils import getToolByName
+from Products.GenericSetup.upgrade import _upgrade_registry
 
 from collective.upgrade import interfaces
 from collective.upgrade import utils
@@ -53,5 +54,24 @@ class Upgrader(utils.Upgrader):
                         yield subinfo
             elif info['proposed']:
                 yield info
+
+    def doUpgrades(self, profile_id, steps_to_run):
+        """Perform all selected upgrade steps.
+        """
+        step = None
+        for step in steps_to_run:
+            step = _upgrade_registry.getUpgradeStep(profile_id, step['id'])
+            if step is not None:
+                self.log("Running upgrade step %s for profile %s"
+                         % (step.title, profile_id))
+                step.doStep(self.setup)
+                self.log("Ran upgrade step %s for profile %s"
+                         % (step.title, profile_id))
+
+        # We update the profile version to the last one we have reached
+        # with running an upgrade step.
+        if step and step.dest is not None and step.checker is None:
+            self.log("Upgraded profile %r to %r" % (profile_id, step.dest))
+            self.setup.setLastVersionForProfile(profile_id, step.dest)
 
     def upgradeAddOns(self):
