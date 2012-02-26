@@ -4,11 +4,12 @@ import pdb
 
 import transaction
 
-
 from Products.CMFCore.utils import getToolByName
 
+from collective.upgrade import utils
 
-class Upgrader(object):
+
+class Upgrader(utils.Upgrader):
 
     def __call__(self):
         self.portal = portal = self.context

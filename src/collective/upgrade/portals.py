@@ -1,9 +1,10 @@
 from zope.component import hooks
 
 from collective.upgrade import interfaces
+from collective.upgrade import utils
 
 
-class PortalsUpgrader(object):
+class PortalsUpgrader(utils.Upgrader):
     """Upgrades multiple portals in an instance."""
 
     def __call__(self, paths=[]):
