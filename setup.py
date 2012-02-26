@@ -38,6 +38,9 @@ setup(name='collective.upgrade',
       test_suite = 'collective.upgrade.tests.test_suite',
       entry_points="""
       # -*- Entry points: -*-
+      [console_scripts]
+      upgrade-portals = collective.upgrade.run:main
+      
       [z3c.autoinclude.plugin]
       target = plone
       """,
