@@ -41,6 +41,12 @@ class PortalUpgrader(utils.Upgrader):
             self.log('Finished upgrading %r profile' % profile_id)
 
     def listUpgrades(self, profile_id):
+        """Return only the upgrade steps needed to get to the next version."""
+        # TODO Handle 'unknown' versions.  For some reason if
+        # setup.getLastVersionForProfile(profile_id) == 'unknown'
+        # then all upgrade steps for all versions of the profile up to
+        # the current version are marked 'proposed' so we lose
+        # incremental committing for those profiles.
         for info in self.setup.listUpgrades(profile_id):
             if type(info) == list:
                 for subinfo in info:
