@@ -2,18 +2,29 @@ import logging
 
 import transaction
 
+from zope import interface
+from zope.publisher import browser
 
-class Upgrader(object):
+from collective.upgrade import interfaces
+
+
+class Upgrader(browser.BrowserView):
+    interface.implements(interfaces.IUpgrader)
 
     logger = logging.getLogger('collective.upgrade')
     log_level = logging.INFO
     log_template = '{context}: {msg}'
 
-    def __init__(self, context):
-        self.context = context
+    def __init__(self, context, request=None):
+        super(Upgrader, self).__init__(context, request)
 
     def __call__(self):
         """Do the actual upgrade work."""
+        if self.request.form.get('submitted'):
+            self.upgrade()
+        return super(Upgrader, self).__call__()
+
+    def upgrade(self):
         raise NotImplemented('Subclasses should override "__call__()"')
 
     def log(self, msg, level=None, template=None):

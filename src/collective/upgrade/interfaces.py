@@ -20,10 +20,3 @@ class IUpgrader(interface.Interface):
     def commit():
         """Do a 'transaction.commit()' of upgrade progess with a log message"""
 
-
-class IPortalUpgrader(IUpgrader):
-    """Upgrade a individual portal."""
-
-
-class IMultiPortalUpgrader(IUpgrader):
-    """Upgrade multiple portals."""

@@ -29,38 +29,6 @@ parser.add_option(
     'Can be omitted when used as a zopectl "run" script.')
 
 
-class UpgradeRunner(utils.Upgrader):
-
-    def __init__(self, app, options):
-        from Testing.makerequest import makerequest
-        self.app = app = makerequest(app)
-        self.upgrader = interfaces.IMultiPortalUpgrader(app)
-        self.options = options
-
-    def __call__(self):
-        from AccessControl import SpecialUsers
-        from AccessControl.SecurityManagement import newSecurityManager
-        newSecurityManager(None, SpecialUsers.system)
-
-        self.upgrader(self.options.portal_path)
-        self.updateZODB()
-
-    def updateZODB(self):
-        """Use zodbupdate to update persistent objects from module aliases"""
-        self.commit()
-        storage = self.app._p_jar.db().storage
-
-        self.log('Packing ZODB in %r' % storage)
-        storage.pack(time.time(), ZODB.serialize.referencesf)
-
-        updater = update.Updater(storage)
-        self.log('Updating ZODB in %r' % storage)
-        updater()
-        implicit_renames = updater.processor.get_found_implicit_rules()
-        self.log('zodbupdate found new rules: %s' %
-                 pprint.pformat(implicit_renames))
-
-
 def main(app=None, args=None):
     options, args = parser.parse_args(args)
     if args:
@@ -95,9 +63,15 @@ def main(app=None, args=None):
     log_file.setFormatter(formatter)
     root.addHandler(log_file)
 
-    runner = UpgradeRunner(app, options)
+    from AccessControl import SpecialUsers
+    from AccessControl.SecurityManagement import newSecurityManager
+    newSecurityManager(None, SpecialUsers.system)
+    from Testing.makerequest import makerequest
+    app = makerequest(app)
+
+    runner = app.restrictedTraverse('@@collective.upgrade.form')
     try:
-        runner()
+        runner.upgrade(options.portal_path)
     except:
         transaction.abort()
         runner.logger.exception('Exception running the upgrades.')

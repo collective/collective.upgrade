@@ -1,23 +1,19 @@
-from zope import interface
-from zope import component
+from zope.component import hooks
 
 import transaction
 
-from Products.CMFCore import interfaces as cmf_ifaces
 from Products.CMFCore.utils import getToolByName
 from Products.GenericSetup.upgrade import _upgrade_registry
 
-from collective.upgrade import interfaces
 from collective.upgrade import utils
 
 
 class PortalUpgrader(utils.Upgrader):
-    interface.implements(interfaces.IPortalUpgrader)
-    component.adapts(cmf_ifaces.ISiteRoot)
 
-    def __call__(self):
-        self.portal = portal = self.context
-        self.setup = getToolByName(portal, 'portal_setup')
+    def upgrade(self):
+        hooks.setSite(self.context)
+        self.setup = getToolByName(self.context, 'portal_setup')
+        self.log('Upgrading {0}'.format(self.context))
 
         # Do the baseline profile upgrade first
         baseline = self.setup.getBaselineContextID()
@@ -26,6 +22,8 @@ class PortalUpgrader(utils.Upgrader):
 
         # Upgrade extension profiles
         self.upgradeExtensions()
+
+        self.log('Upgraded {0}'.format(self.context))
 
     def upgradeProfile(self, profile_id):
         upgrades = list(self.listUpgrades(profile_id))

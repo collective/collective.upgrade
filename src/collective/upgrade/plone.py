@@ -23,5 +23,5 @@ class PloneUpgrader(upgrader.PortalUpgrader):
             return installed
 
         product, profile = profile_id.split(':', 1)
-        qi = getToolByName(self.portal, 'portal_quickinstaller')
+        qi = getToolByName(self.context, 'portal_quickinstaller')
         return qi.isProductInstalled(product)
