@@ -30,7 +30,7 @@ class PortalsUpgrader(utils.Upgrader):
             self.log('Upgraded {0}'.format(portal))
 
     def walkUpgraders(self, context):
-        upgrader = interfaces.IUpgrader(context, None)
+        upgrader = interfaces.IPortalUpgrader(context, None)
         if upgrader is not None:
             yield upgrader
         elif ofs_ifaces.IObjectManager.providedBy(context):

@@ -36,7 +36,7 @@ class UpgradeRunner(utils.Upgrader):
 
     def __init__(self, app, options):
         self.app = app = makerequest(app)
-        self.upgrader = interfaces.IUpgrader(app)
+        self.upgrader = interfaces.IMultiPortalUpgrader(app)
         self.options = options
 
     def __call__(self):
