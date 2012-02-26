@@ -1,14 +1,9 @@
 import logging
 
-from zope import interface
-
 import transaction
-
-from collective.upgrade import interfaces
 
 
 class Upgrader(object):
-    interface.implements(interfaces.IUpgrader)
 
     logger = logging.getLogger('collective.upgrade')
     log_level = logging.INFO
