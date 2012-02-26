@@ -24,7 +24,8 @@ parser.add_option(
 parser.add_option(
     "-p", "--portal-path", metavar="PATH", action="append",
     help="Run upgrades for the portals at the given paths only.  "
-    "May be given multiple times to specify multiple portals.")
+    "May be given multiple times to specify multiple portals.  "
+    "If not given all CMF portals in the Zope app will be upgraded.")
 
 
 class UpgradeRunner(utils.Upgrader):
