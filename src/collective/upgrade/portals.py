@@ -1,4 +1,3 @@
-from collective.upgrade import interfaces
 from collective.upgrade import utils
 
 
@@ -8,7 +7,8 @@ class PortalsUpgrader(utils.Upgrader):
     def upgrade(self, paths=[]):
         if paths:
             upgraders = (
-                interfaces.IUpgrader(self.app.restrictedTraverse(path))
+                self.context.restrictedTraverse(
+                    path+'/@@collective.upgrade.form')
                 for path in paths)
         else:
             upgraders = self.walkUpgraders(self.context)
