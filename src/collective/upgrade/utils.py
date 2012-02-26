@@ -1,9 +1,14 @@
 import logging
 
+from zope import interface
+
 import transaction
+
+from collective.upgrade import interfaces
 
 
 class Upgrader(object):
+    interface.implements(interfaces.IUpgrader)
 
     logger = logging.getLogger('collective.upgrade')
     log_level = logging.INFO
@@ -11,6 +16,10 @@ class Upgrader(object):
 
     def __init__(self, context):
         self.context = context
+
+    def __call__(self):
+        """Do the actual upgrade work."""
+        raise NotImplemented('Subclasses should override "__call__()"')
 
     def log(self, msg, level=None, template=None):
         """Log a message using per-upgrader template and level."""

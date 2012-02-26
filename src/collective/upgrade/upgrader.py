@@ -11,7 +11,7 @@ from collective.upgrade import utils
 
 
 class Upgrader(utils.Upgrader):
-    interface.implements(interfaces.IUpgrader)
+    interface.implements(interfaces.IPortalUpgrader)
     component.adapts(cmf_ifaces.ISiteRoot)
 
     def __call__(self):
