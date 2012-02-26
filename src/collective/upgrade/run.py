@@ -9,10 +9,6 @@ import ZODB.serialize
 from zodbupdate import update
 import zodbupdate.main
 
-from AccessControl import SpecialUsers
-from AccessControl.SecurityManagement import newSecurityManager
-from Testing.makerequest import makerequest
-
 from collective.upgrade import interfaces
 from collective.upgrade import utils
 
@@ -35,12 +31,16 @@ parser.add_option(
 class UpgradeRunner(utils.Upgrader):
 
     def __init__(self, app, options):
+        from Testing.makerequest import makerequest
         self.app = app = makerequest(app)
         self.upgrader = interfaces.IMultiPortalUpgrader(app)
         self.options = options
 
     def __call__(self):
+        from AccessControl import SpecialUsers
+        from AccessControl.SecurityManagement import newSecurityManager
         newSecurityManager(None, SpecialUsers.system)
+
         self.upgrader(self.options.portal_path)
         self.updateZODB()
 
