@@ -20,12 +20,16 @@ from collective.upgrade import utils
 parser = optparse.OptionParser()
 parser.add_option(
     "-l", "--log-file", metavar="FILE", default='upgrade.log',
-    help="Log upgrade messages, filterd for duplicates to FILE")
+    help="Log upgrade messages, filterd for duplicates, to FILE")
 parser.add_option(
     "-p", "--portal-path", metavar="PATH", action="append",
     help="Run upgrades for the portals at the given paths only.  "
     "May be given multiple times to specify multiple portals.  "
-    "If not given all CMF portals in the Zope app will be upgraded.")
+    "If not given, all CMF portals in the Zope app will be upgraded.")
+parser.add_option(
+    "-z", "--zope-conf", metavar="FILE",
+    help='The "zope.conf" FILE to use when starting the Zope2 app. '
+    'Can be omitted when used as a zopectl "run" script.')
 
 
 class UpgradeRunner(utils.Upgrader):
@@ -60,6 +64,16 @@ def main(args=None):
     options, args = parser.parse_args()
     if args:
         parser.error('Unrecognized args given: %r' % args)
+    try:
+        app
+    except NameError:
+        if not options.zope_conf:
+            parser.error(
+                'Must give the "--zope-conf" option when not used as a '
+                'zopectl "run" script.')
+        import Zope2
+        Zope2.configure(options.zope_conf)
+        app = Zope2.app()
     
     root = logging.getLogger()
     root.setLevel(logging.INFO)
@@ -68,7 +82,7 @@ def main(args=None):
     stdout_handler.addFilter(zodbupdate.main.duplicate_filter)
     root.addHandler(logging.FileHandler(options.log_file, mode='w'))
 
-    runner = UpgradeRunner(app)
+    runner = UpgradeRunner(app, options)
     try:
         runner()
     except:
