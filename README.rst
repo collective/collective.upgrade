@@ -6,6 +6,36 @@ sites, supporting incremental commits, upgrading multiple portals at
 once, and a command-line script for upgrading scripts outside the
 browser.
 
+Quick Start
+-----------
+
+In a buildout with::
+
+    [instance1]
+    recipe = plone.recipe.zope2instance
+    eggs = ...
+
+Add another part like so::
+
+    parts =
+        ...
+        zopepy
+    ...
+
+    [zopepy]
+    recipe = zc.recipe.egg
+    eggs =
+        ${instance1:eggs}
+        collective.upgrade
+    interpreter = zopepy
+
+    ...
+
+Then, after running buildout, you can upgrade all Plone portals and
+their add-ons with::
+
+    $ bin/upgrade-portals -z parts/instance1/etc/zope.conf -l var/log/upgrade.log
+
 Incremental Commits
 -------------------
 
