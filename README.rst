@@ -26,6 +26,7 @@ Add another part like so::
     ...
     eggs = ...
         collective.upgrade
+    http-address = localhost:8080
     ...
 
     [upgrade]
@@ -41,6 +42,12 @@ Then, after running buildout, you can upgrade all Plone portals and
 their add-ons and monitor the progress in `var/log/upgrade.log` with::
 
     $ bin/upgrade-portals
+
+Alternatively, you can open the following URL in your browser to
+upgrade all portals and the logs of progress will be streamed to
+your browser::
+
+    http://localhost:8080/@@collective.upgrade.form
 
 Use the `--help` option for more details::
 
