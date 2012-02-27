@@ -18,9 +18,10 @@ CAUTION
 -------
 
 Use of this package will immediately commit changes to your ZODB.
-There is no "dry run" option as that is not it's purpose.  As such, it
-should *never* be used on a ZODB that has not been backed up along
-with the BLOBs *immediately before* use.
+There is no "dry run" option as that is contrary to it's purpose.  As
+such, it should *never* be used on a ZODB that has not been backed up
+along with the BLOBs *immediately before* use.  Neither should it be
+used directly on production as a first attempt at upgrading portals.  
 
 Quick Start
 -----------
@@ -174,4 +175,5 @@ upgrades steps.  See the ``collective.upgrade.steps`` source for
 details:
 
   * delete custom skin objects
+  * cleanup missing skin/theme layers
   * uninstall add-ons

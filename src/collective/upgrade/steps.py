@@ -24,6 +24,31 @@ def deleteCustomSkinObjs(context, *obj_ids):
         % (skins.custom, del_ids))
 
 
+_default_layers = []
+def cleanupSkinLayers(context, remove_layers=_default_layers):
+    skins = getToolByName(context, 'portal_skins')
+    for theme in skins.getSkinSelections():
+        path = skins.getSkinPath(theme)
+        layers = path.split(',')
+        found = []
+        for layer in layers:
+            if layer in remove_layers:
+                continue
+            if hasattr(skins, layer):
+                found.append(layer)
+                continue
+            if remove_layers is not _default_layers:
+                raise ValueError(
+                    '%r theme layer %r is missing but not listed to be removed'
+                    % (theme, layer))
+
+        diff = list(set(layers).difference(found))
+        if diff:
+            logger.info('Removing layers from theme %r for %r: %r'
+                        % (theme, skins, diff))
+            skins.addSkinSelection(theme, ','.join(found), test=1)
+        
+
 def uninstallAddOns(context, addons=None):
     """
     Uninstall the given add-ons using the cleanest method possible.
