@@ -1,0 +1,18 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:browser="http://namespaces.zope.org/browser">
+
+  <browser:page name="collective.upgrade.form"
+                for="Products.CMFCore.interfaces.ISiteRoot"
+                permission="cmf.ManagePortal"
+                class=".upgrader.PortalUpgrader" />
+  <browser:page name="collective.upgrade.form"
+                for="OFS.interfaces.IObjectManager"
+                permission="zope2.ViewManagementScreens"
+                class=".portals.PortalsUpgrader" />
+
+  <browser:page name="collective.upgrade.form"
+                for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+                permission="cmf.ManagePortal"
+                class=".plone.PloneUpgrader" />
+
+</configure>
