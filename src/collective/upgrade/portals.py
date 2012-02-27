@@ -10,8 +10,10 @@ class PortalsUpgrader(utils.Upgrader):
                 self.context.restrictedTraverse(
                     path+'/@@collective.upgrade.form')
                 for path in paths)
+            self.log('Upgrading portals: %r' % paths)
         else:
             upgraders = self.walkUpgraders(self.context)
+            self.log('Upgrading all portals')
                             
         for upgrader in upgraders:
             upgrader.upgrade(**kw)
