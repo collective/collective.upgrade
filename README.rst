@@ -6,6 +6,14 @@ sites, supporting incremental commits, upgrading multiple portals at
 once, and a command-line script for upgrading scripts outside the
 browser.
 
+CAUTION
+-------
+
+Use of this package will immediately commit changes to your ZODB.
+There is no "dry run" option as that is not it's purpose.  As such, it
+should *never* be used on a ZODB that has not been backed up along
+with the BLOBs *immediately before* use.
+
 Quick Start
 -----------
 
