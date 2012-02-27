@@ -12,6 +12,8 @@ Also included are a number of upgrade steps for cleaning up messy
 portals during upgrades including cleaning up broken objects,
 components and registrations.
 
+.. contents::
+
 CAUTION
 -------
 
