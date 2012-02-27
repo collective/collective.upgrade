@@ -64,7 +64,7 @@ Alternatively, you can open the following URL in your browser to
 upgrade all portals and the logs of progress will be streamed to
 your browser::
 
-    http://localhost:8080/@@collective.upgrade.form
+    http://localhost:8080/@@collective.upgrade.form?submitted=1
 
 Use the ``--help`` option for more details::
 
@@ -110,9 +110,9 @@ will pick up from the last successful profile version reached without
 having to repeat what has already succeeded.
 
 To use this upgrader you can simply visit the
-``@@collective.upgrade.form`` view on the portal to upgrade.
-Alternatively, you can use the ``upgrade-portals`` console script
-described in the `Quick Start`_ section.
+``@@collective.upgrade.form?submitted=1`` view on the portal to
+upgrade.  Alternatively, you can use the ``upgrade-portals`` console
+script described in the `Quick Start`_ section.
 
 Multiple Portals
 ----------------
@@ -124,9 +124,9 @@ possible to specify the paths of the portals to upgrade.
 
 It uses the same incremental commit support described above for each
 portal and commits after each portal and can also be run using the
-``@@collective.upgrade.form`` view on the container of the portals to
-upgrade or using the console script described in the `Quick Start`_
-section.
+``@@collective.upgrade.form?submitted=1`` view on the container of the
+portals to upgrade or using the console script described in the `Quick
+Start`_ section.
 
 Command-line Script
 -------------------
