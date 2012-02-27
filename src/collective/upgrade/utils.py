@@ -5,7 +5,12 @@ import transaction
 from zope import interface
 from zope.publisher import browser
 
+import zodbupdate.main
+
 from collective.upgrade import interfaces
+
+formatter = logging.Formatter(
+    "%(asctime)s %(levelname)s %(name)s %(message)s", "%Y-%m-%d %H:%M:%S")
 
 
 class Upgrader(browser.BrowserView):
@@ -20,8 +25,18 @@ class Upgrader(browser.BrowserView):
 
     def __call__(self):
         """Do the actual upgrade work."""
-        if self.request.form.get('submitted'):
-            self.upgrade()
+        if self.request.form.pop('submitted'):
+            self.request.response.setHeader('Content-Type', 'text/plain')
+            handler = logging.StreamHandler(self.request.response)
+            handler.addFilter(zodbupdate.main.duplicate_filter)
+            handler.setFormatter(formatter)
+            root = logging.getLogger()
+            root.addHandler(handler)
+            try:
+                self.upgrade(**self.request.form)
+            finally:
+                root.removeHandler(handler)
+            return self.request.response
         return super(Upgrader, self).__call__()
 
     def upgrade(self):

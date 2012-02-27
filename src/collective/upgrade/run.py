@@ -57,10 +57,8 @@ def main(app=None, args=None):
     stderr_handler.addFilter(zodbupdate.main.duplicate_filter)
 
     log_file = logging.FileHandler(options.log_file)
-    formatter = logging.Formatter(
-            "%(asctime)s %(levelname)s %(name)s %(message)s",
-            "%Y-%m-%d %H:%M:%S")
-    log_file.setFormatter(formatter)
+    log_file.addFilter(zodbupdate.main.duplicate_filter)
+    log_file.setFormatter(utils.formatter)
     root.addHandler(log_file)
 
     from AccessControl import SpecialUsers
