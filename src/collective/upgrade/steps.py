@@ -57,10 +57,11 @@ def uninstallAddOns(context, addons=None):
     uninstalled.
     """
     qi = getToolByName(context, 'portal_quickinstaller')
-    for product in qi.listInstalledProducts():
+    for product in qi.listInstallableProducts(skipInstalled=False):
         addon = product['id']
-        if addons is not None and addon not in addons:
-            continue
+        if addons is not None:
+            if addon not in addons:
+                continue
         elif qi.isProductInstallable(addon):
             continue
         
@@ -87,7 +88,8 @@ def uninstallAddOns(context, addons=None):
                 continue
             logger.info('Clearing the %r profile version %r for %r' %
                         (profile, version, setup))
-            setup.setLastVersionForProfile(profile, 'unknown')
+            del setup._profile_upgrade_versions[profile]
+            setup._p_changed = True
 
         assert not qi.isProductInstalled(addon)
 
