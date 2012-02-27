@@ -34,7 +34,25 @@ Add another part like so::
 Then, after running buildout, you can upgrade all Plone portals and
 their add-ons with::
 
-    $ bin/upgrade-portals -z parts/instance1/etc/zope.conf -l var/log/upgrade.log
+    $ bin/upgrade-portals --zope-conf=parts/instance1/etc/zope.conf --log-file=var/log/upgrade.log
+
+Use the `--help` option for more details::
+
+    $ bin/upgrade-portals --help
+    Usage: upgrade-portals [options]
+    
+    Options:
+      -h, --help            show this help message and exit
+      -l FILE, --log-file=FILE
+                            Log upgrade messages, filterd for duplicates, to FILE
+      -p PATH, --portal-path=PATH
+                            Run upgrades for the portals at the given paths only.
+                            May be given multiple times to specify multiple portals.
+                            If not given, all CMF portals in the Zope app will be
+                            upgraded.
+      -z FILE, --zope-conf=FILE
+                            The "zope.conf" FILE to use when starting the Zope2 app.
+                            Can be omitted when used as a zopectl "run" script.
 
 Incremental Commits
 -------------------
