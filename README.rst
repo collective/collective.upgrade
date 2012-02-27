@@ -55,7 +55,7 @@ Add another part like so::
     ...
 
 Then, after running buildout, you can upgrade all Plone portals and
-their add-ons and monitor the progress in `var/log/upgrade.log` with::
+their add-ons and monitor the progress in ``var/log/upgrade.log`` with::
 
     $ bin/upgrade-portals
 
@@ -65,7 +65,7 @@ your browser::
 
     http://localhost:8080/@@collective.upgrade.form
 
-Use the `--help` option for more details::
+Use the ``--help`` option for more details::
 
     $ bin/upgrade-portals --help
     Usage: upgrade-portals [options]
@@ -92,25 +92,25 @@ consuming.  It's also unsafe, however, to commit the results of an
 upgrade that failed in the middle since there's no way to guarantee of
 cleanup the partial execution of an upgrade step.
 
-Fortunately, the upgrade step support for `Products.GenericSetup`
+Fortunately, the upgrade step support for ``Products.GenericSetup``
 profiles provides a good way to incrementally commit upgrade progress
 in a way that much less risky and can save a lot of time in the
 upgrade troubleshooting and debugging process.
 
-The core of `collective.upgrade` are upgrader classes which support
+The core of ``collective.upgrade`` are upgrader classes which support
 incremental upgrading of a portal using GenericSetup profiles.
 Upgrade starts with the portal's base profile and then proceeds to
 upgrade all the other installed profiles.  While processing each
 profile, it commits at the last successful profile version reached but
 aborting any set of upgrade steps that did not succeed.
 
-In other words, each time a `collective.upgrade` upgrader runs, it
+In other words, each time a ``collective.upgrade`` upgrader runs, it
 will pick up from the last successful profile version reached without
 having to repeat what has already succeeded.
 
 To use this upgrader you can simply visit the
-`@@collective.upgrade.form` view on the portal to upgrade.
-Alternatively, you can use the `upgrade-portals` console script
+``@@collective.upgrade.form`` view on the portal to upgrade.
+Alternatively, you can use the ``upgrade-portals`` console script
 described in the `Quick Start`_ section.
 
 Multiple Portals
@@ -123,7 +123,7 @@ possible to specify the paths of the portals to upgrade.
 
 It uses the same incremental commit support described above for each
 portal and commits after each portal and can also be run using the
-`@@collective.upgrade.form` view on the container of the portals to
+``@@collective.upgrade.form`` view on the container of the portals to
 upgrade or using the console script described in the `Quick Start`_
 section.
 
@@ -136,7 +136,7 @@ browser.  This script also logs upgrade messages to a separate log
 file filtering for duplicates to make the upgrade process much easier
 to monitor and review for any unexpected issues.
 
-Use the `--help` option of the script or see the  `Quick Start`_
+Use the ``--help`` option of the script or see the  `Quick Start`_
 section for details.
 
 Upgrade Steps
@@ -160,13 +160,13 @@ a particular Plone upgrade is helped by registering one of the
 existing steps or a new step, let me know and I'll likely add it to
 the registrations in this package.
 
-Including `experimental.broken` while running the upgrade steps for
+Including ``experimental.broken`` while running the upgrade steps for
 cleaning up broken objects is probably a better idea than not doing
 so.
 
-Helper functions are also available in the `collective.upgrade.steps`
+Helper functions are also available in the ``collective.upgrade.steps``
 module.  These helpers are all meant to be used when writing your own
-upgrades steps.  See the `collective.upgrade.steps` source for
+upgrades steps.  See the ``collective.upgrade.steps`` source for
 details:
 
   * delete custom skin objects
