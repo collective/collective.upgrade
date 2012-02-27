@@ -122,7 +122,10 @@ tree applying the upgrade to each CMF portal found.  It is also
 possible to specify the paths of the portals to upgrade.
 
 It uses the same incremental commit support described above for each
-portal and commits after each portal.
+portal and commits after each portal and can also be run using the
+`@@collective.upgrade.form` view on the container of the portals to
+upgrade or using the console script described in the `Quick Start`_
+section.
 
 Command-line Script
 -------------------
@@ -132,6 +135,9 @@ and used to run the multiple portal upgrade process without using the
 browser.  This script also logs upgrade messages to a separate log
 file filtering for duplicates to make the upgrade process much easier
 to monitor and review for any unexpected issues.
+
+Use the `--help` option of the script or see the  `Quick Start`_
+section for details.
 
 Upgrade Steps
 -------------
@@ -147,6 +153,16 @@ to 4.0 upgrade which do the following:
   * migrate cmfeditions folder versions to btrees
   * cleanup duplicate UIDs
   * set default editor for all users
+
+Registered for the 3.* to 4.0 upgrade by default, these steps can be
+registered for any upgrade you might need them for.  If you find that
+a particular Plone upgrade is helped by registering one of the
+existing steps or a new step, let me know and I'll likely add it to
+the registrations in this package.
+
+Including `experimental.broken` while running the upgrade steps for
+cleaning up broken objects is probably a better idea than not doing
+so.
 
 Helper functions are also available in the `collective.upgrade.steps`
 module.  These helpers are all meant to be used when writing your own
