@@ -27,7 +27,7 @@ class PortalUpgrader(utils.Upgrader):
         self.commit()
 
     def upgradeProfile(self, profile_id):
-        upgrades = list(self.listUpgrades(profile_id))
+        upgrades = self.listUpgrades(profile_id)
         if not upgrades:
             self.log('Nothing to upgrade for profile %r' % profile_id)
             return
@@ -35,39 +35,50 @@ class PortalUpgrader(utils.Upgrader):
             transaction.begin()
             self.doUpgrades(profile_id, upgrades)
             self.commit()
-            upgrades = list(self.listUpgrades(profile_id))
+            upgrades = self.listUpgrades(profile_id)
         else:
             self.log('Finished upgrading %r profile' % profile_id)
 
     def listUpgrades(self, profile_id):
         """Return only the upgrade steps needed to get to the next version."""
-        # TODO Handle 'unknown' versions.  For some reason if
-        # setup.getLastVersionForProfile(profile_id) == 'unknown'
-        # then all upgrade steps for all versions of the profile up to
-        # the current version are marked 'proposed' so we lose
-        # incremental committing for those profiles.
+        all_upgrades = list(self.flattenUpgrades(profile_id))
+        if not all_upgrades:
+            return all_upgrades
+        upgrades = [all_upgrades[0]]
+        dest = upgrades[0]['dest']
+        for info in all_upgrades[1:]:
+            if info['dest'] == dest:
+                upgrades.append(info)
+            else:
+                break
+
+        return upgrades
+
+    def flattenUpgrades(self, profile_id):
         for info in self.setup.listUpgrades(profile_id):
             if type(info) == list:
                 for subinfo in info:
-                    if subinfo['proposed']:
-                        yield subinfo
+                    yield subinfo
             elif info['proposed']:
                 yield info
-
+                
     def doUpgrades(self, profile_id, steps_to_run):
         """Perform all selected upgrade steps.
         """
         step = None
+        if steps_to_run:
+            self.log("Upgrading profile %r to %r" %
+                     (profile_id, steps_to_run[0].sdest))
         for step in steps_to_run:
             step = _upgrade_registry.getUpgradeStep(profile_id, step['id'])
             if step is not None:
-                self.log("Running upgrade step %s for profile %s: %r"
-                         % (step.title, profile_id, step.__dict__))
+                self.log("Running upgrade step %r for profile %r."
+                         % (step.title, profile_id))
                 step.doStep(self.setup)
                 self.log("Ran upgrade step %s for profile %s"
                          % (step.title, profile_id))
 
-        self.log("Upgraded profile %r to %r" % (profile_id, step.dest))
+        self.log("Upgraded profile %r to %r" % (profile_id, step.sdest))
         # We update the profile version to the last one we have reached
         # with running an upgrade step.
         if step and step.dest is not None and step.checker is None:
@@ -75,7 +86,7 @@ class PortalUpgrader(utils.Upgrader):
         else:
             raise ValueError(
                 'Upgrade steps %r finished for profile %r but no new version '
-                '%r recorded.' % (steps_to_run, profile_id, step.dest))
+                '%r recorded.' % (steps_to_run, profile_id, step.sdest))
 
     def upgradeExtensions(self):
         for profile_id in self.setup.listProfilesWithUpgrades():
