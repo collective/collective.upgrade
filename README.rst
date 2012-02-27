@@ -19,22 +19,28 @@ Add another part like so::
 
     parts =
         ...
-        zopepy
+        upgrade
     ...
 
-    [zopepy]
-    recipe = zc.recipe.egg
-    eggs =
-        ${instance1:eggs}
+    [instance1]
+    ...
+    eggs = ...
         collective.upgrade
-    interpreter = zopepy
+    ...
 
+    [upgrade]
+    recipe = zc.recipe.egg
+    eggs = ${instance1:eggs}
+    scripts = upgrade-portals
+    arguments = args=[
+        '--zope-conf', '${instance1:location}/etc/zope.conf',
+        '--log-file', '${buildout:directory}/var/log/upgrade.log']
     ...
 
 Then, after running buildout, you can upgrade all Plone portals and
 their add-ons with::
 
-    $ bin/upgrade-portals --zope-conf=parts/instance1/etc/zope.conf --log-file=var/log/upgrade.log
+    $ bin/upgrade-portals
 
 Use the `--help` option for more details::
 
