@@ -38,7 +38,7 @@ Add another part like so::
     ...
 
 Then, after running buildout, you can upgrade all Plone portals and
-their add-ons with::
+their add-ons and monitor the progress in `var/log/upgrade.log` with::
 
     $ bin/upgrade-portals
 
