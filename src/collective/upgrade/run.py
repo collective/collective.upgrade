@@ -17,7 +17,7 @@ from collective.upgrade import utils
 parser = optparse.OptionParser()
 parser.add_option(
     "-l", "--log-file", metavar="FILE", default='upgrade.log',
-    help="Log upgrade messages, filterd for duplicates, to FILE")
+    help="Log upgrade messages, filtered for duplicates, to FILE")
 parser.add_option(
     "-p", "--portal-path", metavar="PATH", action="append",
     help="Run upgrades for the portals at the given paths only.  "

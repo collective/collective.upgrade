@@ -44,7 +44,7 @@ Use the `--help` option for more details::
     Options:
       -h, --help            show this help message and exit
       -l FILE, --log-file=FILE
-                            Log upgrade messages, filterd for duplicates, to FILE
+                            Log upgrade messages, filtered for duplicates, to FILE
       -p PATH, --portal-path=PATH
                             Run upgrades for the portals at the given paths only.
                             May be given multiple times to specify multiple portals.
