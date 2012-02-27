@@ -108,6 +108,11 @@ In other words, each time a `collective.upgrade` upgrader runs, it
 will pick up from the last successful profile version reached without
 having to repeat what has already succeeded.
 
+To use this upgrader you can simply visit the
+`@@collective.upgrade.form` view on the portal to upgrade.
+Alternatively, you can use the `upgrade-portals` console script
+described in the `Quick Start`_ section.
+
 Multiple Portals
 ----------------
 
