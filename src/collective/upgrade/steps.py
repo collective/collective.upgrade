@@ -48,16 +48,22 @@ def uninstallAddOns(context, addons=None):
             profile = uninstall_profiles[0]
             logger.info(
                 'Uninstalling the %r add-on for %r using the %r profile'
-                % (addon, qi, profile))
+                % (addon, setup, profile))
             setup.runAllImportStepsFromProfile('profile-%s' % profile)
             qi.manage_delObjects([addon])
         else:
+            logger.info('Uninstalling the %r add-on for %r' % (addon, qi))
             qi.uninstallProducts([addon])
+
         for profile in install_profiles:
-            if setup.getLastVersionForProfile(profile) == 'unknown':
+            version = setup.getLastVersionForProfile(profile)
+            if version == 'unknown':
                 # Not installed, no need to remove
                 continue
+            logger.info('Clearing the %r profile version %r for %r' %
+                        (profile, version, setup))
             setup.setLastVersionForProfile(profile, 'unknown')
+
         assert not qi.isProductInstalled(addon)
 
 
