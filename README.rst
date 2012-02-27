@@ -97,12 +97,16 @@ profiles provides a good way to incrementally commit upgrade progress
 in a way that much less risky and can save a lot of time in the
 upgrade troubleshooting and debugging process.
 
-The core of `collective.upgrade` is a form that supports incremental
-upgrading of a portal using generic profiles.  Upgrade starts with
-the portal's base profile and then proceeds to upgrade all the other
-installed profiles.  While processing each profile, it commits at the
-last successful profile version reached but aborting any set of
-upgrade steps that did not succeed.
+The core of `collective.upgrade` are upgrader classes which support
+incremental upgrading of a portal using GenericSetup profiles.
+Upgrade starts with the portal's base profile and then proceeds to
+upgrade all the other installed profiles.  While processing each
+profile, it commits at the last successful profile version reached but
+aborting any set of upgrade steps that did not succeed.
+
+In other words, each time a `collective.upgrade` upgrader runs, it
+will pick up from the last successful profile version reached without
+having to repeat what has already succeeded.
 
 Multiple Portals
 ----------------
