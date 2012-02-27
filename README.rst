@@ -140,7 +140,9 @@ to 4.0 upgrade which do the following:
   * set default editor for all users
 
 Helper functions are also available in the `collective.upgrade.steps`
-module to:
+module.  These helpers are all meant to be used when writing your own
+upgrades steps.  See the `collective.upgrade.steps` source for
+details:
 
   * delete custom skin objects
   * uninstall add-ons
