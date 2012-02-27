@@ -4,7 +4,13 @@ collective.upgrade
 This package provides helpers for upgrading CMF portals, such as Plone
 sites, supporting incremental commits, upgrading multiple portals at
 once, and a command-line script for upgrading scripts outside the
-browser.
+browser with post-mortem debugging of errors.  Together, these
+features greatly reduce the amount of time spent on each iteration of
+developing your upgrade steps.
+
+Also included are a number of upgrade steps for cleaning up messy
+portals during upgrades including cleaning up broken objects,
+components and registrations.
 
 CAUTION
 -------
@@ -115,3 +121,24 @@ and used to run the multiple portal upgrade process without using the
 browser.  This script also logs upgrade messages to a separate log
 file filtering for duplicates to make the upgrade process much easier
 to monitor and review for any unexpected issues.
+
+Upgrade Steps
+-------------
+
+This package also registers additional upgrade steps for the Plone 3.*
+to 4.0 upgrade which do the following:
+
+  * cleanup broken OFS objects
+  * cleanup broken TextIndexes objects
+  * cleanup broken component registrations
+  * cleanup broken setup registrations
+  * cleanup broken cmfeditions versions
+  * migrate cmfeditions folder versions to btrees
+  * cleanup duplicate UIDs
+  * set default editor for all users
+
+Helper functions are also available in the `collective.upgrade.steps`
+module to:
+
+  * delete custom skin objects
+  * uninstall add-ons
