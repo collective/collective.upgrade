@@ -18,6 +18,7 @@ class PortalUpgrader(utils.Upgrader):
         # Do the baseline profile upgrade first
         baseline = self.setup.getBaselineContextID()
         prof_type, profile_id = baseline.split('-', 1)
+        self.base_profile = profile_id
         self.upgradeProfile(profile_id)
 
         # Upgrade extension profiles
@@ -92,6 +93,8 @@ class PortalUpgrader(utils.Upgrader):
 
     def upgradeExtensions(self):
         for profile_id in self.setup.listProfilesWithUpgrades():
+            if profile_id == self.base_profile:
+                continue
             if self.isProfileInstalled(profile_id):
                 self.upgradeProfile(profile_id)
 
