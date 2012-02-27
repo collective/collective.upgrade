@@ -4,7 +4,7 @@ from collective.upgrade import utils
 class PortalsUpgrader(utils.Upgrader):
     """Upgrades multiple portals in an instance."""
 
-    def upgrade(self, paths=[]):
+    def upgrade(self, paths=[], **kw):
         if paths:
             upgraders = (
                 self.context.restrictedTraverse(
@@ -14,7 +14,7 @@ class PortalsUpgrader(utils.Upgrader):
             upgraders = self.walkUpgraders(self.context)
                             
         for upgrader in upgraders:
-            upgrader.upgrade()
+            upgrader.upgrade(**kw)
 
     def walkUpgraders(self, context):
         for obj in context.objectValues():

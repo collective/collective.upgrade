@@ -10,7 +10,7 @@ from collective.upgrade import utils
 
 class PortalUpgrader(utils.Upgrader):
 
-    def upgrade(self):
+    def upgrade(self, **kw):
         hooks.setSite(self.context)
         self.setup = getToolByName(self.context, 'portal_setup')
         self.log('Upgrading {0}'.format(self.context))
