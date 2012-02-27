@@ -78,15 +78,17 @@ class PortalUpgrader(utils.Upgrader):
                 self.log("Ran upgrade step %s for profile %s"
                          % (step.title, profile_id))
 
-        self.log("Upgraded profile %r to %r" % (profile_id, step.sdest))
+        self.log("Upgraded profile %r to %r" %
+                 (profile_id, '.'.join(step.dest)))
         # We update the profile version to the last one we have reached
         # with running an upgrade step.
         if step and step.dest is not None and step.checker is None:
             self.setup.setLastVersionForProfile(profile_id, step.dest)
         else:
             raise ValueError(
-                'Upgrade steps %r finished for profile %r but no new version '
-                '%r recorded.' % (steps_to_run, profile_id, step.sdest))
+                'Upgrade steps %r finished for profile %r '
+                'but no new version %r recorded.' %
+                (steps_to_run, profile_id, '.'.join(step.dest)))
 
     def upgradeExtensions(self):
         for profile_id in self.setup.listProfilesWithUpgrades():
