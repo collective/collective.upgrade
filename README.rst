@@ -132,9 +132,13 @@ Command-line Script
 
 This package also provides a runnable script which can be installed
 and used to run the multiple portal upgrade process without using the
-browser.  This script also logs upgrade messages to a separate log
-file filtering for duplicates to make the upgrade process much easier
-to monitor and review for any unexpected issues.
+browser.  The script logs upgrade messages to a separate log file
+filtering for duplicates to make the upgrade process much easier to
+monitor and review for any unexpected issues.  If the upgrade raises
+an exception, the upgrader will abort the transaction and the console
+script will invoke ``pdb.post_mortem()`` to allow inspecting the
+error.  Together, these features make the console script a much faster
+way to iterate through the development of an upgrade procedure.
 
 Use the ``--help`` option of the script or see the  `Quick Start`_
 section for details.
