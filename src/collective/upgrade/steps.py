@@ -40,12 +40,12 @@ def uninstallAddOns(context, addons=None):
             continue
         
         qi._getOb(addon).locked = False
-        uninstall_profiles = [
-            profile for profile in qi.getInstallProfiles(addon)
-            if profile.split(':', 1) == 'uninstall']
+        install_profiles = qi.getInstallProfiles(addon)
+        uninstall_profiles = [profile for profile in install_profiles
+                              if profile.split(':', 1) == 'uninstall']
+        setup = getToolByName(context, 'portal_setup')
         if uninstall_profiles:
             profile = uninstall_profiles[0]
-            setup = getToolByName(context, 'portal_setup')
             logger.info(
                 'Uninstalling the %r add-on for %r using the %r profile'
                 % (addon, qi, profile))
@@ -53,6 +53,11 @@ def uninstallAddOns(context, addons=None):
             qi.manage_delObjects([addon])
         else:
             qi.uninstallProducts([addon])
+        for profile in install_profiles:
+            if setup.getLastVersionForProfile(profile) == 'unknown':
+                # Not installed, no need to remove
+                continue
+            setup.setLastVersionForProfile(profile, 'unknown')
         assert not qi.isProductInstalled(addon)
 
 
