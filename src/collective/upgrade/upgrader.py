@@ -24,6 +24,7 @@ class PortalUpgrader(utils.Upgrader):
         self.upgradeExtensions()
 
         self.log('Upgraded {0}'.format(self.context))
+        self.commit()
 
     def upgradeProfile(self, profile_id):
         upgrades = list(self.listUpgrades(profile_id))
