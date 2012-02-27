@@ -68,7 +68,7 @@ class PortalUpgrader(utils.Upgrader):
         step = None
         if steps_to_run:
             self.log("Upgrading profile %r to %r" %
-                     (profile_id, steps_to_run[0].sdest))
+                     (profile_id, steps_to_run[0]['sdest']))
         for step in steps_to_run:
             step = _upgrade_registry.getUpgradeStep(profile_id, step['id'])
             if step is not None:
