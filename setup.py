@@ -30,6 +30,7 @@ setup(name='collective.upgrade',
           'setuptools',
           # -*- Extra requirements: -*-
           'zodbupdate',
+          'experimental.broken',
           'Products.GenericSetup',
           'Products.CMFCore',
       ],
