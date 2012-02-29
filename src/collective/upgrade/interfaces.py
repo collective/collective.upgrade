@@ -17,6 +17,6 @@ class IUpgrader(interface.Interface):
     def log(msg, level=None, template=None):
         """Log a message using the template and level."""
 
-    def commit():
-        """Do a 'transaction.commit()' of upgrade progess with a log message"""
+    def commit(note='Checkpointing upgrade'):
+        """Commit with a transaction note and log a message."""
 

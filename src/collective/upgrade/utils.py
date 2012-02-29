@@ -1,5 +1,7 @@
 import logging
 
+import transaction
+
 from zope import interface
 from zope.publisher import browser
 
@@ -52,8 +54,11 @@ class Upgrader(browser.BrowserView):
         msg = template.format(msg=msg, **self.__dict__)
         self.logger.log(level, msg)
 
-    def commit(self):
-        """Commit and log a message"""
-        self.log('Committing transaction')
-        self.tm.recordMetaData(self.context, self.request)
+    def commit(self, note='Checkpointing upgrade'):
+        """Commit with a transaction note and log a message."""
+        self.log(note)
+        self.tm.recordMetaData(self, self.request)
+        if note is not None:
+            t = transaction.get()
+            t.note(str(note))
         self.tm.commit()

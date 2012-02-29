@@ -23,7 +23,6 @@ class PortalUpgrader(utils.Upgrader):
         self.upgradeExtensions()
 
         self.log('Upgraded {0}'.format(self.context))
-        self.commit()
 
     def upgradeProfile(self, profile_id):
         upgrades = self.listUpgrades(profile_id)
@@ -31,9 +30,7 @@ class PortalUpgrader(utils.Upgrader):
             self.log('Nothing to upgrade for profile %r' % profile_id)
             return
         while upgrades:
-            self.tm.begin()
             self.doUpgrades(profile_id, upgrades)
-            self.commit()
             upgrades = self.listUpgrades(profile_id)
         else:
             self.log('Finished upgrading %r profile' % profile_id)
@@ -68,6 +65,7 @@ class PortalUpgrader(utils.Upgrader):
         if steps_to_run:
             self.log("Upgrading profile %r to %r" %
                      (profile_id, steps_to_run[0]['sdest']))
+        self.tm.begin()
         for step in steps_to_run:
             step = _upgrade_registry.getUpgradeStep(profile_id, step['id'])
             if step is not None:
@@ -77,8 +75,6 @@ class PortalUpgrader(utils.Upgrader):
                 self.log("Ran upgrade step %s for profile %s"
                          % (step.title, profile_id))
 
-        self.log("Upgraded profile %r to %r" %
-                 (profile_id, '.'.join(step.dest)))
         # We update the profile version to the last one we have reached
         # with running an upgrade step.
         if step and step.dest is not None and step.checker is None:
@@ -88,6 +84,9 @@ class PortalUpgrader(utils.Upgrader):
                 'Upgrade steps %r finished for profile %r '
                 'but no new version %r recorded.' %
                 (steps_to_run, profile_id, '.'.join(step.dest)))
+
+        self.commit("Upgraded profile %r to %r" %
+                    (profile_id, '.'.join(step.dest)))
 
     def upgradeExtensions(self):
         for profile_id in self.setup.listProfilesWithUpgrades():
