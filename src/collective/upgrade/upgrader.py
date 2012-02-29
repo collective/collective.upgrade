@@ -1,7 +1,5 @@
 from zope.component import hooks
 
-import transaction
-
 from Products.CMFCore.utils import getToolByName
 from Products.GenericSetup.upgrade import _upgrade_registry
 
@@ -33,7 +31,7 @@ class PortalUpgrader(utils.Upgrader):
             self.log('Nothing to upgrade for profile %r' % profile_id)
             return
         while upgrades:
-            transaction.begin()
+            self.tm.begin()
             self.doUpgrades(profile_id, upgrades)
             self.commit()
             upgrades = self.listUpgrades(profile_id)

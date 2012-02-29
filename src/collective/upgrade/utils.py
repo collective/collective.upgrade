@@ -1,11 +1,11 @@
 import logging
 
-import transaction
-
 from zope import interface
 from zope.publisher import browser
 
 import zodbupdate.main
+
+import Zope2
 
 from collective.upgrade import interfaces
 
@@ -22,6 +22,7 @@ class Upgrader(browser.BrowserView):
 
     def __init__(self, context, request=None):
         super(Upgrader, self).__init__(context, request)
+        self.tm = Zope2.zpublisher_transactions_manager
 
     def __call__(self):
         """Do the actual upgrade work."""
@@ -54,4 +55,5 @@ class Upgrader(browser.BrowserView):
     def commit(self):
         """Commit and log a message"""
         self.log('Committing transaction')
-        transaction.commit()
+        self.tm.recordMetaData(self.context, self.request)
+        self.tm.commit()
