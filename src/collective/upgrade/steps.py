@@ -1,10 +1,13 @@
 import logging
 import re
 
-from Acquisition import aq_base
+from Acquisition import aq_base, aq_parent
 from Products.PluginIndexes.FieldIndex import FieldIndex
 
 from Products.CMFCore.utils import getToolByName
+
+from plone.uuid import interfaces as uuid_ifaces
+from Products.Archetypes import interfaces as at_ifaces
 
 from collective.upgrade import utils
 
@@ -212,3 +215,29 @@ def setDefaultEditor(context, wanted_editor='', dry_run=False):
     from collective.setdefaulteditor.utils import set_editor_for_all
     # Assumes the zope.component.hooks site has already been set
     set_editor_for_all(wanted_editor, dry_run)
+
+
+class ReferenceTargetCleaner(utils.Upgrader):
+    """Walk through all the reference objects and remove those whose
+    targets can't be found."""
+
+    def upgrade(self):
+        self.ref_catalog = getToolByName(self.context, 'reference_catalog')
+        self.context.ZopeFindAndApply(
+            self.context, search_sub=1, apply_func=self.upgradeObj)
+        
+    def upgradeObj(self, obj, path=None):
+        if not at_ifaces.IReferenceable.providedBy(obj):
+            return
+        for ref in self.ref_catalog.getReferences(obj):
+            if ref.getTargetObject() is None:
+                ref_id = uuid_ifaces.IUUID(ref)
+                self.log('Removing reference %r with missing target: %r'
+                         % (ref_id, ref))
+                aq_parent(ref)._delOb(ref_id)
+
+
+def cleanupMissingReferenceTargets(context):
+    url = getToolByName(context, 'portal_url')
+    upgrader = ReferenceTargetCleaner(url.getPortalObject())
+    upgrader.upgrade()

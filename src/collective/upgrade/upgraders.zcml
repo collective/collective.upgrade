@@ -13,6 +13,6 @@
   <browser:page name="collective.upgrade.form"
                 for="Products.CMFPlone.interfaces.IPloneSiteRoot"
                 permission="cmf.ManagePortal"
-                class=".plone.PloneUpgrader" />
+                class=".ploneupgrader.PloneUpgrader" />
 
 </configure>
