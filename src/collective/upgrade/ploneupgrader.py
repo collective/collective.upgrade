@@ -6,6 +6,8 @@ from Products.CMFPlone import interfaces as plone_ifaces
 
 from collective.upgrade import upgrader
 
+_marker = object()
+
 
 class PloneUpgrader(upgrader.PortalUpgrader):
     component.adapts(plone_ifaces.IPloneSiteRoot)
@@ -16,6 +18,27 @@ class PloneUpgrader(upgrader.PortalUpgrader):
         migration.getInstanceVersion()
 
         return super(PloneUpgrader, self).__call__()
+
+    def upgradeProfile(self, profile_id,
+                       enable_link_integrity_checks=_marker, **kw):
+        upgradeProfile = super(PloneUpgrader, self).upgradeProfile
+
+        properties = getToolByName(self.context, 'portal_properties')
+        orig = properties.site_properties.getProperty(
+            'enable_link_integrity_checks', _marker)
+        if enable_link_integrity_checks is not _marker:
+            properties.site_properties.manage_changeProperties(
+                enable_link_integrity_checks=enable_link_integrity_checks)
+        try:
+            upgradeProfile(profile_id, **kw)
+        finally:
+            if enable_link_integrity_checks is not _marker:
+                if orig is _marker:
+                    properties.site_properties._delPropValue(
+                        enable_link_integrity_checks)
+                else:
+                    properties.site_properties.manage_changeProperties(
+                        enable_link_integrity_checks=orig)
 
     def isProfileInstalled(self, profile_id):
         installed = super(PloneUpgrader, self).isProfileInstalled(profile_id)

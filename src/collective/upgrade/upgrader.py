@@ -17,14 +17,14 @@ class PortalUpgrader(utils.Upgrader):
         baseline = self.setup.getBaselineContextID()
         prof_type, profile_id = baseline.split('-', 1)
         self.base_profile = profile_id
-        self.upgradeProfile(profile_id)
+        self.upgradeProfile(profile_id, **kw)
 
         # Upgrade extension profiles
-        self.upgradeExtensions()
+        self.upgradeExtensions(**kw)
 
         self.log('Upgraded {0}'.format(self.context))
 
-    def upgradeProfile(self, profile_id):
+    def upgradeProfile(self, profile_id, **kw):
         upgrades = self.listUpgrades(profile_id)
         if not upgrades:
             self.log('Nothing to upgrade for profile %r' % profile_id)
@@ -65,7 +65,6 @@ class PortalUpgrader(utils.Upgrader):
         if steps_to_run:
             self.log("Upgrading profile %r to %r" %
                      (profile_id, steps_to_run[0]['sdest']))
-        self.tm.begin()
         for step in steps_to_run:
             step = _upgrade_registry.getUpgradeStep(profile_id, step['id'])
             if step is not None:
@@ -88,12 +87,12 @@ class PortalUpgrader(utils.Upgrader):
         self.commit("Upgraded profile %r to %r" %
                     (profile_id, '.'.join(step.dest)))
 
-    def upgradeExtensions(self):
+    def upgradeExtensions(self, **kw):
         for profile_id in self.setup.listProfilesWithUpgrades():
             if profile_id == self.base_profile:
                 continue
             if self.isProfileInstalled(profile_id):
-                self.upgradeProfile(profile_id)
+                self.upgradeProfile(profile_id, **kw)
 
     def isProfileInstalled(self, profile_id):
         return self.setup.getLastVersionForProfile(profile_id) != 'unknown'

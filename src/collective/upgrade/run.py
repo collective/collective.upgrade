@@ -27,6 +27,10 @@ parser.add_option(
     "-z", "--zope-conf", metavar="FILE",
     help='The "zope.conf" FILE to use when starting the Zope2 app. '
     'Can be omitted when used as a zopectl "run" script.')
+parser.add_option(
+    "-d", "--disable-link-integrity", action="store_true",
+    help='When upgrading a portal using plone.app.linkintegrity, '
+    'disable it during the upgrade.')
 
 
 def main(app=None, args=None):
@@ -61,6 +65,10 @@ def main(app=None, args=None):
     log_file.setFormatter(utils.formatter)
     root.addHandler(log_file)
 
+    kw = dict(paths=options.portal_path)
+    if options.disable_link_integrity:
+        kw['enable_link_integrity_checks'] = False
+
     from AccessControl import SpecialUsers
     from AccessControl.SecurityManagement import newSecurityManager
     newSecurityManager(None, SpecialUsers.system)
@@ -69,7 +77,7 @@ def main(app=None, args=None):
 
     runner = app.restrictedTraverse('@@collective.upgrade.form')
     try:
-        runner.upgrade(options.portal_path)
+        runner.upgrade(**kw)
     except:
         transaction.abort()
         runner.logger.exception('Exception running the upgrades.')
