@@ -12,12 +12,12 @@ _marker = object()
 class PloneUpgrader(upgrader.PortalUpgrader):
     component.adapts(plone_ifaces.IPloneSiteRoot)
 
-    def __call__(self):
+    def upgrade(self, **kw):
         # May fix the profile version
         migration = getToolByName(self.context, 'portal_migration')
         migration.getInstanceVersion()
 
-        return super(PloneUpgrader, self).__call__()
+        return super(PloneUpgrader, self).upgrade(**kw)
 
     def upgradeProfile(self, profile_id,
                        enable_link_integrity_checks=_marker, **kw):
