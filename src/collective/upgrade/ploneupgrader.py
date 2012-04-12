@@ -17,7 +17,14 @@ class PloneUpgrader(upgrader.PortalUpgrader):
         migration = getToolByName(self.context, 'portal_migration')
         migration.getInstanceVersion()
 
-        return super(PloneUpgrader, self).upgrade(**kw)
+        result = super(PloneUpgrader, self).upgrade(**kw)
+
+        getToolByName(self.context, 'portal_css').cookResources()
+        getToolByName(self.context, 'portal_javascripts').cookResources()
+        getToolByName(self.context, 'portal_kss').cookResources()
+        self.log('Refreshed resource registries for {0}'.format(self.context))
+
+        return result
 
     def upgradeProfile(self, profile_id,
                        enable_link_integrity_checks=_marker, **kw):
