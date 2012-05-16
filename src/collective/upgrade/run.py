@@ -36,7 +36,7 @@ parser.add_option(
 def main(app=None, args=None):
     full_args = args
     if args is not None:
-        full_args = sys.argv[0:1] + args + sys.argv[1:]
+        full_args = args + sys.argv[1:]
     options, args = parser.parse_args(full_args)
     if args:
         parser.error('Unrecognized args given: %r' % args)
