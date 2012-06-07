@@ -118,8 +118,16 @@ class CMFEditionsUpgrader(utils.Upgrader):
         from Products.CMFEditions.interfaces.IArchivist import IVersionAwareReference
         self.reference_iface = IVersionAwareReference
 
-        for obj in self.walkVersionObjects():
-            self.recurse(obj)
+        update_catalogs = getattr(self, 'update_catalogs', None)
+        try:
+            self.update_catalogs = False
+            for obj in self.walkVersionObjects():
+                self.recurse(obj)
+        finally:
+            if update_catalogs is None:
+                del self.update_catalogs
+            else:
+                self.update_catalogs = update_catalogs
 
     def walkVersionObjects(self):
         repo = self.storage._getZVCRepo()
