@@ -134,7 +134,6 @@ class CMFEditionsUpgrader(utils.Upgrader):
         self.log('Begin cleaning up CMFEditions objects in %r' % self.storage)
         for history_id in repo._histories:
             history = repo.getVersionHistory(history_id)
-            self.log('Processing history %r' % history)
             for branch in history.objectValues():
                 for version_id in branch.versionIds():
                     version = history.getVersionById(version_id)
