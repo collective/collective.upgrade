@@ -3,6 +3,7 @@ import re
 
 from Acquisition import aq_base, aq_parent
 from Products.PluginIndexes.FieldIndex import FieldIndex
+from Products.ZCatalog.ProgressHandler import ZLogHandler
 
 from Products.CMFCore.utils import getToolByName
 
@@ -12,6 +13,13 @@ from Products.Archetypes import interfaces as at_ifaces
 from collective.upgrade import utils
 
 logger = logging.getLogger('collective.upgrade.steps')
+
+
+def catalogReindex(context):
+    catalog = getToolByName(context, 'portal_catalog')
+    pgthreshold = catalog._getProgressThreshold()
+    handler = (pgthreshold > 0) and ZLogHandler(pgthreshold) or None
+    catalog.refreshCatalog(clear=1, pghandler=handler)
 
 
 def deleteCustomSkinObjs(context, *obj_ids):
