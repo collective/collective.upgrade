@@ -121,8 +121,7 @@ class CMFEditionsUpgrader(utils.Upgrader):
         update_catalogs = getattr(self, 'update_catalogs', None)
         try:
             self.update_catalogs = False
-            for obj in self.walkVersionObjects():
-                self.recurse(obj)
+            self.walkVersionObjects()
         finally:
             if update_catalogs is None:
                 del self.update_catalogs
