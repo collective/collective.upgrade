@@ -39,7 +39,8 @@ def cleanupBrokenSetupRegistrations(context):
             required.pop(id_)
             setup._p_changed = True
 
-    for profile_id in setup.listProfiles():
+    for info in setup.listProfileInfo():
+        profile_id = info['id']
         # Update a broken import step depdendency in the
         # persisent registry which has been fixed in the
         # profile import_steps.xml
