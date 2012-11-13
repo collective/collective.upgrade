@@ -27,6 +27,7 @@ def cleanupBrokenComponents(context):
             component=reg.component, provided=reg.provided,
             name=reg.name)
 
+
 def cleanupBrokenSetupRegistrations(context):
     """Delete portal_setup registrations from missing add-ons."""
     setup = getToolByName(context, 'portal_setup')
