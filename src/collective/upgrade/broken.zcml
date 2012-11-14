@@ -1,0 +1,24 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="plone">
+
+  <genericsetup:upgradeSteps
+      source="*"
+      destination="4001"
+      profile="Products.CMFPlone:plone">
+    <genericsetup:upgradeStep
+        title="Cleanup missing component registrations."
+        handler=".broken.cleanupBrokenComponents" />
+    <genericsetup:upgradeStep
+        title="Cleanup missing portal_setup registrations."
+        handler=".broken.cleanupBrokenSetupRegistrations" />
+    <genericsetup:upgradeStep
+        title="Cleanup broken TextIndexes such as from TextIndexNG."
+        handler=".broken.cleanupBrokenTextIndexes" />
+    <genericsetup:upgradeStep
+        title="Cleanup broken objects."
+        handler=".broken.cleanupBrokenObjects" />
+  </genericsetup:upgradeSteps>
+
+</configure>
