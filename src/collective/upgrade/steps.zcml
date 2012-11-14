@@ -11,11 +11,17 @@
         title="Migrate CMFEditions folder versions."
         handler=".steps.migrateCMFEditionsFolderVersions" />
     <genericsetup:upgradeStep
-        title="Fix duplicate UIDs."
-        handler=".steps.fixDuplicateUIDs" />
-    <genericsetup:upgradeStep
         title="Set all users to use the deault editor."
         handler=".steps.setDefaultEditor" />
+  </genericsetup:upgradeSteps>
+
+  <genericsetup:upgradeSteps
+      source="4100"
+      destination="4101"
+      profile="Products.CMFPlone:plone">
+    <genericsetup:upgradeStep
+        title="Fix duplicate UIDs."
+        handler=".steps.fixDuplicateUIDs" />
   </genericsetup:upgradeSteps>
 
 </configure>
