@@ -57,7 +57,7 @@ class PortalUpgrader(utils.Upgrader):
                     yield subinfo
             elif info['proposed']:
                 yield info
-                
+
     def doUpgrades(self, profile_id, steps_to_run):
         """Perform all selected upgrade steps.
         """

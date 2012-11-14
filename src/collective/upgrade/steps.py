@@ -14,6 +14,8 @@ from collective.upgrade import utils
 
 logger = logging.getLogger('collective.upgrade.steps')
 
+_default_layers = []
+
 
 def catalogReindex(context):
     catalog = getToolByName(context, 'portal_catalog')
@@ -35,7 +37,6 @@ def deleteCustomSkinObjs(context, *obj_ids):
         % (skins.custom, del_ids))
 
 
-_default_layers = []
 def cleanupSkinLayers(context, remove_layers=_default_layers):
     skins = getToolByName(context, 'portal_skins')
     for theme in skins.getSkinSelections():
@@ -58,7 +59,7 @@ def cleanupSkinLayers(context, remove_layers=_default_layers):
             logger.info('Removing layers from theme %r for %r: %r'
                         % (theme, skins, diff))
             skins.addSkinSelection(theme, ','.join(found), test=1)
-        
+
 
 def uninstallAddOns(context, addons=None):
     """
@@ -75,7 +76,7 @@ def uninstallAddOns(context, addons=None):
                 continue
         elif qi.isProductInstallable(addon):
             continue
-        
+
         qi._getOb(addon).locked = False
         install_profiles = qi.getInstallProfiles(addon)
         uninstall_profiles = [profile for profile in install_profiles
@@ -115,7 +116,8 @@ class CMFEditionsUpgrader(utils.Upgrader):
                      'skipping CMFEditions cleanup')
             return
 
-        from Products.CMFEditions.interfaces.IArchivist import IVersionAwareReference
+        from Products.CMFEditions.interfaces.IArchivist import (
+            IVersionAwareReference)
         self.reference_iface = IVersionAwareReference
 
         update_catalogs = getattr(self, 'update_catalogs', None)
@@ -151,7 +153,8 @@ class CMFEditionsUpgrader(utils.Upgrader):
 class CMFEditionsFolderMigrator(CMFEditionsUpgrader):
 
     def upgrade(self):
-        from Products.BTreeFolder2.BTreeFolder2 import BTreeFolder2Base as BTreeFolder
+        from Products.BTreeFolder2.BTreeFolder2 import (
+            BTreeFolder2Base as BTreeFolder)
         from plone.app.folder.migration import BTreeMigrationView
         self.folder_class = BTreeFolder
         self.folder_migrator = BTreeMigrationView(self.context, None)
@@ -170,6 +173,7 @@ def migrateCMFEditionsFolderVersions(context):
 
 copy_id_re = re.compile(r'^copy[0-9]*_of_.*')
 
+
 def origKey(obj):
     """
     The object is assumed to be the original if:
@@ -181,6 +185,7 @@ def origKey(obj):
     return (obj.created(),
             copy_id_re.match(obj.getId()),
             len(obj.getPhysicalPath()))
+
 
 def fixDuplicateUIDs(context):
     """
@@ -212,7 +217,7 @@ def fixDuplicateUIDs(context):
             objs.append(obj)
         if not objs:
             continue
-            
+
         orig = min(objs, key=origKey)
         logger.info('Multiple objects found for UID %r, '
                     'assuming %r is the original' % (uid, orig))
@@ -239,7 +244,7 @@ class ReferenceTargetCleaner(utils.Upgrader):
         self.ref_catalog = getToolByName(self.context, 'reference_catalog')
         self.context.ZopeFindAndApply(
             self.context, search_sub=1, apply_func=self.upgradeObj)
-        
+
     def upgradeObj(self, obj, path=None):
         if not at_ifaces.IReferenceable.providedBy(obj):
             return
