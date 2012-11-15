@@ -54,4 +54,6 @@ class PloneUpgrader(upgrader.PortalUpgrader):
 
         product, profile = profile_id.split(':', 1)
         qi = getToolByName(self.context, 'portal_quickinstaller')
+        if product.startswith('Products.'):
+            product = product[len('Products.'):]
         return qi.isProductInstalled(product)
