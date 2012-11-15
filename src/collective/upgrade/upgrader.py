@@ -65,14 +65,14 @@ class PortalUpgrader(utils.Upgrader):
         if steps_to_run:
             self.log("Upgrading profile %r to %r" %
                      (profile_id, steps_to_run[0]['sdest']))
-        for step in steps_to_run:
-            step = _upgrade_registry.getUpgradeStep(profile_id, step['id'])
+        for info in steps_to_run:
+            step = _upgrade_registry.getUpgradeStep(profile_id, info['id'])
             if step is not None:
-                self.log("Running upgrade step %r for profile %r."
-                         % (step.title, profile_id))
+                msg = 'profile {0} from {ssource} to {sdest}: {title}'.format(
+                    profile_id, **info)
+                self.log("Running upgrade step for {0}.".format(msg))
                 step.doStep(self.setup)
-                self.log("Ran upgrade step %s for profile %s"
-                         % (step.title, profile_id))
+                self.log("Finished upgrade step for {0}.".format(msg))
 
         # We update the profile version to the last one we have reached
         # with running an upgrade step.
