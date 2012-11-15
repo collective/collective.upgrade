@@ -1,3 +1,5 @@
+import operator
+
 from zope.component import hooks
 
 from Products.CMFCore.utils import getToolByName
@@ -40,22 +42,20 @@ class PortalUpgrader(utils.Upgrader):
         all_upgrades = list(self.flattenUpgrades(profile_id))
         if not all_upgrades:
             return all_upgrades
-        upgrades = [all_upgrades[0]]
-        dest = upgrades[0]['dest']
-        for info in all_upgrades[1:]:
-            if info['dest'] == dest:
+        upgrades = []
+        dest = max(
+            all_upgrades, key=operator.itemgetter('proposed', 'dest'))['dest']
+        for info in all_upgrades:
+            if info['dest'] <= dest:
                 upgrades.append(info)
-            else:
-                break
-
         return upgrades
 
     def flattenUpgrades(self, profile_id):
         for info in self.setup.listUpgrades(profile_id):
-            if type(info) == list:
+            if isinstance(info, list):
                 for subinfo in info:
                     yield subinfo
-            elif info['proposed']:
+            else:
                 yield info
 
     def doUpgrades(self, profile_id, steps_to_run):
