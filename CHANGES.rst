@@ -4,7 +4,9 @@ Changelog
 0.3 - unreleased
 ----------------
 
-- no changes yet
+- Support Plone 4.3, tolerate a deleted KSS tool
+  [rpatterson]
+
 
 0.2 - 2012-11-14
 ----------------

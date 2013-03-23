@@ -21,7 +21,9 @@ class PloneUpgrader(upgrader.PortalUpgrader):
 
         getToolByName(self.context, 'portal_css').cookResources()
         getToolByName(self.context, 'portal_javascripts').cookResources()
-        getToolByName(self.context, 'portal_kss').cookResources()
+        portal_kss = getToolByName(self.context, 'portal_kss', None)
+        if portal_kss is not None:
+            portal_kss.cookResources()
         self.log('Refreshed resource registries for {0}'.format(self.context))
 
         return result
