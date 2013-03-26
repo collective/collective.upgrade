@@ -120,6 +120,8 @@ class UpgradeTesting(PloneSandboxLayer):
             'grault_source_group_id', title='Grault Source Group')
         source_groups.addPrincipalToGroup(
             'corge_source_user_id', 'grault_source_group_id')
+        source_groups.addPrincipalToGroup(
+            'corge_source_group_id', 'grault_source_group_id')
         dest_groups.addGroup(
             'grault_source_group_id', title='Grault Source Group')
         source_groups.addGroup(

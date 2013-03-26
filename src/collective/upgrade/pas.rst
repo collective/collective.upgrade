@@ -243,7 +243,7 @@ with: source group plugin memberships, ``OFS.owner.Owned`` owners,
 local roles, and CMF creators:
 
     >>> source_groups.getGroupMembers('grault_source_group_id')
-    ('corge_source_user_id',)
+    ('corge_source_group_id', 'corge_source_user_id')
     >>> portal.corge_doc
     <ATDocument at /plone/corge_doc>
     >>> portal.corge_doc.getOwner()
@@ -389,7 +389,7 @@ It applies those changes to: source group plugin memberships,
 ``OFS.owner.Owned`` owners, local roles, and CMF creators:
 
     >>> source_groups.getGroupMembers('grault_source_group_id')
-    ('corge_dest_user_id',)
+    ('corge_dest_group_id', 'corge_dest_user_id')
     >>> portal.corge_doc
     <ATDocument at /plone/corge_doc>
     >>> portal.corge_doc.getOwner()
