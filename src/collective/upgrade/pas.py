@@ -276,11 +276,13 @@ class ImportReconciler(Reconciler):
                 if source_id in contributors:
                     contributors[contributors.index(source_id)] = dest_id
 
-            if creators:
+            creators = tuple(creators)
+            if creators != orig_creators:
                 logger.info('Changing %r creators from %r to %r',
                             obj, orig_creators, creators)
                 obj.setCreators(creators)
-            if contributors:
+            contributors = tuple(contributors)
+            if contributors != orig_contributors:
                 logger.info('Changing %r contributors from %r to %r',
                             obj, orig_contributors, contributors)
                 obj.setContributors(contributors)
