@@ -199,9 +199,14 @@ class ImportReconciler(Reconciler):
     def import_rows(self):
         if hasattr(self.context, 'openDataFile'):
             csvfile = self.context.openDataFile(self.filename)
+            if csvfile is None:
+                return
         else:
+            datafile = self.context.readDataFile(self.filename)
+            if datafile is None:
+                return
             csvfile = tempfile.TemporaryFile()
-            csvfile.write(self.context.readDataFile(self.filename))
+            csvfile.write(datafile)
             csvfile.seek(0)
         reader = csv.DictReader(csvfile)
 
