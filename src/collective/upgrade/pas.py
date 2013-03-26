@@ -1,6 +1,7 @@
 import mimetypes
 import tempfile
 import csv
+import logging
 
 import transaction
 
@@ -11,6 +12,8 @@ from Products.PluggableAuthService.interfaces.plugins import (
     IPropertiesPlugin)
 
 from Products.CMFCore.utils import getToolByName
+
+logger = logging.getLogger('collective.upgrade.pas')
 
 
 class Reconciler(object):
@@ -228,6 +231,8 @@ class ImportReconciler(Reconciler):
                     continue
                 groups = groupmaker.getGroupsForPrincipal(source_principal)
                 for group in groups:
+                    logger.info('Changing group %r member from %r to %r',
+                                group, source_principal.getId(), dest_id)
                     groupmaker.addPrincipalToGroup(dest_id, group)
                     groupmaker.removePrincipalFromGroup(
                         source_principal.getId(), group)
@@ -241,21 +246,27 @@ class ImportReconciler(Reconciler):
 
             creators = getattr(obj, 'listCreators', [])
             if callable(creators):
-                creators = list(creators())
+                orig_creators = creators()
+                creators = list(orig_creators)
             contributors = getattr(obj, 'listContributors', [])
             if callable(contributors):
-                contributors = list(contributors())
+                orig_contributors = contributors()
+                contributors = list(orig_contributors)
 
             for source_id, dest_id in rows.iteritems():
                 # ownership
                 if (acl_users_path, source_id) == (
                     userdb_path, user_id):
+                    logger.info('Changing %r owner from %r to %r',
+                                obj, source_id, dest_id)
                     dest_principal = getPrincipalById(dest_id)
                     obj.changeOwnership(dest_principal)
 
                 # local roles
                 local_roles = obj.get_local_roles_for_userid(source_id)
                 if local_roles:
+                    logger.info('Changing %r local roles %r from %r to %r',
+                                obj, local_roles, source_id, dest_id)
                     obj.manage_addLocalRoles(dest_id, local_roles)
                     obj.manage_delLocalRoles([source_id])
 
@@ -266,8 +277,12 @@ class ImportReconciler(Reconciler):
                     contributors[contributors.index(source_id)] = dest_id
 
             if creators:
+                logger.info('Changing %r creators from %r to %r',
+                            obj, orig_creators, creators)
                 obj.setCreators(creators)
             if contributors:
+                logger.info('Changing %r contributors from %r to %r',
+                            obj, orig_contributors, contributors)
                 obj.setContributors(contributors)
 
         if rows:
