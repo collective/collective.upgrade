@@ -44,14 +44,25 @@ class UsersGroupsReconciler(object):
         self.dest_groups = self.acl_users._getOb(dest_groups_plugin)
 
     def export(self):
-        content_type = mimetypes.guess_type(self.filename)
-        csvfile = tempfile.TemporaryFile()
-        writer = csv.DictWriter(csvfile, self.fieldnames)
-        writer.writerow(dict((name, name) for name in self.fieldnames))
-        writer.writerows(self.get_user_rows())
-        writer.writerows(self.get_group_rows())
-        text = DataFile(csvfile)
-        self.context.writeDataFile(self.filename, text, content_type)
+        if hasattr(self.context, 'openDataFile'):
+            csvfile = self.context.openDataFile(self.filename)
+        else:
+            csvfile = tempfile.TemporaryFile()
+
+        try:
+            content_type = mimetypes.guess_type(self.filename)
+            writer = csv.DictWriter(csvfile, self.fieldnames)
+            writer.writerow(dict((name, name) for name in self.fieldnames))
+            writer.writerows(self.get_user_rows())
+            writer.writerows(self.get_group_rows())
+
+            if not hasattr(self.context, 'openDataFile'):
+                csvfile.seek(0)
+                self.context.writeDataFile(
+                    self.filename, csvfile.read(), content_type)
+
+        finally:
+            csvfile.close()
 
     def get_user_rows(self):
         seen = set()
