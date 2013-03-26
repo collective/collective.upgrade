@@ -371,19 +371,30 @@ of user and group ``id`` values:
 
     >>> import os
     >>> import collective.upgrade
-    >>> print open(os.path.join(
+
+    >>> import_users_csvfile = open(os.path.join(
     ...     os.path.dirname(collective.upgrade.__file__),
-    ...     'profiles', 'test', 'reconcile_users_groups.csv')).read()
-    Source Plugin ID,Source ID,Destination Plugin ID,Destination ID,Destination Duplicate IDs
-    mutable_properties,corge_source_user_id,dest_users,corge_dest_user_id,
-    mutable_properties,corge_source_user_id,dest_users,bar_dest_user_id,baz_dest_user_id
-    mutable_properties,qux_source_user_id,dest_users,qux_dest_user_id,
-    source_groups,corge_source_group_id,dest_groups,corge_dest_group_id,
-    source_groups,corge_source_group_id,dest_groups,bar_dest_group_id,baz_dest_group_id
-    source_groups,qux_source_group_id,dest_users,qux_dest_group_id,
-    >>> portal_setup.runImportStepFromProfile(
-    ...     'profile-collective.upgrade:test', 'reconcile_users_groups',
-    ...     run_dependencies=False)
+    ...     'profiles', 'testing', 'reconcile_users.csv'))
+    >>> import_users_mappings = pf(list(csv.DictReader(import_users_csvfile)))
+    >>> import_users_mappings == export_users_mappings
+    True
+    >>> pp(portal_setup.runImportStepFromProfile(
+    ...     'profile-collective.upgrade:testing', 'reconcile_users',
+    ...     run_dependencies=False))
+    {'messages': {'reconcile_users': ''},
+     'steps': ['reconcile_users']}
+
+    >>> import_groups_csvfile = open(os.path.join(
+    ...     os.path.dirname(collective.upgrade.__file__),
+    ...     'profiles', 'testing', 'reconcile_groups.csv'))
+    >>> import_groups_mappings = pf(list(csv.DictReader(import_groups_csvfile)))
+    >>> import_groups_mappings == export_groups_mappings
+    True
+    >>> pp(portal_setup.runImportStepFromProfile(
+    ...     'profile-collective.upgrade:testing', 'reconcile_groups',
+    ...     run_dependencies=False))
+    {'messages': {'reconcile_groups': ''},
+     'steps': ['reconcile_groups']}
 
 It applies those changes to: source group plugin memberships,
 ``OFS.owner.Owned`` owners, local roles, and CMF creators:

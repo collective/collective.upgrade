@@ -21,6 +21,26 @@
       handler=".pas.reconcileGroupsExport"
       />
 
+  <genericsetup:importStep name="reconcile_users"
+      title="Reconcile Users"
+      description="Reconcile users between two PluggableAuthService
+                   plugins. Useful, for example, to migrate users from
+                   the local storage plugins to an LDAP plugin added
+                   later."
+      handler=".pas.reconcileUsersImport">
+      <depends name="toolset"/>
+  </genericsetup:importStep>
+
+  <genericsetup:importStep name="reconcile_groups"
+      title="Reconcile Groups"
+      description="Reconcile groups between two PluggableAuthService
+                   plugins. Useful, for example, to migrate groups from
+                   the local storage plugins to an LDAP plugin added
+                   later."
+      handler=".pas.reconcileGroupsImport">
+      <depends name="toolset"/>
+  </genericsetup:importStep>
+
   <genericsetup:upgradeSteps
       source="4001"
       destination="4002"

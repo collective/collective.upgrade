@@ -1,0 +1,10 @@
+Source Plugin ID,Source ID,Destination Plugin ID,Destination ID,Destination Duplicate IDs
+source_groups,Administrators,,,
+source_groups,Reviewers,,,
+source_groups,Site Administrators,,,
+source_groups,bar_source_group_id,dest_groups,bar_dest_group_id,baz_dest_group_id
+source_groups,corge_source_group_id,dest_groups,corge_dest_group_id,
+source_groups,foo_source_group_id,,,
+source_groups,grault_source_group_id,dest_groups,grault_source_group_id,
+source_groups,qux_source_group_id,,,
+auto_group,AuthenticatedUsers,,,

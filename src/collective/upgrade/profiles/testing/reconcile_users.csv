@@ -1,0 +1,7 @@
+Source Plugin ID,Source ID,Destination Plugin ID,Destination ID,Destination Duplicate IDs
+source_users,bar_source_user_id,dest_properties,bar_dest_user_id,baz_dest_user_id
+source_users,corge_source_user_id,dest_properties,corge_dest_user_id,
+source_users,foo_source_user_id,,,
+source_users,grault_source_user_id,dest_users,grault_source_user_id,
+source_users,qux_source_user_id,,,
+source_users,test_user_1_,,,

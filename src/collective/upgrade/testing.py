@@ -23,7 +23,7 @@ class UpgradeTesting(PloneSandboxLayer):
     def setUpZope(self, app, configurationContext):
         # Load ZCML
         import collective.upgrade
-        xmlconfig.file('configure.zcml',
+        xmlconfig.file('testing.zcml',
                        collective.upgrade, context=configurationContext)
 
     def setUpPloneSite(self, portal):

@@ -7,7 +7,8 @@ import transaction
 from Acquisition import aq_base
 
 from Products.PluggableAuthService.interfaces.plugins import (
-    IUserEnumerationPlugin, IGroupEnumerationPlugin, IPropertiesPlugin)
+    IUserEnumerationPlugin, IGroupsPlugin, IGroupEnumerationPlugin,
+    IPropertiesPlugin)
 
 from Products.CMFCore.utils import getToolByName
 
@@ -193,6 +194,36 @@ class ExportReconciler(Reconciler):
             savepoint.rollback()
 
 
+class ImportReconciler(Reconciler):
+
+    def import_(self):
+        if hasattr(self.context, 'openDataFile'):
+            csvfile = self.context.openDataFile(self.filename)
+        else:
+            csvfile = tempfile.TemporaryFile()
+            csvfile.write(self.context.readDataFile(self.filename))
+            csvfile.seek(0)
+        reader = csv.DictReader(csvfile)
+
+        getPrincipalById = getattr(self.acl_users, 'get{}ById'.format(
+            self.principal_type.capitalize()))
+        for row in reader:
+            if not row.get('Destination ID'):
+                continue
+            source_principal = getPrincipalById(row['Source ID'])
+
+            groupmakers = self.plugins.listPlugins(IGroupsPlugin)
+            for groupmaker_id, groupmaker in groupmakers:
+                if not hasattr(groupmaker, 'addPrincipalToGroup'):
+                    continue
+                groups = groupmaker.getGroupsForPrincipal(source_principal)
+                for group in groups:
+                    groupmaker.addPrincipalToGroup(
+                        row['Destination ID'], group)
+                    groupmaker.removePrincipalFromGroup(
+                        source_principal.getId(), group)
+
+
 class DataFile(object):
 
     def __init__(self, file_):
@@ -209,3 +240,13 @@ def reconcileUsersExport(context):
 def reconcileGroupsExport(context):
     reconciler = ExportReconciler(context, 'group')
     reconciler.export()
+
+
+def reconcileUsersImport(context):
+    reconciler = ImportReconciler(context, 'user')
+    reconciler.import_()
+
+
+def reconcileGroupsImport(context):
+    reconciler = ImportReconciler(context, 'group')
+    reconciler.import_()
