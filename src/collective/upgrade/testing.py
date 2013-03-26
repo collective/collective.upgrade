@@ -138,12 +138,6 @@ class UpgradeTesting(PloneSandboxLayer):
         corge_doc.manage_addLocalRoles('corge_source_group_id', ('Reviewer',))
         logout()
 
-        setRoles(portal, 'qux_source_user_id', ['Contributor', 'Member'])
-        login(portal, 'qux_source_user_id')
-        qux_doc = portal[portal.invokeFactory('Document', 'qux_doc')]
-        qux_doc.manage_addLocalRoles('qux_source_group_id', ('Reviewer',))
-        logout()
-
 COLLECTIVE_UPGRADE_FIXTURE = UpgradeTesting()
 
 COLLECTIVE_UPGRADE_INTEGRATION_TESTING = \

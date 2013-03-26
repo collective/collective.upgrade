@@ -249,24 +249,6 @@ local roles, and CMF creators:
      ('corge_source_user_id', ('Owner',)))
     >>> portal.corge_doc.Creator()
     'corge_source_user_id'
-    
-Some user and group ``id`` references point to users and groups not in
-the source plugin but which do have matches with different ``id``
-values in the destination plugin.  These referenceces come from:
-source group plugin memberships, ``OFS.owner.Owned`` owners, local
-roles, and CMF creators:
-
-    >>> source_groups.getGroupMembers('foo_source_group_id')
-    ('qux_source_user_id',)
-    >>> portal.qux_doc
-    <ATDocument at /plone/qux_doc>
-    >>> portal.qux_doc.getOwner()
-    <PloneUser 'qux_source_user_id'>
-    >>> pp(portal.qux_doc.get_local_roles())
-    (('qux_source_group_id', ('Reviewer',)),
-     ('qux_source_user_id', ('Owner',)))
-    >>> portal.qux_doc.Creator()
-    'qux_source_user_id'
 
 
 Exporting Mappings
@@ -400,14 +382,3 @@ It applies those changes to: source group plugin memberships,
      ('corge_dest_user_id', ('Owner',)))
     >>> portal.corge_doc.Creator()
     'corge_dest_user_id'
-
-    >>> source_groups.getGroupMembers('foo_source_group_id')
-    ('qux_dest_user_id',)
-    >>> portal.qux_doc
-    <ATDocument at /plone/qux_doc>
-    >>> portal.qux_doc.getOwner()
-    <PloneUser 'qux_dest_user_id'>
-    >>> pp(portal.qux_doc.get_local_roles())
-    (('qux_dest_group_id', ('Reviewer',)), ('qux_dest_user_id', ('Owner',)))
-    >>> portal.qux_doc.Creator()
-    'qux_dest_user_id'

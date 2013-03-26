@@ -34,7 +34,6 @@ class UsersGroupsReconciler(object):
             dest_users_plugin = self.plugins.listPlugins(
                 IUserEnumerationPlugin)[0][0]
         self.dest_users = self.acl_users._getOb(dest_users_plugin)
-        self.seen_users = set()
         if not dest_properties_plugin:
             dest_properties_plugin = self.plugins.listPlugins(
                 IPropertiesPlugin)[0][0]
@@ -43,7 +42,6 @@ class UsersGroupsReconciler(object):
             dest_groups_plugin = self.plugins.listPlugins(
                 IGroupEnumerationPlugin)[0][0]
         self.dest_groups = self.acl_users._getOb(dest_groups_plugin)
-        self.seen_groups = set()
 
     def export(self):
         content_type = mimetypes.guess_type(self.filename)
@@ -56,6 +54,7 @@ class UsersGroupsReconciler(object):
         self.context.writeDataFile(self.filename, text, content_type)
 
     def get_user_rows(self):
+        seen = set()
         # Temporarily disable the destination plugins from listing
         savepoint = transaction.savepoint(optimistic=True)
         try:
@@ -68,9 +67,9 @@ class UsersGroupsReconciler(object):
 
             # Look for matches for the source users
             for info in self.acl_users.searchUsers():
-                if info['id'] in self.seen_users:
+                if info['id'] in seen:
                     continue
-                self.seen_users.add(info['id'])
+                seen.add(info['id'])
                 result = {'Source Plugin ID': info['pluginid'],
                           'Source ID': info['id']}
 
@@ -119,6 +118,7 @@ class UsersGroupsReconciler(object):
             savepoint.rollback()
 
     def get_group_rows(self):
+        seen = set()
         # Temporarily disable the destination plugins from listing
         savepoint = transaction.savepoint(optimistic=True)
         try:
@@ -127,9 +127,9 @@ class UsersGroupsReconciler(object):
 
             # Look for matches for the source groups
             for info in self.acl_users.searchGroups():
-                if info['id'] in self.seen_groups:
+                if info['id'] in seen:
                     continue
-                self.seen_groups.add(info['id'])
+                seen.add(info['id'])
                 result = {'Source Plugin ID': info['pluginid'],
                           'Source ID': info['id']}
 
