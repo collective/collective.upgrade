@@ -215,10 +215,12 @@ class ImportReconciler(Reconciler):
             self.principal_type.capitalize()))
         rows = {}
         for row in reader:
-            if not row.get('Destination ID'):
+            dest_id = row.get('Destination ID')
+            source_id = row['Source ID']
+            if not dest_id or source_id == dest_id:
                 continue
-            rows[row['Source ID']] = row['Destination ID']
-            source_principal = getPrincipalById(row['Source ID'])
+            rows[source_id] = dest_id
+            source_principal = getPrincipalById(source_id)
 
             groupmakers = self.plugins.listPlugins(IGroupsPlugin)
             for groupmaker_id, groupmaker in groupmakers:
@@ -226,8 +228,7 @@ class ImportReconciler(Reconciler):
                     continue
                 groups = groupmaker.getGroupsForPrincipal(source_principal)
                 for group in groups:
-                    groupmaker.addPrincipalToGroup(
-                        row['Destination ID'], group)
+                    groupmaker.addPrincipalToGroup(dest_id, group)
                     groupmaker.removePrincipalFromGroup(
                         source_principal.getId(), group)
 
