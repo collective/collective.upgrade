@@ -4,6 +4,11 @@ Changelog
 0.3 - unreleased
 ----------------
 
+- Add export and import steps for reconciling users and groups between
+  two PluggableAuthService plugins, such as between existing
+  Plone-only users and a newly added LDAP plugin.
+  [rpatterson]
+
 - Support Plone 4.3, tolerate a deleted KSS tool
   [rpatterson]
 

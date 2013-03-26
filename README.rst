@@ -144,6 +144,40 @@ way to iterate through the development of an upgrade procedure.
 Use the ``--help`` option of the script or see the  `Quick Start`_
 section for details.
 
+Reconciling Users and Groups
+----------------------------
+
+Reconcile users and groups between two PluggableAuthService plugins.
+Useful, for example, to migrate users and groups from the local
+storage plugins to an LDAP plugin added later.
+
+#. The export steps search the destination plugins for users and
+   groups that correspond to those in the source plugins.  Use real
+   names for search when an exact match on id can't be found.
+
+#. The export step writes a CSV file listing all users and groups from
+   the source plugins including those that match exactly on id, those
+   that found matches on real names, and those that found no matches.
+
+   This CSV can be edited to add manual matches and can be used as a
+   list of users to notify that their logins or passwords may change
+   between the source and destination plugins.
+
+#. The import step reads the same CSV file to update:
+
+   * OFS ownership
+   * CMF creators
+   * local roles
+   * group memberships
+
+To use these steps, make sure the destination PAS plugin is the first
+activated IUserEnumerationPlugin, IGroupEnumerationPlugin, and
+IPropertiesPlugin plugin, then run the ``reconcile_users`` and
+``reconcile_groups`` export steps.  The CSV files generated in the
+export can then be edited and adjusted until they represent the
+changes that should be applied at which point they can be placed
+inside a GS import profile and imported to apply the changes.
+
 Upgrade Steps
 -------------
 
