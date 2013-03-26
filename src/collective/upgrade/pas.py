@@ -5,6 +5,7 @@ import csv
 import transaction
 
 from Acquisition import aq_base
+from AccessControl import owner
 
 from Products.PluggableAuthService.interfaces.plugins import (
     IUserEnumerationPlugin, IGroupsPlugin, IGroupEnumerationPlugin,
@@ -207,9 +208,11 @@ class ImportReconciler(Reconciler):
 
         getPrincipalById = getattr(self.acl_users, 'get{}ById'.format(
             self.principal_type.capitalize()))
+        rows = {}
         for row in reader:
             if not row.get('Destination ID'):
                 continue
+            rows[row['Source ID']] = row['Destination ID']
             source_principal = getPrincipalById(row['Source ID'])
 
             groupmakers = self.plugins.listPlugins(IGroupsPlugin)
@@ -222,6 +225,21 @@ class ImportReconciler(Reconciler):
                         row['Destination ID'], group)
                     groupmaker.removePrincipalFromGroup(
                         source_principal.getId(), group)
+
+        acl_users_path = owner.ownerInfo(self.plugins)[0]
+
+        def import_ofs_obj(obj, path=None,
+                           acl_users_path=acl_users_path, rows=rows,
+                           getPrincipalById=getPrincipalById):
+            userdb_path, user_id = obj.getOwnerTuple()
+            for source_id, dest_id in rows.iteritems():
+                # ownership
+                if (acl_users_path, source_id) == (
+                    userdb_path, user_id):
+                    dest_principal = getPrincipalById(dest_id)
+                    obj.changeOwnership(dest_principal)
+
+        self.site.ZopeFindAndApply(self.site, apply_func=import_ofs_obj)
 
 
 class DataFile(object):
