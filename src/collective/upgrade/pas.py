@@ -232,6 +232,14 @@ class ImportReconciler(Reconciler):
                            acl_users_path=acl_users_path, rows=rows,
                            getPrincipalById=getPrincipalById):
             userdb_path, user_id = obj.getOwnerTuple()
+
+            creators = getattr(obj, 'listCreators', [])
+            if callable(creators):
+                creators = list(creators())
+            contributors = getattr(obj, 'listContributors', [])
+            if callable(contributors):
+                contributors = list(contributors())
+
             for source_id, dest_id in rows.iteritems():
                 # ownership
                 if (acl_users_path, source_id) == (
@@ -244,6 +252,17 @@ class ImportReconciler(Reconciler):
                 if local_roles:
                     obj.manage_addLocalRoles(dest_id, local_roles)
                     obj.manage_delLocalRoles([source_id])
+
+                # CMF creators and contributors
+                if source_id in creators:
+                    creators[creators.index(source_id)] = dest_id
+                if source_id in contributors:
+                    contributors[contributors.index(source_id)] = dest_id
+
+            if creators:
+                obj.setCreators(creators)
+            if contributors:
+                obj.setContributors(contributors)
 
         if rows:
             self.site.ZopeFindAndApply(self.site, apply_func=import_ofs_obj)

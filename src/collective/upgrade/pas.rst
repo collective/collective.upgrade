@@ -251,8 +251,10 @@ local roles, and CMF creators:
     >>> pp(portal.corge_doc.get_local_roles())
     (('corge_source_group_id', ('Reviewer',)),
      ('corge_source_user_id', ('Owner',)))
-    >>> portal.corge_doc.Creator()
-    'corge_source_user_id'
+    >>> portal.corge_doc.listCreators()
+    ('corge_source_user_id', 'corge_source_group_id')
+    >>> portal.corge_doc.listContributors()
+    ('corge_source_group_id', 'corge_source_user_id')
 
 
 Exporting Mappings
@@ -408,5 +410,7 @@ It applies those changes to: source group plugin memberships,
     >>> pp(portal.corge_doc.get_local_roles())
     (('corge_dest_group_id', ('Reviewer',)),
      ('corge_dest_user_id', ('Owner',)))
-    >>> portal.corge_doc.Creator()
-    'corge_dest_user_id'
+    >>> portal.corge_doc.listCreators()
+    ('corge_dest_user_id', 'corge_dest_group_id')
+    >>> portal.corge_doc.listContributors()
+    ('corge_dest_group_id', 'corge_dest_user_id')

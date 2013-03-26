@@ -137,6 +137,10 @@ class UpgradeTesting(PloneSandboxLayer):
         login(portal, 'corge_source_user_id')
         corge_doc = portal[portal.invokeFactory('Document', 'corge_doc')]
         corge_doc.manage_addLocalRoles('corge_source_group_id', ('Reviewer',))
+        corge_doc.setCreators(
+            corge_doc.listCreators() + ('corge_source_group_id', ))
+        corge_doc.setContributors(
+            ('corge_source_group_id', 'corge_source_user_id'))
         logout()
 
 COLLECTIVE_UPGRADE_FIXTURE = UpgradeTesting()
