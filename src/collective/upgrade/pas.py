@@ -114,28 +114,29 @@ class ExportReconciler(Reconciler):
                 # Match on properties
                 user = self.acl_users.getUserById(info['id'])
                 value = None
-                for prop in self.user_properties:
-                    prop_result = result.copy()
-                    value = None
-                    for sheet_id in user.listPropertysheets():
-                        sheet = user.getPropertysheet(sheet_id)
-                        if sheet.hasProperty(prop):
-                            value = sheet.getProperty(prop)
-                            if value:
-                                break
-                    else:
-                        continue
-                    matches = self.dest_properties.enumerateUsers(
-                        **{prop: value})
-                    if matches:
-                        prop_result['Destination Plugin ID'] = matches[0].get(
-                            'pluginid', self.dest_users.getId())
-                        prop_result['Destination ID'] = matches[0]['id']
-                        if len(matches) > 1:
-                            prop_result[
-                                'Destination Duplicate IDs'] = ' '.join(
-                                match['id'] for match in matches[1:])
-                        yield prop_result
+                if user is not None:
+                    for prop in self.user_properties:
+                        prop_result = result.copy()
+                        value = None
+                        for sheet_id in user.listPropertysheets():
+                            sheet = user.getPropertysheet(sheet_id)
+                            if sheet.hasProperty(prop):
+                                value = sheet.getProperty(prop)
+                                if value:
+                                    break
+                        else:
+                            continue
+                        matches = self.dest_properties.enumerateUsers(
+                            **{prop: value})
+                        if matches:
+                            prop_result['Destination Plugin ID'] = matches[
+                                0].get('pluginid', self.dest_users.getId())
+                            prop_result['Destination ID'] = matches[0]['id']
+                            if len(matches) > 1:
+                                prop_result[
+                                    'Destination Duplicate IDs'] = ' '.join(
+                                    match['id'] for match in matches[1:])
+                            yield prop_result
 
                 # No match
                 if not value:
