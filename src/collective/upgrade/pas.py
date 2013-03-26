@@ -12,9 +12,24 @@ from Products.PluggableAuthService.interfaces.plugins import (
 from Products.CMFCore.utils import getToolByName
 
 
-class UsersGroupsReconciler(object):
+class Reconciler(object):
 
-    filename = 'reconcile_users_groups.csv'
+    filename = 'reconcile_{}s.csv'
+
+    def __init__(self, context, principal_type):
+        self.context = context
+
+        principal_type = principal_type.lower()
+        self.principal_type = principal_type
+        self.filename = self.filename.format(principal_type)
+
+        self.site = context.getSite()
+        self.acl_users = getToolByName(self.site, 'acl_users')
+        self.plugins = self.acl_users._getOb('plugins')
+
+
+class ExportReconciler(Reconciler):
+
     fieldnames = ('Source Plugin ID',
                   'Source ID',
                   'Destination Plugin ID',
@@ -22,26 +37,28 @@ class UsersGroupsReconciler(object):
                   'Destination Duplicate IDs')
     user_properties = ('fullname', )
 
-    def __init__(self, context,
+    def __init__(self, context, principal_type,
                  dest_users_plugin=None, dest_properties_plugin=None,
                  dest_groups_plugin=None):
-        self.context = context
-        self.site = context.getSite()
-        self.acl_users = getToolByName(self.site, 'acl_users')
+        super(ExportReconciler, self).__init__(context, principal_type)
+        self.get_rows = getattr(
+            self, 'get_{}_rows'.format(self.principal_type))
 
-        self.plugins = self.acl_users._getOb('plugins')
-        if not dest_users_plugin:
-            dest_users_plugin = self.plugins.listPlugins(
-                IUserEnumerationPlugin)[0][0]
-        self.dest_users = self.acl_users._getOb(dest_users_plugin)
-        if not dest_properties_plugin:
-            dest_properties_plugin = self.plugins.listPlugins(
-                IPropertiesPlugin)[0][0]
-        self.dest_properties = self.acl_users._getOb(dest_properties_plugin)
-        if not dest_groups_plugin:
-            dest_groups_plugin = self.plugins.listPlugins(
-                IGroupEnumerationPlugin)[0][0]
-        self.dest_groups = self.acl_users._getOb(dest_groups_plugin)
+        if principal_type == 'user':
+            if not dest_users_plugin:
+                dest_users_plugin = self.plugins.listPlugins(
+                    IUserEnumerationPlugin)[0][0]
+            self.dest_users = self.acl_users._getOb(dest_users_plugin)
+            if not dest_properties_plugin:
+                dest_properties_plugin = self.plugins.listPlugins(
+                    IPropertiesPlugin)[0][0]
+            self.dest_properties = self.acl_users._getOb(
+                dest_properties_plugin)
+        else:
+            if not dest_groups_plugin:
+                dest_groups_plugin = self.plugins.listPlugins(
+                    IGroupEnumerationPlugin)[0][0]
+            self.dest_groups = self.acl_users._getOb(dest_groups_plugin)
 
     def export(self):
         if hasattr(self.context, 'openDataFile'):
@@ -53,8 +70,7 @@ class UsersGroupsReconciler(object):
             content_type = mimetypes.guess_type(self.filename)
             writer = csv.DictWriter(csvfile, self.fieldnames)
             writer.writerow(dict((name, name) for name in self.fieldnames))
-            writer.writerows(self.get_user_rows())
-            writer.writerows(self.get_group_rows())
+            writer.writerows(self.get_rows())
 
             if not hasattr(self.context, 'openDataFile'):
                 csvfile.seek(0)
@@ -185,6 +201,11 @@ class DataFile(object):
         self.file = file_
 
 
-def reconcileUsersAndGroupsExport(context):
-    reconciler = UsersGroupsReconciler(context)
+def reconcileUsersExport(context):
+    reconciler = ExportReconciler(context, 'user')
+    reconciler.export()
+
+
+def reconcileGroupsExport(context):
+    reconciler = ExportReconciler(context, 'group')
     reconciler.export()

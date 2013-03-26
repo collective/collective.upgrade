@@ -263,12 +263,15 @@ plugins.
     >>> import StringIO
     >>> import tarfile
     >>> import csv
+    >>> from pprint import pformat as pf
     >>> portal_setup = getToolByName(portal, 'portal_setup')
-    >>> tarball = StringIO.StringIO(
-    ...     portal_setup.runExportStep('reconcile_users_groups')['tarball'])
-    >>> opened = tarfile.open(fileobj=tarball)
-    >>> pp(list(
-    ...     csv.DictReader(opened.extractfile('reconcile_users_groups.csv'))))
+    >>> export_users_result = portal_setup.runExportStep('reconcile_users')
+    >>> export_users_tarball = StringIO.StringIO(
+    ...     export_users_result['tarball'])
+    >>> opened = tarfile.open(fileobj=export_users_tarball)
+    >>> export_users_csvfile = opened.extractfile('reconcile_users.csv')
+    >>> export_users_mappings = pf(list(csv.DictReader(export_users_csvfile)))
+    >>> print export_users_mappings
     [{'Destination Duplicate IDs': 'baz_dest_user_id',
       'Destination ID': 'bar_dest_user_id',
       'Destination Plugin ID': 'dest_properties',
@@ -298,8 +301,18 @@ plugins.
       'Destination ID': '',
       'Destination Plugin ID': '',
       'Source ID': 'test_user_1_',
-      'Source Plugin ID': 'source_users'},
-     {'Destination Duplicate IDs': '',
+      'Source Plugin ID': 'source_users'}]
+
+    >>> portal_setup = getToolByName(portal, 'portal_setup')
+    >>> export_groups_result = portal_setup.runExportStep('reconcile_groups')
+    >>> export_groups_tarball = StringIO.StringIO(
+    ...     export_groups_result['tarball'])
+    >>> opened = tarfile.open(fileobj=export_groups_tarball)
+    >>> export_groups_csvfile = opened.extractfile('reconcile_groups.csv')
+    >>> export_groups_mappings = pf(list(
+    ...     csv.DictReader(export_groups_csvfile)))
+    >>> print export_groups_mappings
+    [{'Destination Duplicate IDs': '',
       'Destination ID': '',
       'Destination Plugin ID': '',
       'Source ID': 'Administrators',

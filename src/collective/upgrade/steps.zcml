@@ -3,13 +3,22 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="plone">
 
-  <genericsetup:exportStep name="reconcile_users_groups"
-      title="Reconcile Users and Groups"
-      description="Reconcile users and groups between two
-                   PluggableAuthService plugins. Useful, for example,
-                   to migrate users and groups from the local storage
-                   plugins to an LDAP plugin added later."
-      handler=".pas.reconcileUsersAndGroupsExport"
+  <genericsetup:exportStep name="reconcile_users"
+      title="Reconcile Users"
+      description="Reconcile users between two PluggableAuthService
+                   plugins. Useful, for example, to migrate users from
+                   the local storage plugins to an LDAP plugin added
+                   later."
+      handler=".pas.reconcileUsersExport"
+      />
+
+  <genericsetup:exportStep name="reconcile_groups"
+      title="Reconcile Groups"
+      description="Reconcile groups between two PluggableAuthService
+                   plugins. Useful, for example, to migrate groups from
+                   the local storage plugins to an LDAP plugin added
+                   later."
+      handler=".pas.reconcileGroupsExport"
       />
 
   <genericsetup:upgradeSteps
