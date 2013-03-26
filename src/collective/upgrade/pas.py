@@ -239,6 +239,12 @@ class ImportReconciler(Reconciler):
                     dest_principal = getPrincipalById(dest_id)
                     obj.changeOwnership(dest_principal)
 
+                # local roles
+                local_roles = obj.get_local_roles_for_userid(source_id)
+                if local_roles:
+                    obj.manage_addLocalRoles(dest_id, local_roles)
+                    obj.manage_delLocalRoles([source_id])
+
         self.site.ZopeFindAndApply(self.site, apply_func=import_ofs_obj)
 
 
