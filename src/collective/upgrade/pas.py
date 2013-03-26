@@ -245,7 +245,8 @@ class ImportReconciler(Reconciler):
                     obj.manage_addLocalRoles(dest_id, local_roles)
                     obj.manage_delLocalRoles([source_id])
 
-        self.site.ZopeFindAndApply(self.site, apply_func=import_ofs_obj)
+        if rows:
+            self.site.ZopeFindAndApply(self.site, apply_func=import_ofs_obj)
 
 
 class DataFile(object):
