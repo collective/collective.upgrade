@@ -56,15 +56,14 @@ class UpgradeTesting(PloneSandboxLayer):
 
         # Add the users and groups
         user_plugins = plugins.listPlugins(IUserEnumerationPlugin)
-        dest_users = self['dest_users'] = user_plugins[0][1]
-        source_users = self['source_users'] = user_plugins[1][1]
+        dest_users = user_plugins[0][1]
+        source_users = user_plugins[1][1]
         property_plugins = plugins.listPlugins(IPropertiesPlugin)
-        dest_properties = self['dest_properties'] = property_plugins[0][1]
-        mutable_properties = self[
-            'mutable_properties'] = property_plugins[1][1]
+        dest_properties = property_plugins[0][1]
+        mutable_properties = property_plugins[1][1]
         group_plugins = plugins.listPlugins(IGroupEnumerationPlugin)
-        dest_groups = self['dest_groups'] = group_plugins[0][1]
-        source_groups = self['source_groups'] = group_plugins[1][1]
+        dest_groups = group_plugins[0][1]
+        source_groups = group_plugins[1][1]
 
         source_users.addUser(
             'foo_source_user_id', 'foo_source_user_id', 'secret')

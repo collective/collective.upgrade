@@ -12,12 +12,16 @@ and two group plugins:
     >>> acl_users = getToolByName(portal, 'acl_users')
     >>> acl_users
     <PluggableAuthService at /plone/acl_users>
-    >>> dest_users = layer['dest_users']
-    >>> source_users = layer['source_users']
-    >>> dest_properties = layer['dest_properties']
-    >>> dest_groups = layer['dest_groups']
-    >>> source_groups = layer['source_groups']
-    >>> mutable_properties = layer['mutable_properties']
+    >>> plugins = acl_users._getOb('plugins')
+    >>> user_plugins = plugins.listPlugins(IUserEnumerationPlugin)
+    >>> dest_users = user_plugins[0][1]
+    >>> source_users = user_plugins[1][1]
+    >>> property_plugins = plugins.listPlugins(IPropertiesPlugin)
+    >>> dest_properties = property_plugins[0][1]
+    >>> mutable_properties = property_plugins[1][1]
+    >>> group_plugins = plugins.listPlugins(IGroupEnumerationPlugin)
+    >>> dest_groups = group_plugins[0][1]
+    >>> source_groups = group_plugins[1][1]
     >>> source_users
     <UserManager at /plone/acl_users/source_users>
     >>> mutable_properties
