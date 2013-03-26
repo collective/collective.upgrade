@@ -61,7 +61,7 @@ class ExportReconciler(Reconciler):
                     IGroupEnumerationPlugin)[0][0]
             self.dest_groups = self.acl_users._getOb(dest_groups_plugin)
 
-    def export(self):
+    def export_rows(self):
         if hasattr(self.context, 'openDataFile'):
             csvfile = self.context.openDataFile(self.filename)
         else:
@@ -196,7 +196,7 @@ class ExportReconciler(Reconciler):
 
 class ImportReconciler(Reconciler):
 
-    def import_(self):
+    def import_rows(self):
         if hasattr(self.context, 'openDataFile'):
             csvfile = self.context.openDataFile(self.filename)
         else:
@@ -234,19 +234,19 @@ class DataFile(object):
 
 def reconcileUsersExport(context):
     reconciler = ExportReconciler(context, 'user')
-    reconciler.export()
+    reconciler.export_rows()
 
 
 def reconcileGroupsExport(context):
     reconciler = ExportReconciler(context, 'group')
-    reconciler.export()
+    reconciler.export_rows()
 
 
 def reconcileUsersImport(context):
     reconciler = ImportReconciler(context, 'user')
-    reconciler.import_()
+    reconciler.import_rows()
 
 
 def reconcileGroupsImport(context):
     reconciler = ImportReconciler(context, 'group')
-    reconciler.import_()
+    reconciler.import_rows()
