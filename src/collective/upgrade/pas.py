@@ -4,7 +4,6 @@ import csv
 
 import transaction
 
-from Acquisition import aq_base
 from AccessControl import owner
 
 from Products.PluggableAuthService.interfaces.plugins import (
