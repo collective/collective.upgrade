@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.3 - unreleased
+0.3 - 2014-01-30
 ----------------
 
 - Add export and import steps for reconciling users and groups between
