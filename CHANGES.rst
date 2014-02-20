@@ -4,7 +4,9 @@ Changelog
 0.4 - unreleased
 ----------------
 
-- No changes
+- Ensure the the reconciling import steps are only run if the PAS plugins
+  have been set up.
+  [href]
 
 
 0.3 - 2014-01-30

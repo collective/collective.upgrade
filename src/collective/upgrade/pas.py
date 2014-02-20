@@ -299,21 +299,44 @@ class DataFile(object):
         self.file = file_
 
 
+def is_reconcileable(context):
+    try:
+        site = context.getSite()
+        acl_users = getToolByName(site, 'acl_users')
+        acl_users._getOb('plugins')
+    except AttributeError:
+        return False
+    else:
+        return True
+
+
 def reconcileUsersExport(context):
+    if not is_reconcileable(context):
+        return
+
     reconciler = ExportReconciler(context, 'user')
     reconciler.export_rows()
 
 
 def reconcileGroupsExport(context):
+    if not is_reconcileable(context):
+        return
+
     reconciler = ExportReconciler(context, 'group')
     reconciler.export_rows()
 
 
 def reconcileUsersImport(context):
+    if not is_reconcileable(context):
+        return
+
     reconciler = ImportReconciler(context, 'user')
     reconciler.import_rows()
 
 
 def reconcileGroupsImport(context):
+    if not is_reconcileable(context):
+        return
+
     reconciler = ImportReconciler(context, 'group')
     reconciler.import_rows()
