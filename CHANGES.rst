@@ -1,10 +1,11 @@
 Changelog
 =========
 
-0.4 - unreleased
+0.4 - 2014-02-28
 ----------------
 
-- No changes
+- Fix an import step bug when installing a Plone site into a fresh Zope
+  instance.  Fixes #3.  Thanks to @href for the report.  [rpatterson]
 
 
 0.3 - 2014-01-30

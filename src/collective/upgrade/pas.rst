@@ -414,3 +414,22 @@ It applies those changes to: source group plugin memberships,
     ('corge_dest_user_id', 'corge_dest_group_id')
     >>> portal.corge_doc.listContributors()
     ('corge_dest_group_id', 'corge_dest_user_id')
+
+
+==========
+Edge Cases
+==========
+
+    >>> app = layer['app']
+
+Simulate a fresh instance::
+
+    >>> from OFS import userfolder
+    >>> app.manage_delObjects(['acl_users'])
+    >>> userfolder.manage_addUserFolder(app)
+
+Add a new plone site in a fresh instance with the import step registered::
+
+    >>> from Products.CMFPlone import factory
+    >>> factory.addPloneSite(app, 'foo', setup_content=False)
+    <PloneSite at /foo>

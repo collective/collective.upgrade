@@ -22,14 +22,11 @@ class Reconciler(object):
 
     def __init__(self, context, principal_type):
         self.context = context
+        self.site = context.getSite()
 
         principal_type = principal_type.lower()
         self.principal_type = principal_type
         self.filename = self.filename.format(principal_type)
-
-        self.site = context.getSite()
-        self.acl_users = getToolByName(self.site, 'acl_users')
-        self.plugins = self.acl_users._getOb('plugins')
 
 
 class ExportReconciler(Reconciler):
@@ -45,6 +42,9 @@ class ExportReconciler(Reconciler):
                  dest_users_plugin=None, dest_properties_plugin=None,
                  dest_groups_plugin=None):
         super(ExportReconciler, self).__init__(context, principal_type)
+        self.acl_users = getToolByName(self.site, 'acl_users')
+        self.plugins = self.acl_users._getOb('plugins')
+
         self.get_rows = getattr(
             self, 'get_{}_rows'.format(self.principal_type))
 
@@ -213,6 +213,9 @@ class ImportReconciler(Reconciler):
             csvfile.write(datafile)
             csvfile.seek(0)
         reader = csv.DictReader(csvfile)
+
+        self.acl_users = getToolByName(self.site, 'acl_users')
+        self.plugins = self.acl_users._getOb('plugins')
 
         getPrincipalById = getattr(self.acl_users, 'get{}ById'.format(
             self.principal_type.capitalize()))
