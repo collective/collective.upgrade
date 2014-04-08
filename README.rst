@@ -217,3 +217,4 @@ details:
   * delete custom skin objects
   * cleanup missing skin/theme layers
   * uninstall add-ons
+  * pack the ZODB pruning old revision history

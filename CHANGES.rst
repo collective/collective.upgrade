@@ -4,6 +4,9 @@ Changelog
 0.5 - Unreleased
 ----------------
 
+- Add an upgrade step function that packs the ZODB.
+  [@rpatterson]
+
 - Reduce dependencies by moving some into an 'steps' extras_require.
   [@rpatterson]
 

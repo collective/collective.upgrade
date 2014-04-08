@@ -63,11 +63,13 @@ class Upgrader(browser.BrowserView):
 
 
 def transaction_note(
-        context, request=None, note=None,
-        tm=Zope2.zpublisher_transactions_manager):
+        context, request=None, note=None, tm=None):
     """Don't add a transaction note if it would exceed the maximum length."""
     if request is None:
-        request = globalrequest.get_request()
+        request = globalrequest.getRequest()
+    if tm is None:
+        tm = Zope2.zpublisher_transactions_manager
+
     logger.info(note)
     tm.recordMetaData(context, request)
     if note is not None:

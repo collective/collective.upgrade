@@ -1,6 +1,8 @@
 import logging
 import re
 
+import transaction
+
 from Acquisition import aq_base, aq_parent
 from Products.PluginIndexes.FieldIndex import FieldIndex
 from Products.ZCatalog.ProgressHandler import ZLogHandler
@@ -260,3 +262,14 @@ def cleanupMissingReferenceTargets(context):
     url = getToolByName(context, 'portal_url')
     upgrader = ReferenceTargetCleaner(url.getPortalObject())
     upgrader.upgrade()
+
+
+def pack_zodb(context, t=None, days=0):
+    """
+    Pack the database after upgrades to conserve disk space.
+    """
+    utils.transaction_note(
+        context, note='Committing changes prior to packing the ZODB')
+    transaction.commit()
+    db = context._p_jar.db()
+    db.pack(t, days)
