@@ -10,19 +10,28 @@ from collective.upgrade import utils
 
 class PortalUpgrader(utils.Upgrader):
 
-    def upgrade(self, **kw):
+    def upgrade(
+            self, upgrade_portal=True,
+            upgrade_all_profiles=True, upgrade_profiles=(), **kw):
         hooks.setSite(self.context)
         self.setup = getToolByName(self.context, 'portal_setup')
         self.log('Upgrading {0}'.format(self.context))
 
-        # Do the baseline profile upgrade first
         baseline = self.setup.getBaselineContextID()
         prof_type, profile_id = baseline.split('-', 1)
         self.base_profile = profile_id
-        self.upgradeProfile(profile_id, **kw)
+        if upgrade_portal:
+            # Do the baseline profile upgrade first
+            self.upgradeProfile(profile_id, **kw)
 
         # Upgrade extension profiles
-        self.upgradeExtensions(**kw)
+        if upgrade_all_profiles:
+            if upgrade_profiles:
+                raise ValueError(
+                    'upgrade_profiles conflicts with upgrade_all_profiles')
+            upgrade_profiles = self.setup.listProfilesWithUpgrades()
+        if upgrade_profiles:
+            self.upgradeExtensions(upgrade_profiles, **kw)
 
         self.log('Upgraded {0}'.format(self.context))
 
@@ -87,8 +96,8 @@ class PortalUpgrader(utils.Upgrader):
         self.commit("Upgraded profile %r to %r" %
                     (profile_id, '.'.join(step.dest)))
 
-    def upgradeExtensions(self, **kw):
-        for profile_id in self.setup.listProfilesWithUpgrades():
+    def upgradeExtensions(self, profile_ids, **kw):
+        for profile_id in profile_ids:
             if profile_id == self.base_profile:
                 continue
             if self.isProfileInstalled(profile_id):

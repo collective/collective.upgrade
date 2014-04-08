@@ -4,6 +4,9 @@ Changelog
 1.0rc1 - Unreleased
 -------------------
 
+- Add options for controlling which profiles are upgraded.
+  [@rpatterson]
+
 - Migrate from ``optparse`` to ``argparse`` and move portal paths from an
   option to a positional argument.
   [@rpatterson]

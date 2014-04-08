@@ -9,15 +9,12 @@ import zodbupdate.main
 from collective.upgrade import utils
 
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(
+    description='Upgrade CMF portals in a Zope 2 application '
+    'using GenericSetup upgrade steps')
 parser.add_argument(
     "-l", "--log-file", metavar="FILE", default='upgrade.log',
     help="Log upgrade messages, filtered for duplicates, to FILE")
-parser.add_argument(
-    "-p", "--portal-path", metavar="PATH", action="append",
-    help="Run upgrades for the portals at the given paths only.  "
-    "May be given multiple times to specify multiple portals.  "
-    "If not given, all CMF portals in the Zope app will be upgraded.")
 parser.add_argument(
     "-z", "--zope-conf", metavar="FILE",
     help='The "zope.conf" FILE to use when starting the Zope2 app. '
@@ -27,12 +24,37 @@ parser.add_argument(
     help='When upgrading a portal using plone.app.linkintegrity, '
     'disable it during the upgrade.')
 
+group = parser.add_argument_group('upgrades')
+group.add_argument(
+    '-U', '--skip-portal-upgrade', action='store_false', dest='upgrade_portal',
+    help='Skip running the upgrade steps for the core Plone baseline profile.')
+group.add_argument(
+    '-G', '--upgrade-profile', metavar='PROFILE_ID',
+    action='append', dest='upgrade_profiles',
+    help='Run all upgrade steps for the given profile '
+    '(default: upgrade all installed extension profiles)')
+group.add_argument(
+    '-A', '--skip-all-profiles-upgrade',
+    action='store_false', dest='upgrade_all_profiles',
+    help='Skip running all upgrade steps '
+    'for all installed extension profiles.')
+
+parser.add_argument(
+    'portal_paths', metavar='PATH', nargs='*',
+    help='Run upgrades for the portals at the given paths only '
+    '(default: upgrade all CMF portals in the Zope app)')
+
 
 def main(app=None, args=None):
     full_args = args
     if args is not None:
         full_args = args + sys.argv[1:]
     args = parser.parse_args(full_args)
+
+    if args.upgrade_profiles:
+        args.upgrade_all_profiles = False
+    elif not (args.upgrade_portal or args.upgrade_all_profiles):
+        parser.error('The supplied options would not upgrade any profiles')
 
     if app is None:
         import Zope2
@@ -61,7 +83,11 @@ def main(app=None, args=None):
     log_file.setFormatter(utils.formatter)
     root.addHandler(log_file)
 
-    kw = dict(paths=args.portal_paths)
+    kw = dict(
+        paths=args.portal_paths,
+        upgrade_portal=args.upgrade_portal,
+        upgrade_all_profiles=args.upgrade_all_profiles,
+        upgrade_profiles=args.upgrade_profiles)
     if args.disable_link_integrity:
         kw['enable_link_integrity_checks'] = False
 

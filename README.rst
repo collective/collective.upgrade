@@ -69,7 +69,8 @@ your browser::
 Use the ``--help`` option for more details::
 
     $ bin/upgrade-portals --help
-    usage: upgrade-portals [-h] [-l FILE] [-z FILE] [-d] [PATH [PATH ...]]
+    usage: upgrade-portals [-h] [-l FILE] [-z FILE] [-d] [-U] [-G PROFILE_ID] [-A]
+                           [PATH [PATH ...]]
     
     Upgrade CMF portals in a Zope 2 application using GenericSetup upgrade steps
     
@@ -87,6 +88,17 @@ Use the ``--help`` option for more details::
       -d, --disable-link-integrity
                             When upgrading a portal using plone.app.linkintegrity,
                             disable it during the upgrade.
+    
+    upgrades:
+      -U, --skip-portal-upgrade
+                            Skip running the upgrade steps for the core Plone
+                            baseline profile.
+      -G PROFILE_ID, --upgrade-profile PROFILE_ID
+                            Run all upgrade steps for the given profile (default:
+                            upgrade all installed extension profiles)
+      -A, --skip-all-profiles-upgrade
+                            Skip running all upgrade steps for all installed
+                            extension profiles.
 
 
 Incremental Commits
