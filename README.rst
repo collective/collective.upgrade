@@ -69,20 +69,25 @@ your browser::
 Use the ``--help`` option for more details::
 
     $ bin/upgrade-portals --help
-    Usage: upgrade-portals [options]
+    usage: upgrade-portals [-h] [-l FILE] [-z FILE] [-d] [PATH [PATH ...]]
     
-    Options:
+    Upgrade CMF portals in a Zope 2 application using GenericSetup upgrade steps
+    
+    positional arguments:
+      PATH                  Run upgrades for the portals at the given paths only
+                            (default: upgrade all CMF portals in the Zope app)
+    
+    optional arguments:
       -h, --help            show this help message and exit
-      -l FILE, --log-file=FILE
+      -l FILE, --log-file FILE
                             Log upgrade messages, filtered for duplicates, to FILE
-      -p PATH, --portal-path=PATH
-                            Run upgrades for the portals at the given paths only.
-                            May be given multiple times to specify multiple portals.
-                            If not given, all CMF portals in the Zope app will be
-                            upgraded.
-      -z FILE, --zope-conf=FILE
+      -z FILE, --zope-conf FILE
                             The "zope.conf" FILE to use when starting the Zope2 app.
                             Can be omitted when used as a zopectl "run" script.
+      -d, --disable-link-integrity
+                            When upgrading a portal using plone.app.linkintegrity,
+                            disable it during the upgrade.
+
 
 Incremental Commits
 -------------------

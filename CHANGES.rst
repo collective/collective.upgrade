@@ -1,8 +1,12 @@
 Changelog
 =========
 
-0.5 - Unreleased
-----------------
+1.0rc1 - Unreleased
+-------------------
+
+- Migrate from ``optparse`` to ``argparse`` and move portal paths from an
+  option to a positional argument.
+  [@rpatterson]
 
 - Add an upgrade step function that packs the ZODB.
   [@rpatterson]
