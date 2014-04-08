@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0rc1 - Unreleased
+1.0rc1 - 2014-04-08
 -------------------
 
 - Add options for controlling which profiles are upgraded.
