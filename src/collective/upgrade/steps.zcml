@@ -48,9 +48,6 @@
     <genericsetup:upgradeStep
         title="Migrate CMFEditions folder versions."
         handler=".steps.migrateCMFEditionsFolderVersions" />
-    <genericsetup:upgradeStep
-        title="Set all users to use the deault editor."
-        handler=".steps.setDefaultEditor" />
   </genericsetup:upgradeSteps>
 
   <genericsetup:upgradeSteps

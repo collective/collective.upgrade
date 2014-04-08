@@ -33,13 +33,14 @@ setup(name='collective.upgrade',
           # -*- Extra requirements: -*-
           'zope.globalrequest',
           'zodbupdate',
-          'collective.setdefaulteditor',
-          'experimental.broken',
           'Products.GenericSetup',
           'Products.CMFCore',
       ],
       tests_require=tests_require,
-      extras_require=dict(test=tests_require),
+      extras_require=dict(
+          test=tests_require,
+          steps=['experimental.broken',
+                 'collective.setdefaulteditor']),
       test_suite='collective.upgrade.tests.test_suite',
       scripts=['run-portal-upgrades'],
       entry_points="""

@@ -4,6 +4,9 @@ Changelog
 0.5 - Unreleased
 ----------------
 
+- Reduce dependencies by moving some into an 'steps' extras_require.
+  [@rpatterson]
+
 - Fix a transaction error when the transaction note becomes too large.
   [@rpatterson]
 
