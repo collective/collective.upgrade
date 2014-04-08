@@ -92,7 +92,7 @@ class ExportReconciler(Reconciler):
             self.plugins.deactivatePlugin(
                 IUserEnumerationPlugin, self.dest_users.getId())
             if self.dest_properties.getId() in self.plugins.listPluginIds(
-                IUserEnumerationPlugin):
+                    IUserEnumerationPlugin):
                 self.plugins.deactivatePlugin(
                     IUserEnumerationPlugin, self.dest_properties.getId())
 
@@ -259,7 +259,7 @@ class ImportReconciler(Reconciler):
             for source_id, dest_id in rows.iteritems():
                 # ownership
                 if (acl_users_path, source_id) == (
-                    userdb_path, user_id):
+                        userdb_path, user_id):
                     logger.info('Changing %r owner from %r to %r',
                                 obj, source_id, dest_id)
                     dest_principal = getPrincipalById(dest_id)

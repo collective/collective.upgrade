@@ -14,7 +14,7 @@ class PortalsUpgrader(utils.Upgrader):
         else:
             upgraders = self.walkUpgraders(self.context)
             self.log('Upgrading all portals')
-                            
+
         for upgrader in upgraders:
             upgrader.upgrade(**kw)
 

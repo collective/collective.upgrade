@@ -1,16 +1,11 @@
 import sys
 import logging
-import time
-import pprint
 import optparse
 import pdb
 
 import transaction
-import ZODB.serialize
-from zodbupdate import update
 import zodbupdate.main
 
-from collective.upgrade import interfaces
 from collective.upgrade import utils
 
 

@@ -57,8 +57,9 @@ def cleanupBrokenTextIndexes(context):
     catalog = getToolByName(context, 'portal_catalog')
     for id_ in catalog.indexes():
         index = catalog._catalog.getIndex(id_)
-        if (not isinstance(index, broken.Broken) or
-            'TextIndex' not in index.__class__.__name__):
+        if (
+                not isinstance(index, broken.Broken) or
+                'TextIndex' not in index.__class__.__name__):
             continue
 
         steps.logger.info('Replacing %r text index in %r' % (index, catalog))
@@ -102,7 +103,6 @@ class CleanupBrokenObjects(steps.CMFEditionsUpgrader):
         self.context.ZopeFindAndApply(
             self.context, search_sub=1, apply_func=self.upgradeObj)
 
-
         # There should be no more broken interfaces
         catalog = getToolByName(self.context, 'portal_catalog')
         assert len(catalog(
@@ -129,9 +129,10 @@ class CleanupBrokenObjects(steps.CMFEditionsUpgrader):
         if not self.update_catalogs:
             return
         base = aq_base(obj)
-        
-        if (not isinstance(obj, ZCatalog.ZCatalog) and
-            callable(getattr(base, 'indexObject', None))):
+
+        if (
+                not isinstance(obj, ZCatalog.ZCatalog) and
+                callable(getattr(base, 'indexObject', None))):
             obj.indexObject()
 
         if callable(getattr(base, '_updateCatalog', None)):
@@ -151,7 +152,7 @@ class CleanupBrokenObjects(steps.CMFEditionsUpgrader):
             self.log('Unregistering broken transform: %s' % path)
             self.unmapTransform(container, obj)
 
-        self.log('Deleting broken object: %s' %  path)
+        self.log('Deleting broken object: %s' % path)
         container.manage_delObjects([obj_id])
         assert container._getOb(obj_id, None) is None
 

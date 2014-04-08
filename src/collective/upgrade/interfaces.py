@@ -19,4 +19,3 @@ class IUpgrader(interface.Interface):
 
     def commit(note='Checkpointing upgrade'):
         """Commit with a transaction note and log a message."""
-
