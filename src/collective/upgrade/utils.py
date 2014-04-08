@@ -4,6 +4,7 @@ import transaction
 
 from zope import interface
 from zope.publisher import browser
+from zope import globalrequest
 
 import zodbupdate.main
 
@@ -13,12 +14,13 @@ from collective.upgrade import interfaces
 
 formatter = logging.Formatter(
     "%(asctime)s %(levelname)s %(name)s %(message)s", "%Y-%m-%d %H:%M:%S")
+logger = logging.getLogger('collective.upgrade')
 
 
 class Upgrader(browser.BrowserView):
     interface.implements(interfaces.IUpgrader)
 
-    logger = logging.getLogger('collective.upgrade')
+    logger = logger
     log_level = logging.INFO
     log_template = '{context}: {msg}'
 
@@ -56,9 +58,23 @@ class Upgrader(browser.BrowserView):
 
     def commit(self, note='Checkpointing upgrade'):
         """Commit with a transaction note and log a message."""
-        self.log(note)
-        self.tm.recordMetaData(self, self.request)
-        if note is not None:
-            t = transaction.get()
-            t.note(str(note))
+        transaction_note(self.context, self.request, note, self.tm)
         self.tm.commit()
+
+
+def transaction_note(
+        context, request=None, note=None,
+        tm=Zope2.zpublisher_transactions_manager):
+    """Don't add a transaction note if it would exceed the maximum length."""
+    if request is None:
+        request = globalrequest.get_request()
+    logger.info(note)
+    tm.recordMetaData(context, request)
+    if note is not None:
+        t = transaction.get()
+        if (len(t.description) + len(note)) >= 65533:
+            logger.warning(
+                'Transaction note too large omitting {0!r}'.format(
+                    str(note)))
+        else:
+            t.note(str(note))

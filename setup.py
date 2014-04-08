@@ -31,6 +31,7 @@ setup(name='collective.upgrade',
       install_requires=[
           'setuptools',
           # -*- Extra requirements: -*-
+          'zope.globalrequest',
           'zodbupdate',
           'collective.setdefaulteditor',
           'experimental.broken',

@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.5 - Unreleased
+----------------
+
+- Fix a transaction error when the transaction note becomes too large.
+  [@rpatterson]
+
+
 0.4 - 2014-02-28
 ----------------
 
