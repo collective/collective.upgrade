@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.0 - 2014-04-21
+-------------------
+
+- Add an upgrade step for cooking the resource registries.  Useful when
+  encountering viewlet errors on the resource registry viewlets after an
+  upgrade.
+  [@rpatterson]
+
 1.0rc1 - 2014-04-08
 -------------------
 
