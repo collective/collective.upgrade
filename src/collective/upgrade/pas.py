@@ -18,7 +18,7 @@ logger = logging.getLogger('collective.upgrade.pas')
 
 class Reconciler(object):
 
-    filename = 'reconcile_{}s.csv'
+    filename = 'reconcile_{0}s.csv'
 
     def __init__(self, context, principal_type):
         self.context = context
@@ -46,7 +46,7 @@ class ExportReconciler(Reconciler):
         self.plugins = self.acl_users._getOb('plugins')
 
         self.get_rows = getattr(
-            self, 'get_{}_rows'.format(self.principal_type))
+            self, 'get_{0}_rows'.format(self.principal_type))
 
         if principal_type == 'user':
             if not dest_users_plugin:
@@ -217,7 +217,7 @@ class ImportReconciler(Reconciler):
         self.acl_users = getToolByName(self.site, 'acl_users')
         self.plugins = self.acl_users._getOb('plugins')
 
-        getPrincipalById = getattr(self.acl_users, 'get{}ById'.format(
+        getPrincipalById = getattr(self.acl_users, 'get{0}ById'.format(
             self.principal_type.capitalize()))
         rows = {}
         for row in reader:

@@ -1,6 +1,13 @@
 Changelog
 =========
 
+1.1 - 2014-05-08
+----------------
+
+- Restore Python 2.6 compatibility.
+  [rpatterson]
+
+
 1.0 - 2014-04-21
 -------------------
 
