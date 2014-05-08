@@ -1,7 +1,20 @@
 from setuptools import setup, find_packages
 import os
+import sys
 
-version = '1.0'
+version = '1.1'
+
+install_requires=[
+          'setuptools',
+          # -*- Extra requirements: -*-
+          'zope.globalrequest',
+          'zodbupdate',
+          'Products.GenericSetup',
+          'Products.CMFCore',
+      ]
+if sys.version_info[:2] < (2, 7):
+    # depend on the argparse dist before it was included in the stdlib
+    install_requires.append('argparse')
 
 tests_require = ['plone.app.testing']
 
@@ -28,14 +41,7 @@ setup(name='collective.upgrade',
       namespace_packages=['collective'],
       include_package_data=True,
       zip_safe=False,
-      install_requires=[
-          'setuptools',
-          # -*- Extra requirements: -*-
-          'zope.globalrequest',
-          'zodbupdate',
-          'Products.GenericSetup',
-          'Products.CMFCore',
-      ],
+      install_requires=install_requires,
       tests_require=tests_require,
       extras_require=dict(
           test=tests_require,
