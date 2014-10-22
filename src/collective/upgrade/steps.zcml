@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="plone">
 
+  <genericsetup:registerProfile
+      name="blank"
+      title="Blank import for all steps"
+      description="Useful with purge_old=True for resetting a site to an
+                   empty/unconfigured state."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
   <genericsetup:exportStep name="reconcile_users"
       title="Reconcile Users"
       description="Reconcile users between two PluggableAuthService

@@ -231,6 +231,7 @@ module.  These helpers are all meant to be used when writing your own
 upgrades steps.  See the ``collective.upgrade.steps`` source for
 details:
 
+  * reset the site to the baseline GenericSetup profile plus default extensions
   * delete custom skin objects
   * cleanup missing skin/theme layers
   * uninstall add-ons

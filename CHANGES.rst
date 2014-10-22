@@ -1,6 +1,15 @@
 Changelog
 =========
 
+
+1.2 - (Unreleased)
+----------------
+
+- Add an upgrade step to reset the site to the baseline GenericSetup profile
+  plus default extensions.
+  [rpatterson]
+
+
 1.1 - 2014-05-08
 ----------------
 

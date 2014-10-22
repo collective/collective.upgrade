@@ -45,7 +45,7 @@ class PloneUpgrader(upgrader.PortalUpgrader):
                 if orig is _marker:
                     properties.site_properties._delPropValue(
                         enable_link_integrity_checks)
-                else:
+                elif hasattr(properties, 'site_properties'):
                     properties.site_properties.manage_changeProperties(
                         enable_link_integrity_checks=orig)
 

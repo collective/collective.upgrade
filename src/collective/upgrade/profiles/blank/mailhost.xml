@@ -1,0 +1,3 @@
+<?xml version="1.0"?>
+<object name="MailHost"
+        smtp_port="25" />

@@ -287,3 +287,57 @@ def cookResourceRegisties(context, ids=None):
     for obj in portal.objectValues():
         if hasattr(obj, 'cookResources'):
             obj.cookResources()
+
+
+def resetProfiles(context, extension_profiles=None):
+    """
+    Reset the site to its initial profile state.
+
+    Re-apply the base GenericSetup profile and run all import steps from
+    extension profiles.  Example ZCML for a full reset:
+
+      <genericsetup:upgradeSteps
+          profile="foo.policy:default"
+          source="001" destination="002">
+          <genericsetup:upgradeDepends
+              title="Blank the site"
+              description=
+              "Blank all import steps prior to re-setting the site."
+              import_profile="collective.upgrade:blank" purge="true" />
+          <genericsetup:upgradeStep
+              title="Reset the site"
+              description="Reset to the base profile and default extensions"
+              handler="collective.upgrade.steps.resetProfiles" />
+          <genericsetup:upgradeDepends
+              title="Import initial extension profile"
+              description=
+              "Re-import the initial extension profile after resetting"
+              import_profile="foo.policy:initial" run_deps="true" />
+          <genericsetup:upgradeDepends
+              title="Import policy extension profile"
+              description=
+              "Re-import the policy extension profile after resetting"
+              import_profile="foo.policy:default" run_deps="true" />
+          <genericsetup:upgradeStep
+              title="Update the catalog"
+              description="Update the catalog after resetting the site."
+              handler="collective.upgrade.steps.catalogReindex" />
+      </genericsetup:upgradeSteps>
+    """
+    if extension_profiles is None:
+        url = getToolByName(context, 'portal_url')
+        portal = url.getPortalObject()
+        form = portal.restrictedTraverse('@@plone-addsite')
+        extension_profiles = [
+            info['id'] for info in form.profiles()['extensions']
+            if info.get('selected') == 'selected']
+
+    setup = getToolByName(context, 'portal_setup')
+
+    base_profile = setup.getBaselineContextID()
+    logger.info('Importing the %r base profile', base_profile)
+    setup.runAllImportStepsFromProfile(base_profile, purge_old=False)
+
+    for extension_profile in extension_profiles:
+        logger.info('Importing the %r extension profile', extension_profile)
+        setup.runAllImportStepsFromProfile('profile-%s' % extension_profile)
