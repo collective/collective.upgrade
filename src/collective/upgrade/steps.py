@@ -71,6 +71,7 @@ def uninstallAddOns(context, addons=None):
     uninstalled.
     """
     qi = getToolByName(context, 'portal_quickinstaller')
+    setup = getToolByName(context, 'portal_setup')
     for product in qi.listInstallableProducts(skipInstalled=False):
         addon = product['id']
         if addons is not None:
@@ -83,7 +84,6 @@ def uninstallAddOns(context, addons=None):
         install_profiles = qi.getInstallProfiles(addon)
         uninstall_profiles = [profile for profile in install_profiles
                               if profile.split(':', 1) == 'uninstall']
-        setup = getToolByName(context, 'portal_setup')
         if uninstall_profiles:
             profile = uninstall_profiles[0]
             logger.info(
