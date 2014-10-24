@@ -9,6 +9,10 @@ Changelog
   plus default extensions.
   [rpatterson]
 
+- BBB import/export steps for resource registries before the Plone 5 switch to
+  using plone.app.registry.
+  [rpatterson]
+
 
 1.1 - 2014-05-08
 ----------------

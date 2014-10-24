@@ -1,13 +1,16 @@
 import logging
+import contextlib
 
 import transaction
 
 from zope import interface
+from zope.component import hooks
 from zope.publisher import browser
 from zope import globalrequest
 
 import zodbupdate.main
 
+from Acquisition import aq_base
 import Zope2
 
 from collective.upgrade import interfaces
@@ -80,3 +83,33 @@ def transaction_note(
                     str(note)))
         else:
             t.note(str(note))
+
+
+@contextlib.contextmanager
+def overrideComponents(obj=None):
+    """
+    Temporarily override the site manager components registry.
+
+    Useful for registering components that should only be used inside a certain
+    block of code.
+    """
+    from five.localsitemanager import registry
+
+    if obj is None:
+        obj = hooks.getSite()
+
+    # Create a new component registry that uses the existing one as its base
+    next = obj.getSiteManager()
+    components = registry.PersistentComponents('++etc++site', bases=(next,))
+    obj.setSiteManager(components)
+    components.__parent__ = aq_base(obj)
+
+    # Install the new registry and site
+    hooks.setSite(obj)
+
+    # Make the registry available to the calling code
+    yield components
+
+    # Restore the previous site manager
+    obj.setSiteManager(next)
+    hooks.setSite(obj)

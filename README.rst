@@ -236,3 +236,5 @@ details:
   * cleanup missing skin/theme layers
   * uninstall add-ons
   * pack the ZODB pruning old revision history
+  * BBB import/export steps for resource registries before the Plone 5 switch to
+    using plone.app.registry
