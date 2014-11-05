@@ -5,6 +5,10 @@ Changelog
 1.2 - (Unreleased)
 ----------------
 
+- Do not start upgrade steps which are avaiable for `all` destination. These
+  upgrade steps are often used to configure add-on.
+  [bsuttor]
+
 - Add an upgrade step to reset the site to the baseline GenericSetup profile
   plus default extensions.
   [rpatterson]
