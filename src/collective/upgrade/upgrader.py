@@ -56,7 +56,7 @@ class PortalUpgrader(utils.Upgrader):
         dest = max(
             all_upgrades, key=operator.itemgetter('proposed', 'dest'))['dest']
         for info in all_upgrades:
-            if info['dest'] <= dest and info['sdest'] != 'all':
+            if info['dest'] <= dest and info['dest']:
                 upgrades.append(info)
         return upgrades
 
