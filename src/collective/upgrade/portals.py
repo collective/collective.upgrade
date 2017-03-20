@@ -1,3 +1,4 @@
+from zope.component.hooks import setSite
 from collective.upgrade import utils
 
 
@@ -16,6 +17,12 @@ class PortalsUpgrader(utils.Upgrader):
             self.log('Upgrading all portals')
 
         for upgrader in upgraders:
+            setSite(upgrader.context)
+            # initialize portal_skins
+            upgrader.context.setupCurrentSkin(self.context.REQUEST)
+            # setup language
+            upgrader.context.portal_languages(upgrader.context, self.context.REQUEST)
+            # Get Plone site object from Zope application server root
             upgrader.upgrade(**kw)
 
     def walkUpgraders(self, context):
