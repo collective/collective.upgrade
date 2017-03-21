@@ -16,7 +16,6 @@ class PortalsUpgrader(utils.Upgrader):
             self.log('Upgrading all portals')
 
         for upgrader in upgraders:
-            # Get Plone site object from Zope application server root
             upgrader.upgrade(**kw)
 
     def walkUpgraders(self, context):
