@@ -1,6 +1,8 @@
 import operator
 
 from zope.component import hooks
+from zope.event import notify
+from zope.traversing.interfaces import BeforeTraverseEvent
 
 from Products.CMFCore.utils import getToolByName
 from Products.GenericSetup.upgrade import _upgrade_registry
@@ -14,8 +16,14 @@ class PortalUpgrader(utils.Upgrader):
             self, upgrade_portal=True,
             upgrade_all_profiles=True, upgrade_profiles=(), **kw):
         hooks.setSite(self.context)
+        # initialize portal_skins
+        self.context.setupCurrentSkin(self.context.REQUEST)
+        # setup language
+        self.context.portal_languages(self.context, self.context.REQUEST)
         self.setup = getToolByName(self.context, 'portal_setup')
         self.log('Upgrading {0}'.format(self.context))
+        # setup BrowserLayer, see: https://dev.plone.org/ticket/11673
+        notify(BeforeTraverseEvent(self.context, self.context.REQUEST))
 
         baseline = self.setup.getBaselineContextID()
         prof_type, profile_id = baseline.split('-', 1)

@@ -13,6 +13,12 @@ Changelog
   using plone.app.registry.
   [rpatterson]
 
+- Added argument to define Zope user id to use.
+  [gbastien]
+
+- Complete portal setup : portal_skins, portal_languages, BrowserLayer.
+  [gbastien]
+
 
 1.1 - 2014-05-08
 ----------------

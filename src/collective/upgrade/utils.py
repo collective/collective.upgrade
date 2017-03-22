@@ -1,12 +1,11 @@
-import logging
 import contextlib
-
+import logging
 import transaction
 
+from zope import globalrequest
 from zope import interface
 from zope.component import hooks
 from zope.publisher import browser
-from zope import globalrequest
 
 import zodbupdate.main
 

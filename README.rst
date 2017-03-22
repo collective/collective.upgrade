@@ -88,7 +88,10 @@ Use the ``--help`` option for more details::
       -d, --disable-link-integrity
                             When upgrading a portal using plone.app.linkintegrity,
                             disable it during the upgrade.
-    
+      -u, --username
+                            Specify username to use during the upgrade (if not
+                            provided, a special user will run the upgrade).
+
     upgrades:
       -U, --skip-portal-upgrade
                             Skip running the upgrade steps for the core Plone

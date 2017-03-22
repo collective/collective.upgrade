@@ -23,6 +23,9 @@ parser.add_argument(
     "-d", "--disable-link-integrity", action="store_true",
     help='When upgrading a portal using plone.app.linkintegrity, '
     'disable it during the upgrade.')
+parser.add_argument(
+    "-u", "--username", help='Specify username to use during the upgrade '
+    '(if not provided, a special user will run the upgrade).')
 
 group = parser.add_argument_group('upgrades')
 group.add_argument(
@@ -91,10 +94,19 @@ def main(app=None, args=None):
     if args.disable_link_integrity:
         kw['enable_link_integrity_checks'] = False
 
-    from AccessControl import SpecialUsers
+    # setup user and REQUEST
     from AccessControl.SecurityManagement import newSecurityManager
-    newSecurityManager(None, SpecialUsers.system)
     from Testing.makerequest import makerequest
+    if args.username:
+        acl_users = app.acl_users
+        user = acl_users.getUser(args.username)
+        if user:
+            user = user.__of__(acl_users)
+    else:
+        from AccessControl import SpecialUsers
+        user = SpecialUsers.system
+
+    newSecurityManager(None, user)
     app = makerequest(app)
 
     runner = app.restrictedTraverse('@@collective.upgrade.form')
