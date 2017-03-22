@@ -25,7 +25,7 @@ parser.add_argument(
     'disable it during the upgrade.')
 parser.add_argument(
     "-u", "--username", help='Specify username to use during the upgrade '
-    '(if not provided, a special user will run the upgrade)')
+    '(if not provided, a special user will run the upgrade).')
 
 group = parser.add_argument_group('upgrades')
 group.add_argument(
