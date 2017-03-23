@@ -1,3 +1,5 @@
+include *.py
+include buildout.cfg
 include *.rst
 recursive-include src *.csv
 recursive-include src *.pp
