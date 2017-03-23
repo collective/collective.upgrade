@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.2 - (Unreleased)
+1.2 (2017-03-23)
 ----------------
 
 - Add an upgrade step to reset the site to the baseline GenericSetup profile
