@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from collective.upgrade import utils
 
 
@@ -8,7 +10,7 @@ class PortalsUpgrader(utils.Upgrader):
         if paths:
             upgraders = (
                 self.context.restrictedTraverse(
-                    path+'/@@collective.upgrade.form')
+                    path + '/@@collective.upgrade.form')
                 for path in paths)
             self.log('Upgrading portals: %r' % paths)
         else:

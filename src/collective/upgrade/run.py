@@ -1,7 +1,9 @@
+# encoding: utf-8
+
 import sys
 import logging
 import argparse
-import pdb
+import pdb  # noqa
 
 import transaction
 import zodbupdate.main

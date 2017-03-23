@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from zope import component
 
 from Products.CMFCore.utils import getToolByName

@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 import contextlib
 import logging
 import transaction

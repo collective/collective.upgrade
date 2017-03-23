@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 import operator
 
 from zope.component import hooks

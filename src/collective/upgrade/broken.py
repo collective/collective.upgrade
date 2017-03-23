@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from zope import interface
 from zope import component
 

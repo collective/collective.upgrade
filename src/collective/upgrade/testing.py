@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 """Test fixtures and utilities"""
 
 from plone.app.testing import PloneSandboxLayer
@@ -142,6 +144,7 @@ class UpgradeTesting(PloneSandboxLayer):
         corge_doc.setContributors(
             ('corge_source_group_id', 'corge_source_user_id'))
         logout()
+
 
 COLLECTIVE_UPGRADE_FIXTURE = UpgradeTesting()
 
