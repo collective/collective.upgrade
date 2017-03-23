@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 import doctest
-
-import unittest2 as unittest
-
+import unittest
 from plone.testing import layered
-
 from collective.upgrade import testing
 
 
