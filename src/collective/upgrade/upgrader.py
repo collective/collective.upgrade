@@ -4,6 +4,7 @@ import operator
 
 from zope.component import hooks
 from zope.event import notify
+from zope.globalrequest import setRequest
 from zope.traversing.interfaces import BeforeTraverseEvent
 
 from Products.CMFCore.utils import getToolByName
@@ -18,6 +19,7 @@ class PortalUpgrader(utils.Upgrader):
             self, upgrade_portal=True,
             upgrade_all_profiles=True, upgrade_profiles=(), **kw):
         hooks.setSite(self.context)
+        setRequest(self.context.REQUEST)
         # initialize portal_skins
         self.context.setupCurrentSkin(self.context.REQUEST)
         # setup language
