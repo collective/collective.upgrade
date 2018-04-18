@@ -5,7 +5,8 @@ Changelog
 1.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add zope global request to PortalUpgrader.
+  [bsuttor]
 
 
 1.2 (2017-03-23)
