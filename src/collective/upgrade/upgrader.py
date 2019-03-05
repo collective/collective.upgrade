@@ -22,8 +22,9 @@ class PortalUpgrader(utils.Upgrader):
         setRequest(self.context.REQUEST)
         # initialize portal_skins
         self.context.setupCurrentSkin(self.context.REQUEST)
-        # setup language
-        self.context.portal_languages(self.context, self.context.REQUEST)
+        # setup language for plone 4: see https://docs.plone.org/manage/upgrading/version_specific_migration/p4x_to_p5x_upgrade.html#portal-languages-is-now-a-utility  # noqa
+        if getattr(self.context, 'portal_languages', None):
+            self.context.portal_languages(self.context, self.context.REQUEST)
         self.setup = getToolByName(self.context, 'portal_setup')
         self.log('Upgrading {0}'.format(self.context))
         # setup BrowserLayer, see: https://dev.plone.org/ticket/11673
