@@ -5,6 +5,9 @@ Changelog
 1.4 (unreleased)
 ----------------
 
+- Bugfix: Fix the Zope instance run script argument handling.
+  [rpatterson]
+
 - Bugfix: portal_languages is no longer a persistent tool.
   See: https://docs.plone.org/manage/upgrading/version_specific_migration/p4x_to_p5x_upgrade.html#portal-languages-is-now-a-utility
   [bsuttor]

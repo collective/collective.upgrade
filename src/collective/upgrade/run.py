@@ -51,10 +51,7 @@ parser.add_argument(
 
 
 def main(app=None, args=None):
-    full_args = args
-    if args is not None:
-        full_args = args + sys.argv[1:]
-    args = parser.parse_args(full_args)
+    args = parser.parse_args(args)
 
     if args.upgrade_profiles:
         args.upgrade_all_profiles = False
@@ -119,6 +116,17 @@ def main(app=None, args=None):
         runner.logger.exception('Exception running the upgrades.')
         pdb.post_mortem(sys.exc_info()[2])
         raise
+
+
+def run(app, args=None):
+    """
+    Run the upgrades as a Zope instance `run` script:
+
+    $ bin/instance run bin/run-portal-upgrades
+    """
+    if args is None:
+        args = sys.argv[3:]
+    main(app, args)
 
 
 if __name__ == '__main__':

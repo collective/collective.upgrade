@@ -1,4 +1,4 @@
 #!/usr/bin/env python
 
 from collective.upgrade import run
-run.main(app)
+run.run(app)
