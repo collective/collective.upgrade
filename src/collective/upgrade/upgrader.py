@@ -42,7 +42,7 @@ class PortalUpgrader(utils.Upgrader):
             if upgrade_profiles:
                 raise ValueError(
                     'upgrade_profiles conflicts with upgrade_all_profiles')
-            upgrade_profiles = self.setup.listProfilesWithUpgrades()
+            upgrade_profiles = self.setup.listProfilesWithPendingUpgrades()
         if upgrade_profiles:
             self.upgradeExtensions(upgrade_profiles, **kw)
 

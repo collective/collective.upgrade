@@ -5,6 +5,10 @@ Changelog
 1.4 (unreleased)
 ----------------
 
+- Bugfix: Fix upgrading all profiles, was running all upgrade steps for all
+  profiles that had upgrade steps registered.
+  [rpatterson]
+
 - Bugfix: Fix the Zope instance run script argument handling.
   [rpatterson]
 
