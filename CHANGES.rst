@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.4 (unreleased)
+1.4 (2019-03-31)
 ----------------
 
 - Bugfix: Fix upgrading all profiles, was running all upgrade steps for all
