@@ -60,6 +60,8 @@ Thumbs.db
 *.egg
 .mr.developer.cfg
 .installed.cfg
+/build
+/dist
 
 # Eclipse pydev related #
 #########################
