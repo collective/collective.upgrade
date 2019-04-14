@@ -5,7 +5,7 @@ Changelog
 1.5 (Unreleased)
 ----------------
 
-- *add item here*
+- Bugfix: Fix incremental commits when no source matches the first step.
 
 
 1.4 (2019-03-31)

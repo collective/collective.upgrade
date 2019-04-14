@@ -65,8 +65,7 @@ class PortalUpgrader(utils.Upgrader):
         if not all_upgrades:
             return all_upgrades
         upgrades = []
-        dest = max(
-            all_upgrades, key=operator.itemgetter('proposed', 'dest'))['dest']
+        dest = min(all_upgrades, key=operator.itemgetter('dest'))['dest']
         for info in all_upgrades:
             if info['dest'] <= dest:
                 upgrades.append(info)
