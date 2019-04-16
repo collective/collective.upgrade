@@ -64,7 +64,7 @@ class PortalUpgrader(utils.Upgrader):
         all_upgrades = list(self.flattenUpgrades(profile_id))
         if not all_upgrades:
             return all_upgrades
-        dest = min(all_upgrades, key=operator.itemgetter('dest'))['dest']
+        dest = all_upgrades[0]['dest']
         return [info for info in all_upgrades if info['dest'] <= dest]
 
     def flattenUpgrades(self, profile_id):
