@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-import operator
-
 from zope.component import hooks
 from zope.event import notify
 from zope.globalrequest import setRequest
