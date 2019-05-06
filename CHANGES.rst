@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.5 (Unreleased)
+1.5 (2019-05-06)
 ----------------
 
 - Bugfix: Fix incremental commits when no source matches the first step.
