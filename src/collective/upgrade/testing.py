@@ -15,7 +15,7 @@ from Products.CMFCore.utils import getToolByName
 
 from Products.PluggableAuthService.interfaces.plugins import (
     IUserEnumerationPlugin, IGroupEnumerationPlugin, IPropertiesPlugin)
-from Products.PlonePAS.Extensions.Install import activatePluginInterfaces
+from Products.PlonePAS.setuphandlers import activatePluginInterfaces
 
 
 class UpgradeTesting(PloneSandboxLayer):
