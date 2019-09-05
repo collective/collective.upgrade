@@ -3,11 +3,11 @@
 """Test fixtures and utilities"""
 
 from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import login
 from plone.app.testing import logout
 from plone.app.testing import setRoles
+from plone.app.contenttypes import testing as ct_testing
 
 from zope.configuration import xmlconfig
 
@@ -20,7 +20,7 @@ from Products.PlonePAS.setuphandlers import activatePluginInterfaces
 
 class UpgradeTesting(PloneSandboxLayer):
 
-    defaultBases = (PLONE_FIXTURE, )
+    defaultBases = (ct_testing.PLONE_APP_CONTENTTYPES_FIXTURE, )
 
     def setUpZope(self, app, configurationContext):
         # Load ZCML

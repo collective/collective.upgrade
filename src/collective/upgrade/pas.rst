@@ -245,7 +245,7 @@ local roles, and CMF creators:
     >>> source_groups.getGroupMembers('grault_source_group_id')
     ('corge_source_group_id', 'corge_source_user_id')
     >>> portal.corge_doc
-    <ATDocument at /plone/corge_doc>
+    <Document at /plone/corge_doc>
     >>> portal.corge_doc.getOwner()
     <PloneUser 'corge_source_user_id'>
     >>> pp(portal.corge_doc.get_local_roles())
@@ -404,7 +404,7 @@ It applies those changes to: source group plugin memberships,
     >>> source_groups.getGroupMembers('grault_source_group_id')
     ('corge_dest_group_id', 'corge_dest_user_id')
     >>> portal.corge_doc
-    <ATDocument at /plone/corge_doc>
+    <Document at /plone/corge_doc>
     >>> portal.corge_doc.getOwner()
     <PloneUser 'corge_dest_user_id'>
     >>> pp(portal.corge_doc.get_local_roles())

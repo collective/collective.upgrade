@@ -16,7 +16,7 @@ if sys.version_info[:2] < (2, 7):
     # depend on the argparse dist before it was included in the stdlib
     install_requires.append('argparse')
 
-tests_require = ['plone.app.testing']
+tests_require = ['plone.app.testing', 'plone.app.contenttypes']
 
 setup(name='collective.upgrade',
       version=version,
