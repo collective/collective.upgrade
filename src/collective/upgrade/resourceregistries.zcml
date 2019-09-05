@@ -1,0 +1,38 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="plone">
+
+  <genericsetup:importStep
+      name="cssregistry-bbb"
+      title="Stylesheet BBB registry"
+      description="Import stylesheet BBB registry"
+      handler=".steps.importBBBCSSRegistry">
+    <depends name="skins"/>
+    <depends name="componentregistry"/>
+    <depends name="plone.app.registry"/>
+    <depends name="toolset"/>
+  </genericsetup:importStep>
+  <genericsetup:exportStep
+      name="cssregistry-bbb"
+      title="Stylesheet BBB registry"
+      description="Export stylesheet BBB registry"
+      handler=".steps.exportBBBCSSRegistry" />
+
+  <genericsetup:importStep
+      name="jsregistry-bbb"
+      title="Javascript BBB registry"
+      description="Import javascript BBB registry"
+      handler=".steps.importBBBJSRegistry">
+    <depends name="skins"/>
+    <depends name="componentregistry"/>
+    <depends name="plone.app.registry"/>
+    <depends name="toolset"/>
+  </genericsetup:importStep>
+  <genericsetup:exportStep
+      name="jsregistry-bbb"
+      title="Javascript BBB registry"
+      description="Export javascript BBB registry"
+      handler=".steps.exportBBBJSRegistry" />
+
+</configure>
