@@ -12,7 +12,6 @@ from zope.publisher import browser
 import zodbupdate.main
 
 from Acquisition import aq_base
-import Zope2
 
 from collective.upgrade import interfaces
 
@@ -30,7 +29,7 @@ class Upgrader(browser.BrowserView):
 
     def __init__(self, context, request=None):
         super(Upgrader, self).__init__(context, request)
-        self.tm = Zope2.zpublisher_transactions_manager
+        self.tm = transaction.manager
 
     def __call__(self):
         """Do the actual upgrade work."""
@@ -72,7 +71,7 @@ def transaction_note(
     if request is None:
         request = globalrequest.getRequest()
     if tm is None:
-        tm = Zope2.zpublisher_transactions_manager
+        tm = transaction.manager
 
     logger.info(note)
     tm.recordMetaData(context, request)
