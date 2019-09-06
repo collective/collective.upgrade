@@ -11,8 +11,8 @@ from collective.upgrade import upgrader
 _marker = object()
 
 
+@component.adapter(plone_ifaces.IPloneSiteRoot)
 class PloneUpgrader(upgrader.PortalUpgrader):
-    component.adapts(plone_ifaces.IPloneSiteRoot)
 
     def upgrade(self, **kw):
         # May fix the profile version

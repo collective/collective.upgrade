@@ -20,8 +20,8 @@ formatter = logging.Formatter(
 logger = logging.getLogger('collective.upgrade')
 
 
+@interface.implementer(interfaces.IUpgrader)
 class Upgrader(browser.BrowserView):
-    interface.implements(interfaces.IUpgrader)
 
     logger = logger
     log_level = logging.INFO
