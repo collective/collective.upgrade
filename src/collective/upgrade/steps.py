@@ -12,7 +12,6 @@ from Products.ZCatalog.ProgressHandler import ZLogHandler
 from Products.CMFCore.utils import getToolByName
 
 from plone.uuid import interfaces as uuid_ifaces
-from Products.Archetypes import interfaces as at_ifaces
 
 from collective.upgrade import utils
 
@@ -250,6 +249,8 @@ class ReferenceTargetCleaner(utils.Upgrader):
             self.context, search_sub=1, apply_func=self.upgradeObj)
 
     def upgradeObj(self, obj, path=None):
+        from Products.Archetypes import interfaces as at_ifaces
+
         if not at_ifaces.IReferenceable.providedBy(obj):
             return
         for ref in self.ref_catalog.getReferences(obj):
