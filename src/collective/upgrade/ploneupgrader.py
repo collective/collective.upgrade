@@ -14,6 +14,8 @@ _marker = object()
 @component.adapter(plone_ifaces.IPloneSiteRoot)
 class PloneUpgrader(upgrader.PortalUpgrader):
 
+    RESOURCE_TOOLS = {'portal_css', 'portal_javascripts', 'portal_kss'}
+
     def upgrade(self, **kw):
         # May fix the profile version
         migration = getToolByName(self.context, 'portal_migration')
@@ -21,12 +23,16 @@ class PloneUpgrader(upgrader.PortalUpgrader):
 
         result = super(PloneUpgrader, self).upgrade(**kw)
 
-        getToolByName(self.context, 'portal_css').cookResources()
-        getToolByName(self.context, 'portal_javascripts').cookResources()
-        portal_kss = getToolByName(self.context, 'portal_kss', None)
-        if portal_kss is not None:
-            portal_kss.cookResources()
-        self.log('Refreshed resource registries for {0}'.format(self.context))
+        # BBB Support for Plone < 5.2
+        resource_tools_exist = False
+        for resource_tool_id in self.RESOURCE_TOOLS:
+            resource_tool = getToolByName(self.context, resource_tool_id, None)
+            if resource_tool is not None:
+                resource_tool.cookResources()
+                resource_tools_exist = True
+        if resource_tools_exist:
+            self.log('Refreshed resource registries for {0}'.format(
+                self.context))
 
         return result
 
