@@ -266,7 +266,7 @@ default, the export step assumes the first IUserEnumerationPlugin,
 IGroupEnumerationPlugin, and IPropertiesPlugin are the destination
 plugins.
 
-    >>> import StringIO
+    >>> from six import StringIO
     >>> import tarfile
     >>> import csv
     >>> from pprint import pformat as pf
@@ -374,10 +374,12 @@ of user and group ``id`` values:
     >>> import os
     >>> import collective.upgrade
 
-    >>> import_users_csvfile = open(os.path.join(
-    ...     os.path.dirname(collective.upgrade.__file__),
-    ...     'profiles', 'testing', 'reconcile_users.csv'))
-    >>> import_users_mappings = pf(list(csv.DictReader(import_users_csvfile)))
+    >>> with open(os.path.join(
+    ...         os.path.dirname(collective.upgrade.__file__),
+    ...         'profiles', 'testing', 'reconcile_users.csv')
+    ... ) as import_users_csvfile:
+    ...     import_users_mappings = pf(list(csv.DictReader(
+    ...         import_users_csvfile)))
     >>> import_users_mappings == export_users_mappings
     True
     >>> pp(portal_setup.runImportStepFromProfile(
@@ -386,10 +388,12 @@ of user and group ``id`` values:
     {'messages': {'reconcile_users': ''},
      'steps': ['reconcile_users']}
 
-    >>> import_groups_csvfile = open(os.path.join(
-    ...     os.path.dirname(collective.upgrade.__file__),
-    ...     'profiles', 'testing', 'reconcile_groups.csv'))
-    >>> import_groups_mappings = pf(list(csv.DictReader(import_groups_csvfile)))
+    >>> with open(os.path.join(
+    ...         os.path.dirname(collective.upgrade.__file__),
+    ...         'profiles', 'testing', 'reconcile_groups.csv')
+    ... ) as import_groups_csvfile:
+    ...     import_groups_mappings = pf(list(csv.DictReader(
+    ...         import_groups_csvfile)))
     >>> import_groups_mappings == export_groups_mappings
     True
     >>> pp(portal_setup.runImportStepFromProfile(

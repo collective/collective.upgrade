@@ -33,11 +33,11 @@ class Reconciler(object):
 
 class ExportReconciler(Reconciler):
 
-    fieldnames = ('Source Plugin ID',
-                  'Source ID',
-                  'Destination Plugin ID',
-                  'Destination ID',
-                  'Destination Duplicate IDs')
+    fieldnames = (b'Source Plugin ID',
+                  b'Source ID',
+                  b'Destination Plugin ID',
+                  b'Destination ID',
+                  b'Destination Duplicate IDs')
     user_properties = ('fullname', )
 
     def __init__(self, context, principal_type,
