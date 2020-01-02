@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+from zope import interface
 from zope import component
 
 from Products.CMFCore.utils import getToolByName
@@ -9,6 +10,21 @@ from Products.CMFPlone import interfaces as plone_ifaces
 from collective.upgrade import upgrader
 
 _marker = object()
+
+
+@interface.implementer(plone_ifaces.INonInstallable)
+class HiddenProfiles(object):
+    """
+    Exclude utility or upgrade profiles on the Plone add-on control panel.
+    """
+
+    def getNonInstallableProfiles(self):  # pragma: no cover
+        """
+        Exclude utility or upgrade profiles on the Plone add-on control panel.
+        """
+        return [
+            u"collective.upgrade:blank",
+        ]
 
 
 @component.adapter(plone_ifaces.IPloneSiteRoot)

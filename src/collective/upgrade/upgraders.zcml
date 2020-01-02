@@ -10,6 +10,12 @@
                 permission="zope2.ViewManagementScreens"
                 class=".portals.PortalsUpgrader" />
 
+
+  <utility
+      factory=".ploneupgrader.HiddenProfiles"
+      name="collective.upgrade"
+      provides="Products.CMFPlone.interfaces.INonInstallable"
+      />
   <browser:page name="collective.upgrade.form"
                 for="Products.CMFPlone.interfaces.IPloneSiteRoot"
                 permission="cmf.ManagePortal"
