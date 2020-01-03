@@ -12,6 +12,7 @@ from zope.publisher import browser
 import zodbupdate.main
 
 from Acquisition import aq_base
+from ZPublisher import utils
 
 from collective.upgrade import interfaces
 
@@ -29,7 +30,6 @@ class Upgrader(browser.BrowserView):
 
     def __init__(self, context, request=None):
         super(Upgrader, self).__init__(context, request)
-        self.tm = transaction.manager
 
     def __call__(self):
         """Do the actual upgrade work."""
@@ -61,20 +61,17 @@ class Upgrader(browser.BrowserView):
 
     def commit(self, note='Checkpointing upgrade'):
         """Commit with a transaction note and log a message."""
-        transaction_note(self.context, self.request, note, self.tm)
-        self.tm.commit()
+        transaction_note(self.context, self.request, note)
+        transaction.commit()
 
 
-def transaction_note(
-        context, request=None, note=None, tm=None):
+def transaction_note(context, request=None, note=None):
     """Don't add a transaction note if it would exceed the maximum length."""
     if request is None:
         request = globalrequest.getRequest()
-    if tm is None:
-        tm = transaction.manager
 
     logger.info(note)
-    tm.recordMetaData(context, request)
+    utils.recordMetaData(context, request)
     if note is not None:
         t = transaction.get()
         if (len(t.description) + len(note)) >= 65533:
