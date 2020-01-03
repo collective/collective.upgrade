@@ -18,6 +18,12 @@ class HiddenProfiles(object):
     Exclude utility or upgrade profiles on the Plone add-on control panel.
     """
 
+    def getNonInstallableProducts(self):  # pragma: no cover
+        """
+        No general packages all of whose profiles to exclude.
+        """
+        return []
+
     def getNonInstallableProfiles(self):  # pragma: no cover
         """
         Exclude utility or upgrade profiles on the Plone add-on control panel.

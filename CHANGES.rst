@@ -5,7 +5,9 @@ Changelog
 1.6 (Unreleased)
 ----------------
 
-- *Add changes here*
+- Hide upgrade profiles from Plone add-on control panel.
+  [rpatterson]
+
 
 1.5 (2019-05-06)
 ----------------
