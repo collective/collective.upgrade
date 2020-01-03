@@ -48,7 +48,7 @@ class Upgrader(browser.BrowserView):
         return super(Upgrader, self).__call__()
 
     def upgrade(self):
-        raise NotImplemented('Subclasses should override "__call__()"')
+        raise NotImplementedError('Subclasses should override "__call__()"')
 
     def log(self, msg, level=None, template=None):
         """Log a message using per-upgrader template and level."""
