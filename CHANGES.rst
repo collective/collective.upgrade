@@ -2,7 +2,13 @@ Changelog
 =========
 
 
-1.6 (Unreleased)
+1.7 (unreleased)
+----------------
+
+- Nothing changed yet.
+
+
+1.6 (2020-03-10)
 ----------------
 
 - Hide upgrade profiles from Plone add-on control panel.
