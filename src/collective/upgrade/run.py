@@ -28,6 +28,11 @@ parser.add_argument(
 parser.add_argument(
     "-u", "--username", help='Specify username to use during the upgrade '
     '(if not provided, a special user will run the upgrade).')
+parser.add_argument(
+    "-p", "--disable-pdb",
+    action="store_true",
+    help='When upgrading a portal disable start of pdb post mortem.'
+)
 
 group = parser.add_argument_group('upgrades')
 group.add_argument(
@@ -114,7 +119,8 @@ def main(app=None, args=None):
     except:
         transaction.abort()
         runner.logger.exception('Exception running the upgrades.')
-        pdb.post_mortem(sys.exc_info()[2])
+        if not args.disable_pdb:
+            pdb.post_mortem(sys.exc_info()[2])
         raise
 
 
