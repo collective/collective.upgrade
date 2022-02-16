@@ -5,7 +5,7 @@ Changelog
 1.7 (unreleased)
 ----------------
 
-- Add option to disable PDB post mortem on exception.
+- Add option to enable PDB post-mortem on exception.
   [thokas]
 
 

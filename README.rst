@@ -91,8 +91,8 @@ Use the ``--help`` option for more details::
       -u, --username
                             Specify username to use during the upgrade (if not
                             provided, a special user will run the upgrade).
-      -p, --disable-pdb
-                            When upgrading a portal disable start of pdb post mortem.
+      -D, --pdb
+                            When upgrading a portal enable post-mortem debugging.
 
     upgrades:
       -U, --skip-portal-upgrade
