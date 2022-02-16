@@ -5,7 +5,8 @@ Changelog
 1.7 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add option to enable PDB post-mortem on exception.
+  [thokas]
 
 
 1.6 (2020-03-10)

@@ -28,6 +28,11 @@ parser.add_argument(
 parser.add_argument(
     "-u", "--username", help='Specify username to use during the upgrade '
     '(if not provided, a special user will run the upgrade).')
+parser.add_argument(
+    "-D", "--pdb",
+    action="store_true",
+    help='When upgrading a portal enable post-mortem debugging.'
+)
 
 group = parser.add_argument_group('upgrades')
 group.add_argument(
@@ -111,10 +116,11 @@ def main(app=None, args=None):
     runner = app.restrictedTraverse('@@collective.upgrade.form')
     try:
         runner.upgrade(**kw)
-    except:
+    except Exception:
         transaction.abort()
         runner.logger.exception('Exception running the upgrades.')
-        pdb.post_mortem(sys.exc_info()[2])
+        if args.pdb:
+            pdb.post_mortem(sys.exc_info()[2])
         raise
 
 
