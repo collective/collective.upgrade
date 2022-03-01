@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.7 (unreleased)
+1.7 (2022-03-01)
 ----------------
 
 - Add option to enable PDB post-mortem on exception.
