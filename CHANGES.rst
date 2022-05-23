@@ -5,7 +5,8 @@ Changelog
 1.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fix import error for resource registries (#11)
+  [pgrunewald]
 
 
 1.7 (2022-03-01)
