@@ -3,7 +3,10 @@
 import sys
 import logging
 import argparse
-import pdb  # noqa
+try:
+    import ipdb as pdb  # noqa
+except ImportError:
+    import pdb  # noqa
 
 import transaction
 import zodbupdate.main

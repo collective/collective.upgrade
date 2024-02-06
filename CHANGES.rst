@@ -14,6 +14,9 @@ Changelog
 - Add option to dry-run the upgrade (use `-n` or `--dry-run`) without committing.
   [pgrunewald]
 
+- Use ipdb for post-mortem debugging, when available.
+  [pgrunewald]
+
 1.7 (2022-03-01)
 ----------------
 
