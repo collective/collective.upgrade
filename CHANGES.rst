@@ -8,6 +8,8 @@ Changelog
 - Fix import error for resource registries (#11)
   [pgrunewald]
 
+- Allow operating with aliases for Products.ResourceRegistries (e.g. via eea.aliases)
+  [pgrunewald]
 
 1.7 (2022-03-01)
 ----------------
