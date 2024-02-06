@@ -27,6 +27,7 @@ class Upgrader(browser.BrowserView):
     logger = logger
     log_level = logging.INFO
     log_template = '{context}: {msg}'
+    dry_run = False
 
     def __init__(self, context, request=None):
         super(Upgrader, self).__init__(context, request)
@@ -41,7 +42,10 @@ class Upgrader(browser.BrowserView):
             root = logging.getLogger()
             root.addHandler(handler)
             try:
-                self.upgrade(**self.request.form)
+                parameters = self.request.form
+                if parameters.get("dry_run") in {"1", "t", "T", "true", "True", True}:
+                    parameters["dry_run"] = True
+                self.upgrade(**parameters)
             finally:
                 root.removeHandler(handler)
             return self.request.response
@@ -61,6 +65,9 @@ class Upgrader(browser.BrowserView):
 
     def commit(self, note='Checkpointing upgrade'):
         """Commit with a transaction note and log a message."""
+        if self.dry_run:
+            self.log("Commits are disabled (Note: {})".format(note))
+            return
         transaction_note(self.context, self.request, note)
         transaction.commit()
 

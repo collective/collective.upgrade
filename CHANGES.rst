@@ -11,6 +11,9 @@ Changelog
 - Allow operating with aliases for Products.ResourceRegistries (e.g. via eea.aliases)
   [pgrunewald]
 
+- Add option to dry-run the upgrade (use `-n` or `--dry-run`) without committing.
+  [pgrunewald]
+
 1.7 (2022-03-01)
 ----------------
 

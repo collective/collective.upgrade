@@ -21,7 +21,7 @@ Use of this package will immediately commit changes to your ZODB.
 There is no "dry run" option as that is contrary to it's purpose.  As
 such, it should *never* be used on a ZODB that has not been backed up
 along with the BLOBs *immediately before* use.  Neither should it be
-used directly on production as a first attempt at upgrading portals.  
+used directly on production as a first attempt at upgrading portals.
 
 Quick Start
 -----------
@@ -66,42 +66,47 @@ your browser::
 
     http://localhost:8080/@@collective.upgrade.form?submitted=1
 
+Additionally you can add parameter ``&dry_run=1`` for testing the migration
+without doing any commit.
+
 Use the ``--help`` option for more details::
 
     $ bin/upgrade-portals --help
-    usage: upgrade-portals [-h] [-l FILE] [-z FILE] [-d] [-U] [-G PROFILE_ID] [-A]
-                           [PATH [PATH ...]]
-    
+    usage: upgrade-portals [-h] [-l FILE] [-z FILE] [-d] [-u USERNAME] [-D] [-n]
+                        [-U] [-G PROFILE_ID] [-A]
+                        [PATH [PATH ...]]
+
     Upgrade CMF portals in a Zope 2 application using GenericSetup upgrade steps
-    
+
     positional arguments:
-      PATH                  Run upgrades for the portals at the given paths only
+    PATH                  Run upgrades for the portals at the given paths only
                             (default: upgrade all CMF portals in the Zope app)
-    
+
     optional arguments:
-      -h, --help            show this help message and exit
-      -l FILE, --log-file FILE
+    -h, --help            show this help message and exit
+    -l FILE, --log-file FILE
                             Log upgrade messages, filtered for duplicates, to FILE
-      -z FILE, --zope-conf FILE
-                            The "zope.conf" FILE to use when starting the Zope2 app.
-                            Can be omitted when used as a zopectl "run" script.
-      -d, --disable-link-integrity
+    -z FILE, --zope-conf FILE
+                            The "zope.conf" FILE to use when starting the Zope2
+                            app. Can be omitted when used as a zopectl "run"
+                            script.
+    -d, --disable-link-integrity
                             When upgrading a portal using plone.app.linkintegrity,
                             disable it during the upgrade.
-      -u, --username
+    -u USERNAME, --username USERNAME
                             Specify username to use during the upgrade (if not
                             provided, a special user will run the upgrade).
-      -D, --pdb
-                            When upgrading a portal enable post-mortem debugging.
+    -D, --pdb             When upgrading a portal enable post-mortem debugging.
+    -n, --dry-run         When in dry-run there will be no commits.
 
     upgrades:
-      -U, --skip-portal-upgrade
+    -U, --skip-portal-upgrade
                             Skip running the upgrade steps for the core Plone
                             baseline profile.
-      -G PROFILE_ID, --upgrade-profile PROFILE_ID
+    -G PROFILE_ID, --upgrade-profile PROFILE_ID
                             Run all upgrade steps for the given profile (default:
                             upgrade all installed extension profiles)
-      -A, --skip-all-profiles-upgrade
+    -A, --skip-all-profiles-upgrade
                             Skip running all upgrade steps for all installed
                             extension profiles.
 
