@@ -51,7 +51,7 @@
   </genericsetup:importStep>
 
   <include
-      zcml:condition="installed Products.ResourceRegistries"
+      zcml:condition="installed Products.ResourceRegistries.exportimport"
       file="resourceregistries.zcml" />
 
   <genericsetup:upgradeSteps

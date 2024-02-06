@@ -15,7 +15,7 @@ class PortalUpgrader(utils.Upgrader):
 
     def upgrade(
             self, upgrade_portal=True,
-            upgrade_all_profiles=True, upgrade_profiles=(), **kw):
+            upgrade_all_profiles=True, upgrade_profiles=(), dry_run=False, **kw):
         hooks.setSite(self.context)
         setRequest(self.context.REQUEST)
         # initialize portal_skins
@@ -23,6 +23,8 @@ class PortalUpgrader(utils.Upgrader):
         # setup language for plone 4: see https://docs.plone.org/manage/upgrading/version_specific_migration/p4x_to_p5x_upgrade.html#portal-languages-is-now-a-utility  # noqa
         if getattr(self.context, 'portal_languages', None):
             self.context.portal_languages(self.context, self.context.REQUEST)
+        # setup dry-run to avoid committing
+        self.dry_run = dry_run
         self.setup = getToolByName(self.context, 'portal_setup')
         self.log('Upgrading {0}'.format(self.context))
         # setup BrowserLayer, see: https://dev.plone.org/ticket/11673

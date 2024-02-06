@@ -3,7 +3,10 @@
 import sys
 import logging
 import argparse
-import pdb  # noqa
+try:
+    import ipdb as pdb  # noqa
+except ImportError:
+    import pdb  # noqa
 
 import transaction
 import zodbupdate.main
@@ -32,6 +35,11 @@ parser.add_argument(
     "-D", "--pdb",
     action="store_true",
     help='When upgrading a portal enable post-mortem debugging.'
+)
+parser.add_argument(
+    "-n", "--dry-run",
+    action="store_true",
+    help='Activate dry-run to disable commits.'
 )
 
 group = parser.add_argument_group('upgrades')
@@ -94,7 +102,8 @@ def main(app=None, args=None):
         paths=args.portal_paths,
         upgrade_portal=args.upgrade_portal,
         upgrade_all_profiles=args.upgrade_all_profiles,
-        upgrade_profiles=args.upgrade_profiles)
+        upgrade_profiles=args.upgrade_profiles,
+        dry_run=args.dry_run)
     if args.disable_link_integrity:
         kw['enable_link_integrity_checks'] = False
 

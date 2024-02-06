@@ -7,7 +7,7 @@
       name="cssregistry-bbb"
       title="Stylesheet BBB registry"
       description="Import stylesheet BBB registry"
-      handler=".steps.importBBBCSSRegistry">
+      handler=".resourceregistries.importBBBCSSRegistry">
     <depends name="skins"/>
     <depends name="componentregistry"/>
     <depends name="plone.app.registry"/>
@@ -17,13 +17,13 @@
       name="cssregistry-bbb"
       title="Stylesheet BBB registry"
       description="Export stylesheet BBB registry"
-      handler=".steps.exportBBBCSSRegistry" />
+      handler=".resourceregistries.exportBBBCSSRegistry" />
 
   <genericsetup:importStep
       name="jsregistry-bbb"
       title="Javascript BBB registry"
       description="Import javascript BBB registry"
-      handler=".steps.importBBBJSRegistry">
+      handler=".resourceregistries.importBBBJSRegistry">
     <depends name="skins"/>
     <depends name="componentregistry"/>
     <depends name="plone.app.registry"/>
@@ -33,6 +33,6 @@
       name="jsregistry-bbb"
       title="Javascript BBB registry"
       description="Export javascript BBB registry"
-      handler=".steps.exportBBBJSRegistry" />
+      handler=".resourceregistries.exportBBBJSRegistry" />
 
 </configure>
