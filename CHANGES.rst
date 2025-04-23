@@ -5,7 +5,9 @@ Changelog
 1.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Portal_properties is no longer a persistent tool.
+  [bsuttor]
+
 
 
 1.7 (2022-03-01)
