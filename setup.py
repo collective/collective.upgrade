@@ -1,5 +1,4 @@
 import os
-import sys
 
 from setuptools import setup, find_packages
 
@@ -13,11 +12,12 @@ install_requires = [
     'Products.GenericSetup',
     'Products.CMFCore',
 ]
-if sys.version_info[:2] < (2, 7):
-    # depend on the argparse dist before it was included in the stdlib
-    install_requires.append('argparse')
 
-tests_require = ['plone.app.testing', 'plone.app.contenttypes']
+tests_require = [
+    'plone.app.testing',
+    'plone.app.robotframework',
+    'plone.app.contenttypes',
+]
 
 setup(
     name='collective.upgrade',
@@ -30,7 +30,10 @@ setup(
     # http://www.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         "Framework :: Plone",
+        "Framework :: Plone",
+        "Framework :: Plone :: 6.1",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3.13",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     keywords='Zope CMF Plone GenericSetup upgrade',

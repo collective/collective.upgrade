@@ -5,9 +5,8 @@ Changelog
 1.8 (unreleased)
 ----------------
 
-- Portal_properties is no longer a persistent tool.
-  [bsuttor]
-
+- Add Plone 6.1 compatibility, drop Plone 4 / 5 compatibility
+  [bsuttor, laulaz, szakitibi]
 
 
 1.7 (2022-03-01)

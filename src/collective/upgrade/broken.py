@@ -34,7 +34,7 @@ def cleanupBrokenSetupRegistrations(context):
     """Delete portal_setup registrations from missing add-ons."""
     setup = getToolByName(context, 'portal_setup')
     required = setup.getToolsetRegistry()._required
-    for id_, tool in required.items():
+    for id_, tool in list(required.items()):
         if utils._resolveDottedName(tool['class']) is None:
             steps.logger.info(
                 'Unregistering missing required tool %r in %r' % (tool, setup))
@@ -162,8 +162,8 @@ class CleanupBrokenObjects(steps.CMFEditionsUpgrader):
 
     def unmapTransform(self, container, transform):
         """unmap transform from portal_transforms structures"""
-        for dest in container._mtmap.itervalues():
-            for transforms in dest.itervalues():
+        for dest in container._mtmap.values():
+            for transforms in dest.values():
                 for registered in transforms:
                     if aq_base(registered) is aq_base(transform):
                         transforms.remove(transform)

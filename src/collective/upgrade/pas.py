@@ -1,8 +1,8 @@
 # encoding: utf-8
 
 import mimetypes
-import tempfile
 import csv
+import io
 import logging
 
 import transaction
@@ -33,11 +33,11 @@ class Reconciler(object):
 
 class ExportReconciler(Reconciler):
 
-    fieldnames = (b'Source Plugin ID',
-                  b'Source ID',
-                  b'Destination Plugin ID',
-                  b'Destination ID',
-                  b'Destination Duplicate IDs')
+    fieldnames = ('Source Plugin ID',
+                  'Source ID',
+                  'Destination Plugin ID',
+                  'Destination ID',
+                  'Destination Duplicate IDs')
     user_properties = ('fullname', )
 
     def __init__(self, context, principal_type,
@@ -70,7 +70,7 @@ class ExportReconciler(Reconciler):
         if hasattr(self.context, 'openDataFile'):
             csvfile = self.context.openDataFile(self.filename)
         else:
-            csvfile = tempfile.TemporaryFile()
+            csvfile = io.StringIO()
 
         try:
             content_type = mimetypes.guess_type(self.filename)
@@ -211,10 +211,9 @@ class ImportReconciler(Reconciler):
             datafile = self.context.readDataFile(self.filename)
             if datafile is None:
                 return
-            csvfile = tempfile.TemporaryFile()
-            csvfile.write(datafile)
-            csvfile.seek(0)
-        reader = csv.DictReader(csvfile)
+            csvfile = io.StringIO(datafile)
+        decoded_file = io.TextIOWrapper(csvfile, encoding='utf-8')
+        reader = csv.DictReader(decoded_file)
 
         self.acl_users = getToolByName(self.site, 'acl_users')
         self.plugins = self.acl_users._getOb('plugins')
@@ -258,7 +257,7 @@ class ImportReconciler(Reconciler):
                 orig_contributors = contributors()
                 contributors = list(orig_contributors)
 
-            for source_id, dest_id in rows.iteritems():
+            for source_id, dest_id in rows.items():
                 # ownership
                 if (acl_users_path, source_id) == (
                         userdb_path, user_id):
