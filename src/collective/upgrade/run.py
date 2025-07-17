@@ -64,14 +64,15 @@ def main(app=None, args=None):
         parser.error('The supplied options would not upgrade any profiles')
 
     if app is None:
-        import Zope2
         from App import config
+        from Zope2.Startup.run import configure_wsgi
         if config._config is None:
             if not args.zope_conf:
                 parser.error(
                     'Must give the "--zope-conf" option when not used as a '
                     'zopectl "run" script.')
-            Zope2.configure(args.zope_conf)
+            configure_wsgi(args.zope_conf)
+        import Zope2
         app = Zope2.app()
     elif args.zope_conf:
         parser.error(
