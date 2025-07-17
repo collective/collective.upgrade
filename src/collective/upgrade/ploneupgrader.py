@@ -1,13 +1,10 @@
 # encoding: utf-8
 
-from plone.registry.interfaces import IRegistry
-from zope import interface
-from zope import component
-from zope.component import getUtility
-
-from Products.CMFCore.utils import getToolByName
-
 from plone.base import interfaces as plone_ifaces
+from plone.registry.interfaces import IRegistry
+from Products.CMFCore.utils import getToolByName
+from zope import component, interface
+from zope.component import getUtility
 
 from collective.upgrade import upgrader
 
@@ -83,5 +80,5 @@ class PloneUpgrader(upgrader.PortalUpgrader):
         product, profile = profile_id.split(":", 1)
         qi = getToolByName(self.context, "portal_quickinstaller")
         if product.startswith("Products."):
-            product = product[len("Products.") :]
+            product = product[len("Products."):]
         return qi.isProductInstalled(product)
