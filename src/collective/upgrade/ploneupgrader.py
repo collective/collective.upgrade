@@ -1,6 +1,6 @@
 from collective.upgrade import upgrader
+from plone.base import interfaces as plone_ifaces
 from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone import interfaces as plone_ifaces
 from zope import component
 from zope import interface
 
@@ -31,26 +31,12 @@ class HiddenProfiles:
 @component.adapter(plone_ifaces.IPloneSiteRoot)
 class PloneUpgrader(upgrader.PortalUpgrader):
 
-    RESOURCE_TOOLS = {"portal_css", "portal_javascripts", "portal_kss"}
-
     def upgrade(self, **kw):
         # May fix the profile version
         migration = getToolByName(self.context, "portal_migration")
         migration.getInstanceVersion()
 
-        result = super().upgrade(**kw)
-
-        # BBB Support for Plone < 5.2
-        resource_tools_exist = False
-        for resource_tool_id in self.RESOURCE_TOOLS:
-            resource_tool = getToolByName(self.context, resource_tool_id, None)
-            if resource_tool is not None:
-                resource_tool.cookResources()
-                resource_tools_exist = True
-        if resource_tools_exist:
-            self.log(f"Refreshed resource registries for {self.context}")
-
-        return result
+        return super().upgrade(**kw)
 
     def upgradeProfile(self, profile_id, enable_link_integrity_checks=_marker, **kw):
         upgradeProfile = super().upgradeProfile

@@ -44,22 +44,6 @@
     <depends name="toolset" />
   </genericsetup:importStep>
 
-  <include
-      file="resourceregistries.zcml"
-      zcml:condition="installed Products.ResourceRegistries"
-      />
-
-  <genericsetup:upgradeSteps
-      profile="Products.CMFPlone:plone"
-      source="4001"
-      destination="4002"
-      >
-    <genericsetup:upgradeStep
-        title="Migrate CMFEditions folder versions."
-        handler=".steps.migrateCMFEditionsFolderVersions"
-        />
-  </genericsetup:upgradeSteps>
-
   <genericsetup:upgradeSteps
       profile="Products.CMFPlone:plone"
       source="4100"

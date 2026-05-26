@@ -1,7 +1,5 @@
 from Acquisition import aq_base
-from Acquisition import aq_parent
 from collective.upgrade import utils
-from plone.uuid import interfaces as uuid_ifaces
 from Products.CMFCore.utils import getToolByName
 from Products.PluginIndexes.FieldIndex import FieldIndex
 from Products.ZCatalog.ProgressHandler import ZLogHandler
@@ -156,27 +154,6 @@ class CMFEditionsUpgrader(utils.Upgrader):
                 self.recurse(subobj)
 
 
-class CMFEditionsFolderMigrator(CMFEditionsUpgrader):
-
-    def upgrade(self):
-        from plone.app.folder.migration import BTreeMigrationView
-        from Products.BTreeFolder2.BTreeFolder2 import BTreeFolder2Base as BTreeFolder
-
-        self.folder_class = BTreeFolder
-        self.folder_migrator = BTreeMigrationView(self.context, None)
-
-        super().upgrade()
-
-    def upgradeObj(self, obj):
-        if isinstance(obj, self.folder_class):
-            self.folder_migrator.migrate(obj)
-
-
-def migrateCMFEditionsFolderVersions(context):
-    upgrader = CMFEditionsFolderMigrator(context)
-    upgrader.upgrade()
-
-
 copy_id_re = re.compile(r"^copy[0-9]*_of_.*")
 
 
@@ -240,38 +217,6 @@ def setDefaultEditor(context, wanted_editor="", dry_run=False):
 
     # Assumes the zope.component.hooks site has already been set
     set_editor_for_all(wanted_editor, dry_run)
-
-
-class ReferenceTargetCleaner(utils.Upgrader):
-    """Walk through all the reference objects and remove those whose
-    targets can't be found."""
-
-    def upgrade(self):
-        self.ref_catalog = getToolByName(self.context, "reference_catalog")
-        self.context.ZopeFindAndApply(
-            self.context, search_sub=1, apply_func=self.upgradeObj
-        )
-
-    def upgradeObj(self, obj, path=None):
-        from Products.Archetypes import interfaces as at_ifaces
-
-        if not at_ifaces.IReferenceable.providedBy(obj):
-            return
-        for ref in self.ref_catalog.getReferences(obj):
-            if ref.getTargetObject() is None:
-                ref_id = uuid_ifaces.IUUID(ref)
-                self.log(
-                    "Removing reference {!r} with missing target: {!r}".format(
-                        ref_id, ref
-                    )
-                )
-                aq_parent(ref)._delOb(ref_id)
-
-
-def cleanupMissingReferenceTargets(context):
-    url = getToolByName(context, "portal_url")
-    upgrader = ReferenceTargetCleaner(url.getPortalObject())
-    upgrader.upgrade()
 
 
 def pack_zodb(context, t=None, days=0):
