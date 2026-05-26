@@ -8,10 +8,10 @@ long_description = "\n\n".join(
     for filename in ("README.rst", "CHANGES.rst")
 )
 
-entry_point = "collective.upgrade.run:main"
 entry_points = {
     "console_scripts": [
-        f"upgrade-portals = {entry_point}",
+        "upgrade-portals = collective.upgrade.run:main",
+        "run-portal-upgrades = collective.upgrade.run:run_portal_upgrades",
     ],
     "z3c.autoinclude.plugin": [
         "target = plone",
@@ -65,6 +65,5 @@ setup(
             "Products.PlonePAS",
         ],
     },
-    scripts=["run-portal-upgrades"],
     entry_points=entry_points,
 )

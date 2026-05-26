@@ -167,6 +167,37 @@ def run(app, args=None):
     main(app, args)
 
 
+def run_portal_upgrades():
+    """
+    Console-script entry point installed as `bin/run-portal-upgrades`.
+
+    A replacement for removed `run-portal-upgardes` script.
+    The `bin/run-portal-upgrades` still exists, intended for automation calling:
+
+        bin/instance run bin/run-portal-upgrades [args...]
+
+    For direct, standalone invocation use `bin/upgrade-portals`
+    instead.
+
+    Fix missing `Manager` role for system user.
+    """
+    from AccessControl import SpecialUsers
+    from App import config
+
+    if config._config is None:
+        raise SystemExit(
+            "Must be invoked via "
+            "`bin/instance run bin/run-portal-upgrades`. "
+            "For standalone use, run: `bin/upgrade-portals`"
+        )
+
+    user = SpecialUsers.system
+    if "Manager" not in user.roles:
+        user.roles = tuple(user.roles) + ("Manager",)
+
+    run(None)
+
+
 if __name__ == "__main__":
     try:
         main(app)
