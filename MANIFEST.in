@@ -2,6 +2,7 @@ include *.py
 include *.rst
 recursive-include src *.csv
 recursive-include src *.pp
+recursive-include src *.py
 recursive-include src *.rst
 recursive-include src *.xml
 recursive-include src *.zcml

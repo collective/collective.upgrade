@@ -214,9 +214,7 @@ class ImportReconciler(Reconciler):
             binary_csvfile = self.context.openDataFile(self.filename)
             if binary_csvfile is None:
                 return
-            csvfile = io.TextIOWrapper(
-                binary_csvfile, encoding="utf-8", newline=""
-            )
+            csvfile = io.TextIOWrapper(binary_csvfile, encoding="utf-8", newline="")
         else:
             datafile = self.context.readDataFile(self.filename)
             if datafile is None:
