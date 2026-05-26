@@ -1,5 +1,4 @@
 from pathlib import Path
-from setuptools import find_packages
 from setuptools import setup
 
 version = "1.8.dev0"
@@ -43,8 +42,6 @@ setup(
     author_email="me@rpatterson.net",
     url="https://github.com/collective/collective.upgrade",
     license="GPL",
-    packages=find_packages("src", exclude=["ez_setup"]),
-    package_dir={"": "src"},
     include_package_data=True,
     zip_safe=False,
     python_requires=">=3.10",
