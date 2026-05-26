@@ -19,12 +19,12 @@
 
   <utility
       factory=".ploneupgrader.HiddenProfiles"
-      provides="Products.CMFPlone.interfaces.INonInstallable"
+      provides="plone.base.interfaces.installable.INonInstallable"
       name="collective.upgrade"
       />
   <browser:page
       name="collective.upgrade.form"
-      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      for="plone.base.interfaces.IPloneSiteRoot"
       class=".ploneupgrader.PloneUpgrader"
       permission="cmf.ManagePortal"
       />

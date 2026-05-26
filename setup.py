@@ -2,7 +2,6 @@ from setuptools import find_packages
 from setuptools import setup
 
 import os
-import sys
 
 version = "1.8.dev0"
 
@@ -14,9 +13,6 @@ install_requires = [
     "Products.GenericSetup",
     "Products.CMFCore",
 ]
-if sys.version_info[:2] < (2, 7):
-    # depend on the argparse dist before it was included in the stdlib
-    install_requires.append("argparse")
 
 tests_require = ["plone.app.testing", "plone.app.contenttypes"]
 
@@ -27,12 +23,18 @@ setup(
     long_description=open("README.rst").read()
     + "\n"
     + open(os.path.join("CHANGES.rst")).read(),
-    # Get more strings from
-    # http://www.python.org/pypi?%3Aaction=list_classifiers
+    # Get more strings from https://pypi.org/classifiers
     classifiers=[
+        "Development Status :: 5 - Production/Stable",
         "Framework :: Plone",
+        "Framework :: Plone :: 6.2",
+        "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python",
-        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
     ],
     keywords="Zope CMF Plone GenericSetup upgrade",
     author="Ross Patterson",

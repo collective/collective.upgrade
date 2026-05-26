@@ -205,7 +205,7 @@ def fixDuplicateUIDs(context):
     uid_index = catalog.Indexes._getOb("UID", None)
     if not isinstance(uid_index, FieldIndex.FieldIndex):
         return
-    for uid, rids in list(uid_index._index.iteritems()):
+    for uid, rids in list(uid_index._index.items()):
         if isinstance(rids, int) or len(rids) <= 1:
             continue
 

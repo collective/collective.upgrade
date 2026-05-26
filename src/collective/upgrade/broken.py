@@ -156,8 +156,8 @@ class CleanupBrokenObjects(steps.CMFEditionsUpgrader):
 
     def unmapTransform(self, container, transform):
         """unmap transform from portal_transforms structures"""
-        for dest in container._mtmap.itervalues():
-            for transforms in dest.itervalues():
+        for dest in container._mtmap.values():
+            for transforms in dest.values():
                 for registered in transforms:
                     if aq_base(registered) is aq_base(transform):
                         transforms.remove(transform)

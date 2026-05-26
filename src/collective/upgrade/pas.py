@@ -6,9 +6,9 @@ from Products.PluggableAuthService.interfaces.plugins import IPropertiesPlugin
 from Products.PluggableAuthService.interfaces.plugins import IUserEnumerationPlugin
 
 import csv
+import io
 import logging
 import mimetypes
-import tempfile
 import transaction
 
 logger = logging.getLogger("collective.upgrade.pas")
@@ -30,11 +30,11 @@ class Reconciler:
 class ExportReconciler(Reconciler):
 
     fieldnames = (
-        b"Source Plugin ID",
-        b"Source ID",
-        b"Destination Plugin ID",
-        b"Destination ID",
-        b"Destination Duplicate IDs",
+        "Source Plugin ID",
+        "Source ID",
+        "Destination Plugin ID",
+        "Destination ID",
+        "Destination Duplicate IDs",
     )
     user_properties = ("fullname",)
 
@@ -71,23 +71,21 @@ class ExportReconciler(Reconciler):
             self.dest_groups = self.acl_users._getOb(dest_groups_plugin)
 
     def export_rows(self):
+        buf = io.StringIO(newline="")
+        content_type = mimetypes.guess_type(self.filename)
+        writer = csv.DictWriter(buf, self.fieldnames)
+        writer.writerow({name: name for name in self.fieldnames})
+        writer.writerows(self.get_rows())
+
+        data = buf.getvalue().encode("utf-8")
         if hasattr(self.context, "openDataFile"):
-            csvfile = self.context.openDataFile(self.filename)
+            out = self.context.openDataFile(self.filename)
+            try:
+                out.write(data)
+            finally:
+                out.close()
         else:
-            csvfile = tempfile.TemporaryFile()
-
-        try:
-            content_type = mimetypes.guess_type(self.filename)
-            writer = csv.DictWriter(csvfile, self.fieldnames)
-            writer.writerow({name: name for name in self.fieldnames})
-            writer.writerows(self.get_rows())
-
-            if not hasattr(self.context, "openDataFile"):
-                csvfile.seek(0)
-                self.context.writeDataFile(self.filename, csvfile.read(), content_type)
-
-        finally:
-            csvfile.close()
+            self.context.writeDataFile(self.filename, data, content_type)
 
     def get_user_rows(self):
         seen = set()
@@ -213,16 +211,17 @@ class ImportReconciler(Reconciler):
 
     def import_rows(self):
         if hasattr(self.context, "openDataFile"):
-            csvfile = self.context.openDataFile(self.filename)
-            if csvfile is None:
+            binary_csvfile = self.context.openDataFile(self.filename)
+            if binary_csvfile is None:
                 return
+            csvfile = io.TextIOWrapper(
+                binary_csvfile, encoding="utf-8", newline=""
+            )
         else:
             datafile = self.context.readDataFile(self.filename)
             if datafile is None:
                 return
-            csvfile = tempfile.TemporaryFile()
-            csvfile.write(datafile)
-            csvfile.seek(0)
+            csvfile = io.StringIO(datafile.decode("utf-8"), newline="")
         reader = csv.DictReader(csvfile)
 
         self.acl_users = getToolByName(self.site, "acl_users")
@@ -275,7 +274,7 @@ class ImportReconciler(Reconciler):
                 orig_contributors = contributors()
                 contributors = list(orig_contributors)
 
-            for source_id, dest_id in rows.iteritems():
+            for source_id, dest_id in rows.items():
                 # ownership
                 if (acl_users_path, source_id) == (userdb_path, user_id):
                     logger.info(
