@@ -219,6 +219,9 @@ def cookResourceRegisties(context, ids=None):
 
     This can address the issue where sometimes the resource registries viewlet
     fails to render correctly.
+
+    Has no Plone 6 equivalent.
+    Might remain useful for objects implementing the legacy interface.
     """
     url = getToolByName(context, "portal_url")
     portal = url.getPortalObject()
