@@ -211,14 +211,6 @@ def fixDuplicateUIDs(context):
             logger.info(f"Assigned new UID {new_uid!r} to {obj!r}")
 
 
-def setDefaultEditor(context, wanted_editor="", dry_run=False):
-    """Use the default editor for all users."""
-    from collective.setdefaulteditor.utils import set_editor_for_all
-
-    # Assumes the zope.component.hooks site has already been set
-    set_editor_for_all(wanted_editor, dry_run)
-
-
 def pack_zodb(context, t=None, days=0):
     """
     Pack the database after upgrades to conserve disk space.

@@ -62,7 +62,6 @@ setup(
             "Products.PlonePAS",
         ],
         "steps": [
-            "collective.setdefaulteditor",
             "experimental.broken",
         ],
     },
