@@ -1,28 +1,30 @@
+from pathlib import Path
 from setuptools import find_packages
 from setuptools import setup
 
-import os
-
 version = "1.8.dev0"
 
-install_requires = [
-    "setuptools",
-    # -*- Extra requirements: -*-
-    "zope.globalrequest",
-    "zodbupdate",
-    "Products.GenericSetup",
-    "Products.CMFCore",
-]
+long_description = "\n\n".join(
+    Path(filename).read_text(encoding="utf-8")
+    for filename in ("README.rst", "CHANGES.rst")
+)
 
-tests_require = ["plone.app.testing", "plone.app.contenttypes"]
+entry_point = "collective.upgrade.run:main"
+entry_points = {
+    "console_scripts": [
+        f"upgrade-portals = {entry_point}",
+    ],
+    "z3c.autoinclude.plugin": [
+        "target = plone",
+    ],
+}
 
 setup(
     name="collective.upgrade",
     version=version,
     description="CMF portal upgrade helpers",
-    long_description=open("README.rst").read()
-    + "\n"
-    + open(os.path.join("CHANGES.rst")).read(),
+    long_description=long_description,
+    long_description_content_type="text/x-rst",
     # Get more strings from https://pypi.org/classifiers
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -46,19 +48,25 @@ setup(
     include_package_data=True,
     zip_safe=False,
     python_requires=">=3.10",
-    install_requires=install_requires,
-    tests_require=tests_require,
-    extras_require=dict(
-        test=tests_require, steps=["experimental.broken", "collective.setdefaulteditor"]
-    ),
-    test_suite="collective.upgrade.tests.test_suite",
+    install_requires=[
+        "setuptools",
+        "zope.globalrequest",
+        "zodbupdate",
+        "Products.GenericSetup",
+        "Products.CMFCore",
+    ],
+    extras_require={
+        "test": [
+            "plone.app.testing",
+            "plone.app.contenttypes",
+            "plone.app.robotframework",
+            "plone.testing",
+        ],
+        "steps": [
+            "experimental.broken",
+            "collective.setdefaulteditor",
+        ],
+    },
     scripts=["run-portal-upgrades"],
-    entry_points="""
-      # -*- Entry points: -*-
-      [console_scripts]
-      upgrade-portals = collective.upgrade.run:main
-
-      [z3c.autoinclude.plugin]
-      target = plone
-      """,
+    entry_points=entry_points,
 )

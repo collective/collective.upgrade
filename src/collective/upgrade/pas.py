@@ -220,7 +220,6 @@ class ImportReconciler(Reconciler):
             if datafile is None:
                 return
             csvfile = io.StringIO(datafile.decode("utf-8"), newline="")
-        reader = csv.DictReader(csvfile)
 
         self.acl_users = getToolByName(self.site, "acl_users")
         self.plugins = self.acl_users._getOb("plugins")
@@ -229,28 +228,32 @@ class ImportReconciler(Reconciler):
             self.acl_users, f"get{self.principal_type.capitalize()}ById"
         )
         rows = {}
-        for row in reader:
-            dest_id = row.get("Destination ID")
-            source_id = row["Source ID"]
-            if not dest_id or source_id == dest_id:
-                continue
-            rows[source_id] = dest_id
-            source_principal = getPrincipalById(source_id)
-
-            groupmakers = self.plugins.listPlugins(IGroupsPlugin)
-            for groupmaker_id, groupmaker in groupmakers:
-                if not hasattr(groupmaker, "addPrincipalToGroup"):
+        with csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                dest_id = row.get("Destination ID")
+                source_id = row["Source ID"]
+                if not dest_id or source_id == dest_id:
                     continue
-                groups = groupmaker.getGroupsForPrincipal(source_principal)
-                for group in groups:
-                    logger.info(
-                        "Changing group %r member from %r to %r",
-                        group,
-                        source_principal.getId(),
-                        dest_id,
-                    )
-                    groupmaker.addPrincipalToGroup(dest_id, group)
-                    groupmaker.removePrincipalFromGroup(source_principal.getId(), group)
+                rows[source_id] = dest_id
+                source_principal = getPrincipalById(source_id)
+
+                groupmakers = self.plugins.listPlugins(IGroupsPlugin)
+                for groupmaker_id, groupmaker in groupmakers:
+                    if not hasattr(groupmaker, "addPrincipalToGroup"):
+                        continue
+                    groups = groupmaker.getGroupsForPrincipal(source_principal)
+                    for group in groups:
+                        logger.info(
+                            "Changing group %r member from %r to %r",
+                            group,
+                            source_principal.getId(),
+                            dest_id,
+                        )
+                        groupmaker.addPrincipalToGroup(dest_id, group)
+                        groupmaker.removePrincipalFromGroup(
+                            source_principal.getId(), group
+                        )
 
         acl_users_path = owner.ownerInfo(self.plugins)[0]
 
