@@ -1,9 +1,12 @@
 from Acquisition import aq_base
 from collective.upgrade import utils
 from plone.base.utils import get_installer
+from plone.uuid.interfaces import IMutableUUID
+from plone.uuid.interfaces import IUUIDGenerator
 from Products.CMFCore.utils import getToolByName
 from Products.PluginIndexes.FieldIndex import FieldIndex
 from Products.ZCatalog.ProgressHandler import ZLogHandler
+from zope.component import getUtility
 
 import logging
 import re
@@ -166,10 +169,10 @@ def fixDuplicateUIDs(context):
     objects with the same UID.
     """
     catalog = getToolByName(context, "portal_catalog")
-    ref_catalog = getToolByName(context, "reference_catalog")
     uid_index = catalog.Indexes._getOb("UID", None)
     if not isinstance(uid_index, FieldIndex.FieldIndex):
         return
+    uuid_generator = getUtility(IUUIDGenerator)
     for uid, rids in list(uid_index._index.items()):
         if isinstance(rids, int) or len(rids) <= 1:
             continue
@@ -194,7 +197,8 @@ def fixDuplicateUIDs(context):
         for obj in objs:
             if aq_base(obj) is aq_base(orig):
                 continue
-            new_uid = ref_catalog._getUUIDFor(obj)
+            new_uid = uuid_generator()
+            IMutableUUID(obj).set(new_uid)
             obj.reindexObject(idxs=["UID"])
             logger.info(f"Assigned new UID {new_uid!r} to {obj!r}")
 
