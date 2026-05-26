@@ -47,7 +47,9 @@ setup(
     python_requires=">=3.10",
     install_requires=[
         "plone.base",
+        "plone.uuid",
         "Products.CMFCore",
+        "Products.CMFEditions",
         "Products.GenericSetup",
         "Products.PluggableAuthService",
         "Zope",
@@ -58,11 +60,9 @@ setup(
             "plone.app.contenttypes",
             "plone.app.robotframework",
             "plone.app.testing",
+            "plone.testing",
             "Products.CMFPlone",
             "Products.PlonePAS",
-        ],
-        "steps": [
-            "experimental.broken",
         ],
     },
     scripts=["run-portal-upgrades"],
