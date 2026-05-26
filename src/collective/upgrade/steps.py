@@ -1,5 +1,6 @@
 from Acquisition import aq_base
 from collective.upgrade import utils
+from plone.base.utils import get_installer
 from Products.CMFCore.utils import getToolByName
 from Products.PluginIndexes.FieldIndex import FieldIndex
 from Products.ZCatalog.ProgressHandler import ZLogHandler
@@ -60,39 +61,26 @@ def cleanupSkinLayers(context, remove_layers=_default_layers):
 
 def uninstallAddOns(context, addons=None):
     """
-    Uninstall the given add-ons using the cleanest method possible.
+    Uninstall the given add-ons.
 
-    If no add-ons are specified then all missing add-ons are
-    uninstalled.
+    If no add-ons are specified then all installed add-ons whose
+    underlying product is no longer installable are uninstalled.
     """
-    qi = getToolByName(context, "portal_quickinstaller")
+    installer = get_installer(context)
     setup = getToolByName(context, "portal_setup")
-    for product in qi.listInstallableProducts(skipInstalled=False):
-        addon = product["id"]
-        if addons is not None:
-            if addon not in addons:
-                continue
-        elif qi.isProductInstallable(addon):
-            continue
 
-        qi._getOb(addon).locked = False
-        install_profiles = qi.getInstallProfiles(addon)
-        uninstall_profiles = [
-            profile
-            for profile in install_profiles
-            if profile.split(":", 1) == "uninstall"
+    if addons is None:
+        addons = [
+            addon["id"]
+            for addon in installer.list_addons(installed=True)
+            if not installer.is_product_installable(addon["id"])
         ]
-        if uninstall_profiles:
-            profile = uninstall_profiles[0]
-            logger.info(
-                "Uninstalling the %r add-on for %r using the %r profile"
-                % (addon, setup, profile)
-            )
-            setup.runAllImportStepsFromProfile("profile-%s" % profile)
-            qi.manage_delObjects([addon])
-        else:
-            logger.info(f"Uninstalling the {addon!r} add-on for {qi!r}")
-            qi.uninstallProducts([addon])
+
+    for addon in addons:
+        install_profiles = installer.get_install_profiles(addon)
+
+        logger.info(f"Uninstalling the {addon!r} add-on")
+        installer.uninstall_product(addon)
 
         for profile in install_profiles:
             version = setup.getLastVersionForProfile(profile)
@@ -107,7 +95,7 @@ def uninstallAddOns(context, addons=None):
             del setup._profile_upgrade_versions[profile]
             setup._p_changed = True
 
-        assert not qi.isProductInstalled(addon)
+        assert not installer.is_product_installed(addon)
 
 
 class CMFEditionsUpgrader(utils.Upgrader):
