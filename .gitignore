@@ -1,79 +1,58 @@
-# Compiled source #
-###################
-*.com
-*.class
-*.dll
-*.exe
-*.o
-*.so
-*.lo
-*.la
-*.rej
+# Generated from:
+# https://github.com/plone/meta/tree/2.x/src/plone/meta/default
+# See the inline comments on how to expand/tweak this configuration file
+# python related
+*.egg-info
 *.pyc
 *.pyo
 
-# Packages #
-############
-# it's better to unpack these files and commit the raw source
-# git has its own built in compression methods
-*.7z
-*.dmg
-*.gz
-*.iso
-*.jar
-*.rar
-*.tar
-*.zip
+# translation related
+*.mo
 
-# Logs and databases #
-######################
-*.log
-*.sql
-*.sqlite
+# tools related
+build/
+.coverage
+.*project
+coverage.xml
+dist/
+docs/_build
+__pycache__/
+.tox
+.vscode/
+node_modules/
+forest.dot
+forest.json
 
-# OS generated files #
-######################
-.DS_Store
-.DS_Store?
-ehthumbs.db
-Icon?
-Thumbs.db
-*.tmproj
-
-# Editor backup files #
-#######################
-*~
-*.sw[op]
-
-# Other VCSes #
-###############
-.svn
-
-# Python projects related #
-###########################
-*.egg-info
-.egg-info.installed.cfg
-*.pt.py
-*.cpt.py
-*.zpt.py
-*.html.py
-*.egg
-.mr.developer.cfg
+# venv / buildout related
+bin/
+develop-eggs/
+eggs/
+.eggs/
+etc/
 .installed.cfg
-/build
-/dist
+include/
+lib/
+lib64
+.mr.developer.cfg
+parts/
+pyvenv.cfg
+var/
+local.cfg
 
-# Eclipse pydev related #
-#########################
-.project
-.pydevproject
-.settings
+# mxdev
+/instance/
+/.make-sentinels/
+/*-mxdev.txt
+/reports/
+/sources/
+/venv/
+.installed.txt
 
-# Buildout generated folders #
-##############################
-bin
-parts
-develop-eggs
-var
-include
-lib
+
+##
+# Add extra configuration options in .meta.toml:
+#  [gitignore]
+#  extra_lines = """
+#  _your own configuration lines_
+#  """
+##

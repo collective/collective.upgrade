@@ -1,24 +1,32 @@
-<configure xmlns="http://namespaces.zope.org/zope"
-           xmlns:browser="http://namespaces.zope.org/browser">
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    >
 
-  <browser:page name="collective.upgrade.form"
-                for="Products.CMFCore.interfaces.ISiteRoot"
-                permission="cmf.ManagePortal"
-                class=".upgrader.PortalUpgrader" />
-  <browser:page name="collective.upgrade.form"
-                for="OFS.interfaces.IObjectManager"
-                permission="zope2.ViewManagementScreens"
-                class=".portals.PortalsUpgrader" />
+  <browser:page
+      name="collective.upgrade.form"
+      for="Products.CMFCore.interfaces.ISiteRoot"
+      class=".upgrader.PortalUpgrader"
+      permission="cmf.ManagePortal"
+      />
+  <browser:page
+      name="collective.upgrade.form"
+      for="OFS.interfaces.IObjectManager"
+      class=".portals.PortalsUpgrader"
+      permission="zope2.ViewManagementScreens"
+      />
 
 
   <utility
       factory=".ploneupgrader.HiddenProfiles"
+      provides="plone.base.interfaces.installable.INonInstallable"
       name="collective.upgrade"
-      provides="Products.CMFPlone.interfaces.INonInstallable"
       />
-  <browser:page name="collective.upgrade.form"
-                for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-                permission="cmf.ManagePortal"
-                class=".ploneupgrader.PloneUpgrader" />
+  <browser:page
+      name="collective.upgrade.form"
+      for="plone.base.interfaces.IPloneSiteRoot"
+      class=".ploneupgrader.PloneUpgrader"
+      permission="cmf.ManagePortal"
+      />
 
 </configure>
