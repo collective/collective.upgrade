@@ -6,3 +6,4 @@ recursive-include src *.py
 recursive-include src *.rst
 recursive-include src *.xml
 recursive-include src *.zcml
+prune news
