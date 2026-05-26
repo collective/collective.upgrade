@@ -268,7 +268,16 @@ def resetProfiles(context, extension_profiles=None):
     if extension_profiles is None:
         url = getToolByName(context, "portal_url")
         portal = url.getPortalObject()
-        form = portal.restrictedTraverse("@@plone-addsite")
+        form = portal.restrictedTraverse("@@plone-addsite", None)
+        if form is None:
+            # Plone 6.1+ dropped the `@@plone-addsite` browser:page
+            # registration (Products.CMFPlone#3981) but the underlying
+            # `AddPloneSite` class is still shipped. Instantiate it
+            # directly to keep auto-discovery of the default extension
+            # profiles working.
+            from Products.CMFPlone.browser.admin import AddPloneSite
+
+            form = AddPloneSite(portal, portal.REQUEST)
         extension_profiles = [
             info["id"]
             for info in form.profiles()["extensions"]
