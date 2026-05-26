@@ -1,26 +1,22 @@
-# encoding: utf-8
+from AccessControl import owner
+from Products.CMFCore.utils import getToolByName
+from Products.PluggableAuthService.interfaces.plugins import IGroupEnumerationPlugin
+from Products.PluggableAuthService.interfaces.plugins import IGroupsPlugin
+from Products.PluggableAuthService.interfaces.plugins import IPropertiesPlugin
+from Products.PluggableAuthService.interfaces.plugins import IUserEnumerationPlugin
 
-import mimetypes
-import tempfile
 import csv
 import logging
-
+import mimetypes
+import tempfile
 import transaction
 
-from AccessControl import owner
-
-from Products.PluggableAuthService.interfaces.plugins import (
-    IUserEnumerationPlugin, IGroupsPlugin, IGroupEnumerationPlugin,
-    IPropertiesPlugin)
-
-from Products.CMFCore.utils import getToolByName
-
-logger = logging.getLogger('collective.upgrade.pas')
+logger = logging.getLogger("collective.upgrade.pas")
 
 
-class Reconciler(object):
+class Reconciler:
 
-    filename = 'reconcile_{0}s.csv'
+    filename = "reconcile_{0}s.csv"
 
     def __init__(self, context, principal_type):
         self.context = context
@@ -33,41 +29,49 @@ class Reconciler(object):
 
 class ExportReconciler(Reconciler):
 
-    fieldnames = (b'Source Plugin ID',
-                  b'Source ID',
-                  b'Destination Plugin ID',
-                  b'Destination ID',
-                  b'Destination Duplicate IDs')
-    user_properties = ('fullname', )
+    fieldnames = (
+        b"Source Plugin ID",
+        b"Source ID",
+        b"Destination Plugin ID",
+        b"Destination ID",
+        b"Destination Duplicate IDs",
+    )
+    user_properties = ("fullname",)
 
-    def __init__(self, context, principal_type,
-                 dest_users_plugin=None, dest_properties_plugin=None,
-                 dest_groups_plugin=None):
-        super(ExportReconciler, self).__init__(context, principal_type)
-        self.acl_users = getToolByName(self.site, 'acl_users')
-        self.plugins = self.acl_users._getOb('plugins')
+    def __init__(
+        self,
+        context,
+        principal_type,
+        dest_users_plugin=None,
+        dest_properties_plugin=None,
+        dest_groups_plugin=None,
+    ):
+        super().__init__(context, principal_type)
+        self.acl_users = getToolByName(self.site, "acl_users")
+        self.plugins = self.acl_users._getOb("plugins")
 
-        self.get_rows = getattr(
-            self, 'get_{0}_rows'.format(self.principal_type))
+        self.get_rows = getattr(self, f"get_{self.principal_type}_rows")
 
-        if principal_type == 'user':
+        if principal_type == "user":
             if not dest_users_plugin:
-                dest_users_plugin = self.plugins.listPlugins(
-                    IUserEnumerationPlugin)[0][0]
+                dest_users_plugin = self.plugins.listPlugins(IUserEnumerationPlugin)[0][
+                    0
+                ]
             self.dest_users = self.acl_users._getOb(dest_users_plugin)
             if not dest_properties_plugin:
-                dest_properties_plugin = self.plugins.listPlugins(
-                    IPropertiesPlugin)[0][0]
-            self.dest_properties = self.acl_users._getOb(
-                dest_properties_plugin)
+                dest_properties_plugin = self.plugins.listPlugins(IPropertiesPlugin)[0][
+                    0
+                ]
+            self.dest_properties = self.acl_users._getOb(dest_properties_plugin)
         else:
             if not dest_groups_plugin:
-                dest_groups_plugin = self.plugins.listPlugins(
-                    IGroupEnumerationPlugin)[0][0]
+                dest_groups_plugin = self.plugins.listPlugins(IGroupEnumerationPlugin)[
+                    0
+                ][0]
             self.dest_groups = self.acl_users._getOb(dest_groups_plugin)
 
     def export_rows(self):
-        if hasattr(self.context, 'openDataFile'):
+        if hasattr(self.context, "openDataFile"):
             csvfile = self.context.openDataFile(self.filename)
         else:
             csvfile = tempfile.TemporaryFile()
@@ -75,13 +79,12 @@ class ExportReconciler(Reconciler):
         try:
             content_type = mimetypes.guess_type(self.filename)
             writer = csv.DictWriter(csvfile, self.fieldnames)
-            writer.writerow(dict((name, name) for name in self.fieldnames))
+            writer.writerow({name: name for name in self.fieldnames})
             writer.writerows(self.get_rows())
 
-            if not hasattr(self.context, 'openDataFile'):
+            if not hasattr(self.context, "openDataFile"):
                 csvfile.seek(0)
-                self.context.writeDataFile(
-                    self.filename, csvfile.read(), content_type)
+                self.context.writeDataFile(self.filename, csvfile.read(), content_type)
 
         finally:
             csvfile.close()
@@ -92,32 +95,36 @@ class ExportReconciler(Reconciler):
         savepoint = transaction.savepoint(optimistic=True)
         try:
             self.plugins.deactivatePlugin(
-                IUserEnumerationPlugin, self.dest_users.getId())
+                IUserEnumerationPlugin, self.dest_users.getId()
+            )
             if self.dest_properties.getId() in self.plugins.listPluginIds(
-                    IUserEnumerationPlugin):
+                IUserEnumerationPlugin
+            ):
                 self.plugins.deactivatePlugin(
-                    IUserEnumerationPlugin, self.dest_properties.getId())
+                    IUserEnumerationPlugin, self.dest_properties.getId()
+                )
 
             # Look for matches for the source users
             for info in self.acl_users.searchUsers():
-                if info['id'] in seen:
+                if info["id"] in seen:
                     continue
-                seen.add(info['id'])
-                result = {'Source Plugin ID': info['pluginid'],
-                          'Source ID': info['id']}
+                seen.add(info["id"])
+                result = {"Source Plugin ID": info["pluginid"], "Source ID": info["id"]}
 
                 # Exact user id match
                 matches = self.dest_users.enumerateUsers(
-                    id=info['id'], exact_match=True)
+                    id=info["id"], exact_match=True
+                )
                 if len(matches) == 1:
-                    result['Destination Plugin ID'] = matches[0].get(
-                        'pluginid', self.dest_users.getId())
-                    result['Destination ID'] = matches[0]['id']
+                    result["Destination Plugin ID"] = matches[0].get(
+                        "pluginid", self.dest_users.getId()
+                    )
+                    result["Destination ID"] = matches[0]["id"]
                     yield result
                     continue
 
                 # Match on properties
-                user = self.acl_users.getUserById(info['id'])
+                user = self.acl_users.getUserById(info["id"])
                 value = None
                 if user is not None:
                     for prop in self.user_properties:
@@ -131,16 +138,16 @@ class ExportReconciler(Reconciler):
                                     break
                         else:
                             continue
-                        matches = self.dest_properties.enumerateUsers(
-                            **{prop: value})
+                        matches = self.dest_properties.enumerateUsers(**{prop: value})
                         if matches:
-                            prop_result['Destination Plugin ID'] = matches[
-                                0].get('pluginid', self.dest_users.getId())
-                            prop_result['Destination ID'] = matches[0]['id']
+                            prop_result["Destination Plugin ID"] = matches[0].get(
+                                "pluginid", self.dest_users.getId()
+                            )
+                            prop_result["Destination ID"] = matches[0]["id"]
                             if len(matches) > 1:
-                                prop_result[
-                                    'Destination Duplicate IDs'] = ' '.join(
-                                    match['id'] for match in matches[1:])
+                                prop_result["Destination Duplicate IDs"] = " ".join(
+                                    match["id"] for match in matches[1:]
+                                )
                             yield prop_result
 
                 # No match
@@ -157,38 +164,40 @@ class ExportReconciler(Reconciler):
         savepoint = transaction.savepoint(optimistic=True)
         try:
             self.plugins.deactivatePlugin(
-                IGroupEnumerationPlugin, self.dest_groups.getId())
+                IGroupEnumerationPlugin, self.dest_groups.getId()
+            )
 
             # Look for matches for the source groups
             for info in self.acl_users.searchGroups():
-                if info['id'] in seen:
+                if info["id"] in seen:
                     continue
-                seen.add(info['id'])
-                result = {'Source Plugin ID': info['pluginid'],
-                          'Source ID': info['id']}
+                seen.add(info["id"])
+                result = {"Source Plugin ID": info["pluginid"], "Source ID": info["id"]}
 
                 # Exact group id match
                 matches = self.dest_groups.enumerateGroups(
-                    id=info['id'], exact_match=True)
+                    id=info["id"], exact_match=True
+                )
                 if len(matches) == 1:
-                    result['Destination Plugin ID'] = matches[0].get(
-                        'pluginid', self.dest_groups.getId())
-                    result['Destination ID'] = matches[0]['id']
+                    result["Destination Plugin ID"] = matches[0].get(
+                        "pluginid", self.dest_groups.getId()
+                    )
+                    result["Destination ID"] = matches[0]["id"]
                     yield result
                     continue
 
                 # Match on group title
-                if info.get('title'):
-                    matches = self.dest_groups.enumerateGroups(
-                        title=info['title'])
+                if info.get("title"):
+                    matches = self.dest_groups.enumerateGroups(title=info["title"])
                     if matches:
-                        result['Destination Plugin ID'] = matches[0].get(
-                            'pluginid', self.dest_groups.getId())
-                        result['Destination ID'] = matches[0]['id']
+                        result["Destination Plugin ID"] = matches[0].get(
+                            "pluginid", self.dest_groups.getId()
+                        )
+                        result["Destination ID"] = matches[0]["id"]
                         if len(matches) > 1:
-                            result[
-                                'Destination Duplicate IDs'] = ' '.join(
-                                match['id'] for match in matches[1:])
+                            result["Destination Duplicate IDs"] = " ".join(
+                                match["id"] for match in matches[1:]
+                            )
                         yield result
                         continue
 
@@ -203,7 +212,7 @@ class ExportReconciler(Reconciler):
 class ImportReconciler(Reconciler):
 
     def import_rows(self):
-        if hasattr(self.context, 'openDataFile'):
+        if hasattr(self.context, "openDataFile"):
             csvfile = self.context.openDataFile(self.filename)
             if csvfile is None:
                 return
@@ -216,15 +225,16 @@ class ImportReconciler(Reconciler):
             csvfile.seek(0)
         reader = csv.DictReader(csvfile)
 
-        self.acl_users = getToolByName(self.site, 'acl_users')
-        self.plugins = self.acl_users._getOb('plugins')
+        self.acl_users = getToolByName(self.site, "acl_users")
+        self.plugins = self.acl_users._getOb("plugins")
 
-        getPrincipalById = getattr(self.acl_users, 'get{0}ById'.format(
-            self.principal_type.capitalize()))
+        getPrincipalById = getattr(
+            self.acl_users, f"get{self.principal_type.capitalize()}ById"
+        )
         rows = {}
         for row in reader:
-            dest_id = row.get('Destination ID')
-            source_id = row['Source ID']
+            dest_id = row.get("Destination ID")
+            source_id = row["Source ID"]
             if not dest_id or source_id == dest_id:
                 continue
             rows[source_id] = dest_id
@@ -232,46 +242,58 @@ class ImportReconciler(Reconciler):
 
             groupmakers = self.plugins.listPlugins(IGroupsPlugin)
             for groupmaker_id, groupmaker in groupmakers:
-                if not hasattr(groupmaker, 'addPrincipalToGroup'):
+                if not hasattr(groupmaker, "addPrincipalToGroup"):
                     continue
                 groups = groupmaker.getGroupsForPrincipal(source_principal)
                 for group in groups:
-                    logger.info('Changing group %r member from %r to %r',
-                                group, source_principal.getId(), dest_id)
+                    logger.info(
+                        "Changing group %r member from %r to %r",
+                        group,
+                        source_principal.getId(),
+                        dest_id,
+                    )
                     groupmaker.addPrincipalToGroup(dest_id, group)
-                    groupmaker.removePrincipalFromGroup(
-                        source_principal.getId(), group)
+                    groupmaker.removePrincipalFromGroup(source_principal.getId(), group)
 
         acl_users_path = owner.ownerInfo(self.plugins)[0]
 
-        def import_ofs_obj(obj, path=None,
-                           acl_users_path=acl_users_path, rows=rows,
-                           getPrincipalById=getPrincipalById):
+        def import_ofs_obj(
+            obj,
+            path=None,
+            acl_users_path=acl_users_path,
+            rows=rows,
+            getPrincipalById=getPrincipalById,
+        ):
             userdb_path, user_id = obj.getOwnerTuple()
 
-            creators = getattr(obj, 'listCreators', [])
+            creators = getattr(obj, "listCreators", [])
             if callable(creators):
                 orig_creators = creators()
                 creators = list(orig_creators)
-            contributors = getattr(obj, 'listContributors', [])
+            contributors = getattr(obj, "listContributors", [])
             if callable(contributors):
                 orig_contributors = contributors()
                 contributors = list(orig_contributors)
 
             for source_id, dest_id in rows.iteritems():
                 # ownership
-                if (acl_users_path, source_id) == (
-                        userdb_path, user_id):
-                    logger.info('Changing %r owner from %r to %r',
-                                obj, source_id, dest_id)
+                if (acl_users_path, source_id) == (userdb_path, user_id):
+                    logger.info(
+                        "Changing %r owner from %r to %r", obj, source_id, dest_id
+                    )
                     dest_principal = getPrincipalById(dest_id)
                     obj.changeOwnership(dest_principal)
 
                 # local roles
                 local_roles = obj.get_local_roles_for_userid(source_id)
                 if local_roles:
-                    logger.info('Changing %r local roles %r from %r to %r',
-                                obj, local_roles, source_id, dest_id)
+                    logger.info(
+                        "Changing %r local roles %r from %r to %r",
+                        obj,
+                        local_roles,
+                        source_id,
+                        dest_id,
+                    )
                     obj.manage_addLocalRoles(dest_id, local_roles)
                     obj.manage_delLocalRoles([source_id])
 
@@ -283,20 +305,25 @@ class ImportReconciler(Reconciler):
 
             creators = tuple(creators)
             if creators != orig_creators:
-                logger.info('Changing %r creators from %r to %r',
-                            obj, orig_creators, creators)
+                logger.info(
+                    "Changing %r creators from %r to %r", obj, orig_creators, creators
+                )
                 obj.setCreators(creators)
             contributors = tuple(contributors)
             if contributors != orig_contributors:
-                logger.info('Changing %r contributors from %r to %r',
-                            obj, orig_contributors, contributors)
+                logger.info(
+                    "Changing %r contributors from %r to %r",
+                    obj,
+                    orig_contributors,
+                    contributors,
+                )
                 obj.setContributors(contributors)
 
         if rows:
             self.site.ZopeFindAndApply(self.site, apply_func=import_ofs_obj)
 
 
-class DataFile(object):
+class DataFile:
 
     def __init__(self, file_):
         self.size = file_.tell()
@@ -305,20 +332,20 @@ class DataFile(object):
 
 
 def reconcileUsersExport(context):
-    reconciler = ExportReconciler(context, 'user')
+    reconciler = ExportReconciler(context, "user")
     reconciler.export_rows()
 
 
 def reconcileGroupsExport(context):
-    reconciler = ExportReconciler(context, 'group')
+    reconciler = ExportReconciler(context, "group")
     reconciler.export_rows()
 
 
 def reconcileUsersImport(context):
-    reconciler = ImportReconciler(context, 'user')
+    reconciler = ImportReconciler(context, "user")
     reconciler.import_rows()
 
 
 def reconcileGroupsImport(context):
-    reconciler = ImportReconciler(context, 'group')
+    reconciler = ImportReconciler(context, "group")
     reconciler.import_rows()

@@ -1,50 +1,42 @@
-# encoding: utf-8
-
-import logging
-import re
-
-import transaction
-
-from Acquisition import aq_base, aq_parent
+from Acquisition import aq_base
+from Acquisition import aq_parent
+from collective.upgrade import utils
+from plone.uuid import interfaces as uuid_ifaces
+from Products.CMFCore.utils import getToolByName
 from Products.PluginIndexes.FieldIndex import FieldIndex
 from Products.ZCatalog.ProgressHandler import ZLogHandler
 
-from Products.CMFCore.utils import getToolByName
+import logging
+import re
+import transaction
 
-from plone.uuid import interfaces as uuid_ifaces
-
-from collective.upgrade import utils
-
-logger = logging.getLogger('collective.upgrade.steps')
+logger = logging.getLogger("collective.upgrade.steps")
 
 _default_layers = []
 
 
 def catalogReindex(context):
-    catalog = getToolByName(context, 'portal_catalog')
+    catalog = getToolByName(context, "portal_catalog")
     pgthreshold = catalog._getProgressThreshold()
     handler = (pgthreshold > 0) and ZLogHandler(pgthreshold) or None
     catalog.refreshCatalog(clear=1, pghandler=handler)
 
 
 def deleteCustomSkinObjs(context, *obj_ids):
-    skins = getToolByName(context, 'portal_skins')
-    del_ids = [obj_id for obj_id in obj_ids
-               if obj_id in skins.custom]
+    skins = getToolByName(context, "portal_skins")
+    del_ids = [obj_id for obj_id in obj_ids if obj_id in skins.custom]
     if not del_ids:
         return
 
     skins.custom.manage_delObjects(del_ids)
-    logger.info(
-        'Deleted custom skin objects from %r: %r'
-        % (skins.custom, del_ids))
+    logger.info(f"Deleted custom skin objects from {skins.custom!r}: {del_ids!r}")
 
 
 def cleanupSkinLayers(context, remove_layers=_default_layers):
-    skins = getToolByName(context, 'portal_skins')
+    skins = getToolByName(context, "portal_skins")
     for theme in skins.getSkinSelections():
         path = skins.getSkinPath(theme)
-        layers = path.split(',')
+        layers = path.split(",")
         found = []
         for layer in layers:
             if layer in remove_layers:
@@ -54,14 +46,18 @@ def cleanupSkinLayers(context, remove_layers=_default_layers):
                 continue
             if remove_layers is not _default_layers:
                 raise ValueError(
-                    '%r theme layer %r is missing but not listed to be removed'
-                    % (theme, layer))
+                    "%r theme layer %r is missing but not listed to be removed"
+                    % (theme, layer)
+                )
 
         diff = list(set(layers).difference(found))
         if diff:
-            logger.info('Removing layers from theme %r for %r: %r'
-                        % (theme, skins, diff))
-            skins.addSkinSelection(theme, ','.join(found), test=1)
+            logger.info(
+                "Removing layers from theme {!r} for {!r}: {!r}".format(
+                    theme, skins, diff
+                )
+            )
+            skins.addSkinSelection(theme, ",".join(found), test=1)
 
 
 def uninstallAddOns(context, addons=None):
@@ -71,10 +67,10 @@ def uninstallAddOns(context, addons=None):
     If no add-ons are specified then all missing add-ons are
     uninstalled.
     """
-    qi = getToolByName(context, 'portal_quickinstaller')
-    setup = getToolByName(context, 'portal_setup')
+    qi = getToolByName(context, "portal_quickinstaller")
+    setup = getToolByName(context, "portal_setup")
     for product in qi.listInstallableProducts(skipInstalled=False):
-        addon = product['id']
+        addon = product["id"]
         if addons is not None:
             if addon not in addons:
                 continue
@@ -83,26 +79,33 @@ def uninstallAddOns(context, addons=None):
 
         qi._getOb(addon).locked = False
         install_profiles = qi.getInstallProfiles(addon)
-        uninstall_profiles = [profile for profile in install_profiles
-                              if profile.split(':', 1) == 'uninstall']
+        uninstall_profiles = [
+            profile
+            for profile in install_profiles
+            if profile.split(":", 1) == "uninstall"
+        ]
         if uninstall_profiles:
             profile = uninstall_profiles[0]
             logger.info(
-                'Uninstalling the %r add-on for %r using the %r profile'
-                % (addon, setup, profile))
-            setup.runAllImportStepsFromProfile('profile-%s' % profile)
+                "Uninstalling the %r add-on for %r using the %r profile"
+                % (addon, setup, profile)
+            )
+            setup.runAllImportStepsFromProfile("profile-%s" % profile)
             qi.manage_delObjects([addon])
         else:
-            logger.info('Uninstalling the %r add-on for %r' % (addon, qi))
+            logger.info(f"Uninstalling the {addon!r} add-on for {qi!r}")
             qi.uninstallProducts([addon])
 
         for profile in install_profiles:
             version = setup.getLastVersionForProfile(profile)
-            if version == 'unknown':
+            if version == "unknown":
                 # Not installed, no need to remove
                 continue
-            logger.info('Clearing the %r profile version %r for %r' %
-                        (profile, version, setup))
+            logger.info(
+                "Clearing the {!r} profile version {!r} for {!r}".format(
+                    profile, version, setup
+                )
+            )
             del setup._profile_upgrade_versions[profile]
             setup._p_changed = True
 
@@ -112,18 +115,18 @@ def uninstallAddOns(context, addons=None):
 class CMFEditionsUpgrader(utils.Upgrader):
 
     def upgrade(self):
-        self.storage = getToolByName(
-            self.context, 'portal_historiesstorage', None)
+        self.storage = getToolByName(self.context, "portal_historiesstorage", None)
         if self.storage is None:
-            self.log('No portal_historiesstorage tool found, '
-                     'skipping CMFEditions cleanup')
+            self.log(
+                "No portal_historiesstorage tool found, " "skipping CMFEditions cleanup"
+            )
             return
 
-        from Products.CMFEditions.interfaces.IArchivist import (
-            IVersionAwareReference)
+        from Products.CMFEditions.interfaces.IArchivist import IVersionAwareReference
+
         self.reference_iface = IVersionAwareReference
 
-        update_catalogs = getattr(self, 'update_catalogs', None)
+        update_catalogs = getattr(self, "update_catalogs", None)
         try:
             self.update_catalogs = False
             self.walkVersionObjects()
@@ -135,7 +138,7 @@ class CMFEditionsUpgrader(utils.Upgrader):
 
     def walkVersionObjects(self):
         repo = self.storage._getZVCRepo()
-        self.log('Begin cleaning up CMFEditions objects in %r' % self.storage)
+        self.log("Begin cleaning up CMFEditions objects in %r" % self.storage)
         for history_id in repo._histories:
             history = repo.getVersionHistory(history_id)
             for branch in history.objectValues():
@@ -146,7 +149,7 @@ class CMFEditionsUpgrader(utils.Upgrader):
 
     def recurse(self, obj):
         self.upgradeObj(obj)
-        if hasattr(aq_base(obj), 'objectValues'):
+        if hasattr(aq_base(obj), "objectValues"):
             for subobj in obj.objectValues():
                 if self.reference_iface.providedBy(subobj):
                     continue
@@ -156,13 +159,13 @@ class CMFEditionsUpgrader(utils.Upgrader):
 class CMFEditionsFolderMigrator(CMFEditionsUpgrader):
 
     def upgrade(self):
-        from Products.BTreeFolder2.BTreeFolder2 import (
-            BTreeFolder2Base as BTreeFolder)
         from plone.app.folder.migration import BTreeMigrationView
+        from Products.BTreeFolder2.BTreeFolder2 import BTreeFolder2Base as BTreeFolder
+
         self.folder_class = BTreeFolder
         self.folder_migrator = BTreeMigrationView(self.context, None)
 
-        super(CMFEditionsFolderMigrator, self).upgrade()
+        super().upgrade()
 
     def upgradeObj(self, obj):
         if isinstance(obj, self.folder_class):
@@ -174,7 +177,7 @@ def migrateCMFEditionsFolderVersions(context):
     upgrader.upgrade()
 
 
-copy_id_re = re.compile(r'^copy[0-9]*_of_.*')
+copy_id_re = re.compile(r"^copy[0-9]*_of_.*")
 
 
 def origKey(obj):
@@ -185,9 +188,7 @@ def origKey(obj):
     - or it doesn't have an id starting with 'copy_of_'
     - or it has the shortest path
     """
-    return (obj.created(),
-            copy_id_re.match(obj.getId()),
-            len(obj.getPhysicalPath()))
+    return (obj.created(), copy_id_re.match(obj.getId()), len(obj.getPhysicalPath()))
 
 
 def fixDuplicateUIDs(context):
@@ -199,9 +200,9 @@ def fixDuplicateUIDs(context):
     from the catalog and new UIDs are generated for the rest of the
     objects with the same UID.
     """
-    catalog = getToolByName(context, 'portal_catalog')
-    ref_catalog = getToolByName(context, 'reference_catalog')
-    uid_index = catalog.Indexes._getOb('UID', None)
+    catalog = getToolByName(context, "portal_catalog")
+    ref_catalog = getToolByName(context, "reference_catalog")
+    uid_index = catalog.Indexes._getOb("UID", None)
     if not isinstance(uid_index, FieldIndex.FieldIndex):
         return
     for uid, rids in list(uid_index._index.iteritems()):
@@ -213,8 +214,7 @@ def fixDuplicateUIDs(context):
             path = catalog.getpath(rid)
             obj = context.unrestrictedTraverse(path, None)
             if obj is None:
-                logger.info(
-                    'Removing missing object %r from %r' % (path, catalog))
+                logger.info(f"Removing missing object {path!r} from {catalog!r}")
                 catalog.uncatalog_object(path)
                 continue
             objs.append(obj)
@@ -222,19 +222,22 @@ def fixDuplicateUIDs(context):
             continue
 
         orig = min(objs, key=origKey)
-        logger.info('Multiple objects found for UID %r, '
-                    'assuming %r is the original' % (uid, orig))
+        logger.info(
+            "Multiple objects found for UID %r, "
+            "assuming %r is the original" % (uid, orig)
+        )
         for obj in objs:
             if aq_base(obj) is aq_base(orig):
                 continue
             new_uid = ref_catalog._getUUIDFor(obj)
-            obj.reindexObject(idxs=['UID'])
-            logger.info('Assigned new UID %r to %r' % (new_uid, obj))
+            obj.reindexObject(idxs=["UID"])
+            logger.info(f"Assigned new UID {new_uid!r} to {obj!r}")
 
 
-def setDefaultEditor(context, wanted_editor='', dry_run=False):
-    """Use the deault editor for all users."""
+def setDefaultEditor(context, wanted_editor="", dry_run=False):
+    """Use the default editor for all users."""
     from collective.setdefaulteditor.utils import set_editor_for_all
+
     # Assumes the zope.component.hooks site has already been set
     set_editor_for_all(wanted_editor, dry_run)
 
@@ -244,9 +247,10 @@ class ReferenceTargetCleaner(utils.Upgrader):
     targets can't be found."""
 
     def upgrade(self):
-        self.ref_catalog = getToolByName(self.context, 'reference_catalog')
+        self.ref_catalog = getToolByName(self.context, "reference_catalog")
         self.context.ZopeFindAndApply(
-            self.context, search_sub=1, apply_func=self.upgradeObj)
+            self.context, search_sub=1, apply_func=self.upgradeObj
+        )
 
     def upgradeObj(self, obj, path=None):
         from Products.Archetypes import interfaces as at_ifaces
@@ -256,13 +260,16 @@ class ReferenceTargetCleaner(utils.Upgrader):
         for ref in self.ref_catalog.getReferences(obj):
             if ref.getTargetObject() is None:
                 ref_id = uuid_ifaces.IUUID(ref)
-                self.log('Removing reference %r with missing target: %r'
-                         % (ref_id, ref))
+                self.log(
+                    "Removing reference {!r} with missing target: {!r}".format(
+                        ref_id, ref
+                    )
+                )
                 aq_parent(ref)._delOb(ref_id)
 
 
 def cleanupMissingReferenceTargets(context):
-    url = getToolByName(context, 'portal_url')
+    url = getToolByName(context, "portal_url")
     upgrader = ReferenceTargetCleaner(url.getPortalObject())
     upgrader.upgrade()
 
@@ -271,8 +278,7 @@ def pack_zodb(context, t=None, days=0):
     """
     Pack the database after upgrades to conserve disk space.
     """
-    utils.transaction_note(
-        context, note='Committing changes prior to packing the ZODB')
+    utils.transaction_note(context, note="Committing changes prior to packing the ZODB")
     transaction.commit()
     db = context._p_jar.db()
     db.pack(t, days)
@@ -285,10 +291,10 @@ def cookResourceRegisties(context, ids=None):
     This can address the issue where sometimes the resource registries viewlet
     fails to render correctly.
     """
-    url = getToolByName(context, 'portal_url')
+    url = getToolByName(context, "portal_url")
     portal = url.getPortalObject()
     for obj in portal.objectValues():
-        if hasattr(obj, 'cookResources'):
+        if hasattr(obj, "cookResources"):
             obj.cookResources()
 
 
@@ -328,19 +334,21 @@ def resetProfiles(context, extension_profiles=None):
       </genericsetup:upgradeSteps>
     """
     if extension_profiles is None:
-        url = getToolByName(context, 'portal_url')
+        url = getToolByName(context, "portal_url")
         portal = url.getPortalObject()
-        form = portal.restrictedTraverse('@@plone-addsite')
+        form = portal.restrictedTraverse("@@plone-addsite")
         extension_profiles = [
-            info['id'] for info in form.profiles()['extensions']
-            if info.get('selected') == 'selected']
+            info["id"]
+            for info in form.profiles()["extensions"]
+            if info.get("selected") == "selected"
+        ]
 
-    setup = getToolByName(context, 'portal_setup')
+    setup = getToolByName(context, "portal_setup")
 
     base_profile = setup.getBaselineContextID()
-    logger.info('Importing the %r base profile', base_profile)
+    logger.info("Importing the %r base profile", base_profile)
     setup.runAllImportStepsFromProfile(base_profile, purge_old=False)
 
     for extension_profile in extension_profiles:
-        logger.info('Importing the %r extension profile', extension_profile)
-        setup.runAllImportStepsFromProfile('profile-%s' % extension_profile)
+        logger.info("Importing the %r extension profile", extension_profile)
+        setup.runAllImportStepsFromProfile("profile-%s" % extension_profile)

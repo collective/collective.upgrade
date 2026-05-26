@@ -1,17 +1,16 @@
-# encoding: utf-8
-
 from zope import interface
 
 
 class IUpgrader(interface.Interface):
     """Upgrade a context."""
 
-    logger = interface.Attribute(
-        'The logger used to record upgrade information.')
+    logger = interface.Attribute("The logger used to record upgrade information.")
     log_level = interface.Attribute(
-        'The default "logging" module level for log messages.')
+        'The default "logging" module level for log messages.'
+    )
     log_template = interface.Attribute(
-        'The string formatting template used for log messagess.')
+        "The string formatting template used for log messagess."
+    )
 
     def __call__():
         """Do the actual upgrade work."""
@@ -19,5 +18,5 @@ class IUpgrader(interface.Interface):
     def log(msg, level=None, template=None):
         """Log a message using the template and level."""
 
-    def commit(note='Checkpointing upgrade'):
+    def commit(note="Checkpointing upgrade"):
         """Commit with a transaction note and log a message."""
