@@ -1,6 +1,6 @@
 import os
 
-from setuptools import find_packages, setup
+from setuptools import find_namespace_packages, setup
 
 version = "2.0.dev0"
 
@@ -30,9 +30,11 @@ setup(
     # http://www.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         "Framework :: Plone",
-        "Framework :: Plone",
+        "Framework :: Plone :: Addon",
         "Framework :: Plone :: 6.1",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
@@ -41,9 +43,8 @@ setup(
     author_email="me@rpatterson.net",
     url="https://github.com/collective/collective.upgrade",
     license="GPL",
-    packages=find_packages("src", exclude=["ez_setup"]),
+    packages=find_namespace_packages("src", exclude=["ez_setup"]),
     package_dir={"": "src"},
-    namespace_packages=["collective"],
     include_package_data=True,
     zip_safe=False,
     install_requires=install_requires,
