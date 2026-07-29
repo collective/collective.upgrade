@@ -2,23 +2,21 @@
 
 import contextlib
 import logging
-import transaction
 
-from zope import globalrequest
-from zope import interface
+import transaction
+import zodbupdate.main
+from Acquisition import aq_base
+from zope import globalrequest, interface
 from zope.component import hooks
 from zope.publisher import browser
-
-import zodbupdate.main
-
-from Acquisition import aq_base
 from ZPublisher import utils
 
 from collective.upgrade import interfaces
 
 formatter = logging.Formatter(
-    "%(asctime)s %(levelname)s %(name)s %(message)s", "%Y-%m-%d %H:%M:%S")
-logger = logging.getLogger('collective.upgrade')
+    "%(asctime)s %(levelname)s %(name)s %(message)s", "%Y-%m-%d %H:%M:%S"
+)
+logger = logging.getLogger("collective.upgrade")
 
 
 @interface.implementer(interfaces.IUpgrader)
@@ -26,15 +24,15 @@ class Upgrader(browser.BrowserView):
 
     logger = logger
     log_level = logging.INFO
-    log_template = '{context}: {msg}'
+    log_template = "{context}: {msg}"
 
     def __init__(self, context, request=None):
         super(Upgrader, self).__init__(context, request)
 
     def __call__(self):
         """Do the actual upgrade work."""
-        if self.request.form.pop('submitted'):
-            self.request.response.setHeader('Content-Type', 'text/plain')
+        if self.request.form.pop("submitted"):
+            self.request.response.setHeader("Content-Type", "text/plain")
             handler = logging.StreamHandler(self.request.response)
             handler.addFilter(zodbupdate.main.duplicate_filter)
             handler.setFormatter(formatter)
@@ -59,7 +57,7 @@ class Upgrader(browser.BrowserView):
         msg = template.format(msg=msg, **self.__dict__)
         self.logger.log(level, msg)
 
-    def commit(self, note='Checkpointing upgrade'):
+    def commit(self, note="Checkpointing upgrade"):
         """Commit with a transaction note and log a message."""
         transaction_note(self.context, self.request, note)
         transaction.commit()
@@ -76,8 +74,8 @@ def transaction_note(context, request=None, note=None):
         t = transaction.get()
         if (len(t.description) + len(note)) >= 65533:
             logger.warning(
-                'Transaction note too large omitting {0!r}'.format(
-                    str(note)))
+                "Transaction note too large omitting {0!r}".format(str(note))
+            )
         else:
             t.note(str(note))
 
@@ -97,7 +95,7 @@ def overrideComponents(obj=None):
 
     # Create a new component registry that uses the existing one as its base
     next = obj.getSiteManager()
-    components = registry.PersistentComponents('++etc++site', bases=(next,))
+    components = registry.PersistentComponents("++etc++site", bases=(next,))
     obj.setSiteManager(components)
     components.__parent__ = aq_base(obj)
 

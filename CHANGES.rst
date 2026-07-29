@@ -2,10 +2,17 @@ Changelog
 =========
 
 
-1.8 (unreleased)
+2.0 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Switch to PEP 420 native namespace package.
+  [remdub]
+
+- Update classifiers, remove obsolete Plone 4 ``buildout.cfg`` and ``bootstrap.py``.
+  [remdub]
+
+- Add Plone 6.1 compatibility, drop Plone 4 / 5 compatibility
+  [bsuttor, laulaz, szakitibi]
 
 
 1.7 (2022-03-01)

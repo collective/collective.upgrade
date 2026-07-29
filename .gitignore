@@ -69,6 +69,11 @@ Thumbs.db
 .pydevproject
 .settings
 
+# Buildout generated files #
+############################
+.coverage
+.plone.versioncheck.tracked.json
+
 # Buildout generated folders #
 ##############################
 bin

@@ -266,18 +266,19 @@ default, the export step assumes the first IUserEnumerationPlugin,
 IGroupEnumerationPlugin, and IPropertiesPlugin are the destination
 plugins.
 
-    >>> from six import StringIO
     >>> import tarfile
     >>> import csv
+    >>> import io
     >>> from pprint import pformat as pf
     >>> portal_setup = getToolByName(portal, 'portal_setup')
     >>> export_users_result = portal_setup.runExportStep('reconcile_users')
-    >>> export_users_tarball = StringIO.StringIO(
+    >>> export_users_tarball = io.BytesIO(
     ...     export_users_result['tarball'])
     >>> opened = tarfile.open(fileobj=export_users_tarball)
     >>> export_users_csvfile = opened.extractfile('reconcile_users.csv')
-    >>> export_users_mappings = pf(list(csv.DictReader(export_users_csvfile)))
-    >>> print export_users_mappings
+    >>> decoded_file = io.TextIOWrapper(export_users_csvfile, encoding='utf-8')
+    >>> export_users_mappings = pf(list(csv.DictReader(decoded_file)))
+    >>> print(export_users_mappings)
     [{'Destination Duplicate IDs': 'baz_dest_user_id',
       'Destination ID': 'bar_dest_user_id',
       'Destination Plugin ID': 'dest_properties',
@@ -311,13 +312,13 @@ plugins.
 
     >>> portal_setup = getToolByName(portal, 'portal_setup')
     >>> export_groups_result = portal_setup.runExportStep('reconcile_groups')
-    >>> export_groups_tarball = StringIO.StringIO(
+    >>> export_groups_tarball = io.BytesIO(
     ...     export_groups_result['tarball'])
     >>> opened = tarfile.open(fileobj=export_groups_tarball)
     >>> export_groups_csvfile = opened.extractfile('reconcile_groups.csv')
-    >>> export_groups_mappings = pf(list(
-    ...     csv.DictReader(export_groups_csvfile)))
-    >>> print export_groups_mappings
+    >>> decoded_file = io.TextIOWrapper(export_groups_csvfile, encoding='utf-8')
+    >>> export_groups_mappings = pf(list(csv.DictReader(decoded_file)))
+    >>> print(export_groups_mappings)
     [{'Destination Duplicate IDs': '',
       'Destination ID': '',
       'Destination Plugin ID': '',
@@ -376,7 +377,8 @@ of user and group ``id`` values:
 
     >>> with open(os.path.join(
     ...         os.path.dirname(collective.upgrade.__file__),
-    ...         'profiles', 'testing', 'reconcile_users.csv')
+    ...         'profiles', 'testing', 'reconcile_users.csv'),
+    ...         'rt', encoding='utf-8',
     ... ) as import_users_csvfile:
     ...     import_users_mappings = pf(list(csv.DictReader(
     ...         import_users_csvfile)))
@@ -390,7 +392,8 @@ of user and group ``id`` values:
 
     >>> with open(os.path.join(
     ...         os.path.dirname(collective.upgrade.__file__),
-    ...         'profiles', 'testing', 'reconcile_groups.csv')
+    ...         'profiles', 'testing', 'reconcile_groups.csv'),
+    ...         'rt', encoding='utf-8',
     ... ) as import_groups_csvfile:
     ...     import_groups_mappings = pf(list(csv.DictReader(
     ...         import_groups_csvfile)))
