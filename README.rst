@@ -1,3 +1,8 @@
+.. image:: https://github.com/collective/collective.upgrade/actions/workflows/main.yml/badge.svg
+    :target: https://github.com/collective/collective.upgrade/actions/workflows/main.yml
+.. image:: https://coveralls.io/repos/github/collective/collective.upgrade/badge.svg
+    :target: https://coveralls.io/github/collective/collective.upgrade
+
 collective.upgrade
 ==================
 
