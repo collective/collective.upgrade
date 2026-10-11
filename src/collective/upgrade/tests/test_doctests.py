@@ -14,7 +14,9 @@ def test_suite():
     suite.addTests(
         [
             layered(
-                doctest.DocFileSuite("pas.rst", optionflags=optionflags),
+                doctest.DocFileSuite(
+                    "pas.rst", package="collective.upgrade", optionflags=optionflags
+                ),
                 layer=testing.COLLECTIVE_UPGRADE_INTEGRATION_TESTING,
             )
         ]

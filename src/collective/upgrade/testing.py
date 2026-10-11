@@ -2,14 +2,26 @@
 
 """Test fixtures and utilities"""
 
+import logging
+
 from plone.app.contenttypes import testing as ct_testing
-from plone.app.testing import (IntegrationTesting, PloneSandboxLayer, login,
-                               logout, setRoles)
+from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
+from plone.app.testing import (FunctionalTesting, IntegrationTesting,
+                               PloneSandboxLayer, applyProfile, login, logout,
+                               setRoles)
 from Products.CMFCore.utils import getToolByName
 from Products.PlonePAS.setuphandlers import activatePluginInterfaces
 from Products.PluggableAuthService.interfaces.plugins import (
     IGroupEnumerationPlugin, IPropertiesPlugin, IUserEnumerationPlugin)
 from zope.configuration import xmlconfig
+
+from collective.upgrade.tests.upgrades import PROFILE_ID
+from collective.upgrade.utils import logger
+
+try:
+    from plone.testing.zope import WSGI_SERVER_FIXTURE as SERVER_FIXTURE
+except ImportError:  # Plone 4
+    from plone.testing.z2 import ZSERVER_FIXTURE as SERVER_FIXTURE
 
 
 class UpgradeTesting(PloneSandboxLayer):
@@ -21,9 +33,23 @@ class UpgradeTesting(PloneSandboxLayer):
         import collective.upgrade
 
         xmlconfig.file("testing.zcml", collective.upgrade, context=configurationContext)
+        # INFO, like the event log of a Zope instance
+        self.log_level = logger.level
+        logger.setLevel(logging.INFO)
+
+    def tearDownZope(self, app):
+        logger.setLevel(self.log_level)
 
     def setUpPloneSite(self, portal):
         acl_users = getToolByName(portal, "acl_users")
+        # Plone 4: the plone.app.contenttypes 1.1 fixture adds a portal "admin"
+        # user, absent from the pas.rst reconciliations
+        if "admin" in acl_users.source_users.listUserIds():
+            acl_users.source_users.removeUser("admin")
+
+        # Pending upgrades: steps 1 to 2 (two steps) and 2 to 3
+        applyProfile(portal, PROFILE_ID)
+        portal.portal_setup.setLastVersionForProfile(PROFILE_ID, "1")
 
         # Add the destination plugins
         plone_pas = acl_users.manage_addProduct["PlonePAS"]
@@ -143,4 +169,14 @@ COLLECTIVE_UPGRADE_FIXTURE = UpgradeTesting()
 
 COLLECTIVE_UPGRADE_INTEGRATION_TESTING = IntegrationTesting(
     bases=(COLLECTIVE_UPGRADE_FIXTURE,), name="collective.upgrade:Integration"
+)
+
+# The upgraders commit: tests that run upgrades need their own DemoStorage
+COLLECTIVE_UPGRADE_FUNCTIONAL_TESTING = FunctionalTesting(
+    bases=(COLLECTIVE_UPGRADE_FIXTURE,), name="collective.upgrade:Functional"
+)
+
+COLLECTIVE_UPGRADE_ACCEPTANCE_TESTING = FunctionalTesting(
+    bases=(COLLECTIVE_UPGRADE_FIXTURE, REMOTE_LIBRARY_BUNDLE_FIXTURE, SERVER_FIXTURE),
+    name="collective.upgrade:Acceptance",
 )
