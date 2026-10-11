@@ -5,10 +5,12 @@ import re
 
 import transaction
 from Acquisition import aq_base, aq_parent
+from plone.base.utils import get_installer
 from plone.uuid import interfaces as uuid_ifaces
 from Products.CMFCore.utils import getToolByName
 from Products.PluginIndexes.FieldIndex import FieldIndex
 from Products.ZCatalog.ProgressHandler import ZLogHandler
+from zope.component import getUtility
 
 from collective.upgrade import utils
 
@@ -67,47 +69,49 @@ def uninstallAddOns(context, addons=None):
     If no add-ons are specified then all missing add-ons are
     uninstalled.
     """
-    qi = getToolByName(context, "portal_quickinstaller")
+    installer = get_installer(context)
     setup = getToolByName(context, "portal_setup")
-    for product in qi.listInstallableProducts(skipInstalled=False):
-        addon = product["id"]
-        if addons is not None:
-            if addon not in addons:
-                continue
-        elif qi.isProductInstallable(addon):
+    if addons is None:
+        # installed, but their profiles are no longer registered
+        registered = {info["id"] for info in setup.listProfileInfo()}
+        addons = sorted(
+            {
+                profile.split(":", 1)[0]
+                for profile in setup._profile_upgrade_versions
+                if profile not in registered
+            }
+        )
+    for addon in addons:
+        profiles = [
+            profile
+            for profile in setup._profile_upgrade_versions
+            if profile.split(":", 1)[0] in (addon, "Products." + addon)
+        ]
+        if not profiles:
+            # Not installed
             continue
 
-        qi._getOb(addon).locked = False
-        install_profiles = qi.getInstallProfiles(addon)
-        uninstall_profiles = [
-            profile
-            for profile in install_profiles
-            if profile.split(":", 1) == "uninstall"
-        ]
-        if uninstall_profiles:
-            profile = uninstall_profiles[0]
+        uninstall_profile = installer.get_uninstall_profile(addon)
+        if uninstall_profile:
             logger.info(
                 "Uninstalling the %r add-on for %r using the %r profile"
-                % (addon, setup, profile)
+                % (addon, setup, uninstall_profile["id"])
             )
-            setup.runAllImportStepsFromProfile("profile-%s" % profile)
-            qi.manage_delObjects([addon])
+            installer.uninstall_product(addon)
         else:
-            logger.info("Uninstalling the %r add-on for %r" % (addon, qi))
-            qi.uninstallProducts([addon])
+            logger.info("Uninstalling the %r add-on for %r" % (addon, setup))
 
-        for profile in install_profiles:
+        for profile in profiles:
             version = setup.getLastVersionForProfile(profile)
             if version == "unknown":
-                # Not installed, no need to remove
+                # Already unset by the uninstall profile
                 continue
             logger.info(
                 "Clearing the %r profile version %r for %r" % (profile, version, setup)
             )
-            del setup._profile_upgrade_versions[profile]
-            setup._p_changed = True
+            setup.unsetLastVersionForProfile(profile)
 
-        assert not qi.isProductInstalled(addon)
+        assert not installer.is_product_installed(addon)
 
 
 class CMFEditionsUpgrader(utils.Upgrader):
@@ -158,7 +162,11 @@ class CMFEditionsUpgrader(utils.Upgrader):
 class CMFEditionsFolderMigrator(CMFEditionsUpgrader):
 
     def upgrade(self):
-        from plone.app.folder.migration import BTreeMigrationView
+        try:
+            from plone.app.folder.migration import BTreeMigrationView
+        except ImportError:  # Plone 5.2+
+            self.log("No plone.app.folder, skipping the CMFEditions folder migration")
+            return
         from Products.BTreeFolder2.BTreeFolder2 import \
             BTreeFolder2Base as BTreeFolder
 
@@ -188,7 +196,11 @@ def origKey(obj):
     - or it doesn't have an id starting with 'copy_of_'
     - or it has the shortest path
     """
-    return (obj.created(), copy_id_re.match(obj.getId()), len(obj.getPhysicalPath()))
+    return (
+        obj.created(),
+        bool(copy_id_re.match(obj.getId())),
+        len(obj.getPhysicalPath()),
+    )
 
 
 def fixDuplicateUIDs(context):
@@ -201,7 +213,6 @@ def fixDuplicateUIDs(context):
     objects with the same UID.
     """
     catalog = getToolByName(context, "portal_catalog")
-    ref_catalog = getToolByName(context, "reference_catalog")
     uid_index = catalog.Indexes._getOb("UID", None)
     if not isinstance(uid_index, FieldIndex.FieldIndex):
         return
@@ -229,7 +240,8 @@ def fixDuplicateUIDs(context):
         for obj in objs:
             if aq_base(obj) is aq_base(orig):
                 continue
-            new_uid = ref_catalog._getUUIDFor(obj)
+            new_uid = getUtility(uuid_ifaces.IUUIDGenerator)()
+            uuid_ifaces.IMutableUUID(obj).set(new_uid)
             obj.reindexObject(idxs=["UID"])
             logger.info("Assigned new UID %r to %r" % (new_uid, obj))
 
@@ -247,6 +259,11 @@ class ReferenceTargetCleaner(utils.Upgrader):
     targets can't be found."""
 
     def upgrade(self):
+        try:
+            import Products.Archetypes  # noqa: F401
+        except ImportError:  # Plone 5.2+
+            self.log("No Products.Archetypes, skipping the reference targets cleanup")
+            return
         self.ref_catalog = getToolByName(self.context, "reference_catalog")
         self.context.ZopeFindAndApply(
             self.context, search_sub=1, apply_func=self.upgradeObj
@@ -332,14 +349,10 @@ def resetProfiles(context, extension_profiles=None):
       </genericsetup:upgradeSteps>
     """
     if extension_profiles is None:
-        url = getToolByName(context, "portal_url")
-        portal = url.getPortalObject()
-        form = portal.restrictedTraverse("@@plone-addsite")
-        extension_profiles = [
-            info["id"]
-            for info in form.profiles()["extensions"]
-            if info.get("selected") == "selected"
-        ]
+        from Products.CMFPlone.browser.admin import AddPloneSite
+
+        # the ones selected by default when adding a site
+        extension_profiles = AddPloneSite(None, None).default_extension_profiles
 
     setup = getToolByName(context, "portal_setup")
 

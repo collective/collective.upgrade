@@ -59,7 +59,6 @@ class PloneUpgrader(upgrader.PortalUpgrader):
     def upgradeProfile(self, profile_id, enable_link_integrity_checks=_marker, **kw):
         upgradeProfile = super(PloneUpgrader, self).upgradeProfile
 
-        # properties = getToolByName(self.context, "portal_properties")
         registry = getUtility(IRegistry)
         orig = registry.get("plone.enable_link_integrity_checks", _marker)
         if enable_link_integrity_checks is not _marker:
@@ -71,14 +70,3 @@ class PloneUpgrader(upgrader.PortalUpgrader):
         finally:
             if enable_link_integrity_checks is not _marker:
                 registry["plone.enable_link_integrity_checks"] = orig
-
-    def isProfileInstalled(self, profile_id):
-        installed = super(PloneUpgrader, self).isProfileInstalled(profile_id)
-        if installed:
-            return installed
-
-        product, profile = profile_id.split(":", 1)
-        qi = getToolByName(self.context, "portal_quickinstaller")
-        if product.startswith("Products."):
-            product = product[len("Products."):]
-        return qi.isProductInstalled(product)

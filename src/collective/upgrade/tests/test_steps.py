@@ -3,15 +3,22 @@ import os
 import shutil
 import tempfile
 import unittest
+from unittest import mock
 
 import transaction
 from OFS.Folder import Folder
 from OFS.Image import manage_addFile
 from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, login, setRoles
+from plone.base.utils import get_installer
+from plone.registry.interfaces import IRegistry
 from plone.uuid.interfaces import ATTRIBUTE_NAME, IUUID
 from Products.CMFCore.utils import getToolByName
+from Products.DateRecurringIndex.index import DateRecurringIndex
+from Products.GenericSetup.tool import SetupTool
+from Products.PluginIndexes.interfaces import IDateRangeIndex
 from ZODB.DB import DB
 from ZODB.FileStorage import FileStorage
+from zope.component import getUtility
 from zope.globalrequest import clearRequest, setRequest
 from zope.testing.loggingsupport import InstalledHandler
 
@@ -82,42 +89,104 @@ class TestSteps(unittest.TestCase):
         )
 
     def test_uninstallAddOns(self):
-        qi = getToolByName(self.portal, "portal_quickinstaller")
-        qi.installProduct("plone.session")
-        self.assertTrue(qi.isProductInstalled("plone.session"))
-        self.assertNotEqual(self.setup.getLastVersionForProfile("plone.session:default"), "unknown")
-        steps.uninstallAddOns(self.setup, addons=["plone.session"])
-        self.assertFalse(qi.isProductInstalled("plone.session"))
+        installer = get_installer(self.portal)
+        installer.install_product("plone.session")
+        registry = getUtility(IRegistry)
+        self.assertIn("plone.bundles/plone-session.enabled", registry)
+        # with its uninstall profile; an add-on that isn't installed is skipped
+        steps.uninstallAddOns(self.setup, addons=["plone.session", "plone.app.caching"])
+        self.assertFalse(installer.is_product_installed("plone.session"))
         self.assertEqual(self.setup.getLastVersionForProfile("plone.session:default"), "unknown")
-        self.assertTrue(
+        self.assertNotIn("plone.bundles/plone-session.enabled", registry)
+        self.assertEqual(
+            messages(self.log),
             [
-                message
-                for message in messages(self.log)
-                if message.startswith("Uninstalling the 'plone.session' add-on for ")
-            ]
+                "Uninstalling the 'plone.session' add-on for {0!r} using the "
+                "'plone.session:uninstall' profile".format(self.setup)
+            ],
+        )
+        # without an uninstall profile: the profile versions are cleared
+        self.log.clear()
+        steps.uninstallAddOns(self.setup, addons=["collective.upgrade.tests"])
+        self.assertEqual(self.setup.getLastVersionForProfile(PROFILE_ID), "unknown")
+        self.assertEqual(
+            messages(self.log),
+            [
+                "Uninstalling the 'collective.upgrade.tests' add-on for {0!r}".format(self.setup),
+                "Clearing the {0!r} profile version ('1',) for {1!r}".format(PROFILE_ID, self.setup),
+            ],
+        )
+        # no add-ons given: the installed ones whose profiles are no longer registered
+        self.log.clear()
+        self.setup.setLastVersionForProfile("collective.removed:default", "1000")
+        steps.uninstallAddOns(self.setup)
+        self.assertEqual(self.setup.getLastVersionForProfile("collective.removed:default"), "unknown")
+        self.assertNotEqual(
+            self.setup.getLastVersionForProfile("plone.app.contenttypes:default"), "unknown"
+        )
+        self.assertEqual(
+            messages(self.log),
+            [
+                "Uninstalling the 'collective.removed' add-on for {0!r}".format(self.setup),
+                "Clearing the 'collective.removed:default' profile version ('1000',) "
+                "for {0!r}".format(self.setup),
+            ],
         )
 
     def test_migrateCMFEditionsFolderVersions(self):
         document = self.portal[self.portal.invokeFactory("Document", "document")]
         self.portal.portal_repository.save(document)
+        # Plone 5.2+: no plone.app.folder, nothing is migrated
         steps.migrateCMFEditionsFolderVersions(self.setup)
-        self.assertTrue(
-            [
-                message
-                for message in messages(self.log)
-                if " Begin cleaning up CMFEditions objects in " in message
-            ]
+        self.assertEqual(
+            messages(self.log),
+            ["{0}: No plone.app.folder, skipping the CMFEditions folder migration".format(self.setup)],
         )
         self.assertEqual(self.portal.portal_repository.retrieve(document, 0).object.getId(), "document")
 
     def test_fixDuplicateUIDs(self):
         first = self.portal[self.portal.invokeFactory("Document", "first")]
         copy = self.portal[self.portal.invokeFactory("Document", "copy_of_first")]
-        setattr(copy, ATTRIBUTE_NAME, IUUID(first))
+        uid = IUUID(first)
+        setattr(copy, ATTRIBUTE_NAME, uid)
         copy.reindexObject(idxs=["UID"])
         # the UID index is a UUIDIndex: nothing is done
         steps.fixDuplicateUIDs(self.setup)
-        self.assertEqual(IUUID(copy), IUUID(first))
+        self.assertEqual(IUUID(copy), uid)
+        self.assertEqual(messages(self.log), [])
+        # a FieldIndex: the copy gets a new UID
+        catalog = self.portal.portal_catalog
+        catalog.delIndex("UID")
+        catalog.addIndex("UID", "FieldIndex")
+        catalog.reindexIndex("UID", None)
+        self.assertEqual(len(catalog(UID=uid)), 2)
+        # a pasted copy keeps the creation date
+        copy.creation_date = first.creation_date
+        steps.fixDuplicateUIDs(self.setup)
+        self.assertEqual(IUUID(first), uid)
+        self.assertNotEqual(IUUID(copy), uid)
+        self.assertEqual([brain.getObject() for brain in catalog(UID=uid)], [first])
+        self.assertEqual([brain.getObject() for brain in catalog(UID=IUUID(copy))], [copy])
+        self.assertEqual(
+            messages(self.log),
+            [
+                "Multiple objects found for UID {0!r}, assuming {1!r} is the original".format(
+                    uid, first
+                ),
+                "Assigned new UID {0!r} to {1!r}".format(IUUID(copy), copy),
+            ],
+        )
+
+    def test_cleanupMissingReferenceTargets(self):
+        # Plone 5.2+: no Archetypes references to clean up
+        steps.cleanupMissingReferenceTargets(self.setup)
+        self.assertEqual(
+            messages(self.log),
+            [
+                "{0}: No Products.Archetypes, skipping the reference targets "
+                "cleanup".format(self.portal)
+            ],
+        )
 
     def test_pack_zodb(self):
         # a DemoStorage can't be packed: use a FileStorage
@@ -150,18 +219,31 @@ class TestSteps(unittest.TestCase):
             self.assertIn("upgraded.css", css.concatenatedresources)
 
     def test_resetProfiles(self):
-        # the base profile is imported first: Plone 4 fails on the Archetypes type
-        # infos of a site whose types come from plone.app.contenttypes
-        with self.assertRaises(ValueError) as cm:
+        base = "Importing the 'profile-Products.CMFPlone:plone' base profile"
+        if IDateRangeIndex.implementedBy(DateRecurringIndex):
+            # Plone 6.2 (Products.DateRecurringIndex 4): the catalog step of the base
+            # profile gives the start and end indexes to the DateRangeIndex importer
+            with self.assertRaises(AttributeError) as cm:
+                steps.resetProfiles(self.setup, extension_profiles=[PROFILE_ID])
+            self.assertEqual(str(cm.exception), "_since_field")
+            self.assertEqual(messages(self.log), [base])
+        else:
+            # Plone 6.1: the base profile, then the extension profiles
             steps.resetProfiles(self.setup, extension_profiles=[PROFILE_ID])
-        self.assertEqual(str(cm.exception), "undefined property 'content_meta_type'")
-        self.assertEqual(
-            messages(self.log), ["Importing the 'profile-Products.CMFPlone:plone' base profile"]
-        )
+            self.assertEqual(
+                messages(self.log),
+                [base, "Importing the {0!r} extension profile".format(PROFILE_ID)],
+            )
+            self.assertEqual(self.setup.getLastVersionForProfile(PROFILE_ID), ("3",))
         # without extension profiles: the ones selected by default when adding a site
-        self.log.clear()
-        with self.assertRaises(ValueError):
+        with mock.patch.object(SetupTool, "runAllImportStepsFromProfile") as run:
             steps.resetProfiles(self.setup)
         self.assertEqual(
-            messages(self.log), ["Importing the 'profile-Products.CMFPlone:plone' base profile"]
+            run.call_args_list,
+            [
+                mock.call("profile-Products.CMFPlone:plone", purge_old=False),
+                mock.call("profile-plone.app.contenttypes:default"),
+                mock.call("profile-plone.app.caching:default"),
+                mock.call("profile-plonetheme.barceloneta:default"),
+            ],
         )

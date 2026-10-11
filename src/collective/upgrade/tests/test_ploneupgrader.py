@@ -109,17 +109,6 @@ class TestPloneUpgrader(unittest.TestCase):
 
     def test_isProfileInstalled(self):
         self.assertTrue(self.upgrader.isProfileInstalled(PROFILE_ID))
-        # never applied, but its product is installed in portal_quickinstaller
-        # (Plone 4 marks collective.upgrade.tests installed when the fixture applies
-        # its "upgrades" profile)
-        self.assertTrue(self.upgrader.isProfileInstalled(NOT_INSTALLED_PROFILE_ID))
-        # "Products." is stripped from the product name
-        self.assertFalse(
-            self.upgrader.isProfileInstalled("Products.Marshall:default")
-        )
-        qi = self.portal.portal_quickinstaller
-        qi.installProduct("Marshall")
-        self.setup.unsetLastVersionForProfile("Products.Marshall:default")
-        self.assertTrue(
-            self.upgrader.isProfileInstalled("Products.Marshall:default")
-        )
+        # Plone 5.2+: only the profile version counts (no quickinstaller fallback): a
+        # never applied profile of an installed product is not installed
+        self.assertFalse(self.upgrader.isProfileInstalled(NOT_INSTALLED_PROFILE_ID))

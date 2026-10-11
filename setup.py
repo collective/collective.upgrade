@@ -2,7 +2,7 @@ import os
 
 from setuptools import find_namespace_packages, setup
 
-version = "2.0.dev0"
+version = "2.0.0.dev0"
 
 install_requires = [
     "setuptools",
@@ -32,6 +32,7 @@ setup(
         "Framework :: Plone",
         "Framework :: Plone :: Addon",
         "Framework :: Plone :: 6.1",
+        "Framework :: Plone :: 6.2",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.12",
@@ -52,7 +53,6 @@ setup(
     extras_require=dict(
         test=tests_require, steps=["experimental.broken", "collective.setdefaulteditor"]
     ),
-    test_suite="collective.upgrade.tests.test_suite",
     scripts=["run-portal-upgrades"],
     entry_points="""
       # -*- Entry points: -*-

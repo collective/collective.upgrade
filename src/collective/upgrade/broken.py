@@ -52,7 +52,7 @@ class Empty(object):
 
 def cleanupBrokenTextIndexes(context):
     catalog = getToolByName(context, "portal_catalog")
-    for id_ in catalog.indexes():
+    for id_ in list(catalog.indexes()):
         index = catalog._catalog.getIndex(id_)
         if (
             not isinstance(index, broken.Broken)

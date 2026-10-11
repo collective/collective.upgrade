@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+import codecs
 import contextlib
 import logging
 
@@ -33,7 +34,9 @@ class Upgrader(browser.BrowserView):
         """Do the actual upgrade work."""
         if self.request.form.pop("submitted"):
             self.request.response.setHeader("Content-Type", "text/plain")
-            handler = logging.StreamHandler(self.request.response)
+            # the response stream takes bytes
+            stream = codecs.getwriter("utf-8")(self.request.response)
+            handler = logging.StreamHandler(stream)
             handler.addFilter(zodbupdate.main.duplicate_filter)
             handler.setFormatter(formatter)
             root = logging.getLogger()
