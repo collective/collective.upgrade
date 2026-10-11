@@ -1,0 +1,8 @@
+[run]
+source = src/collective/upgrade
+
+[report]
+include =
+    src/collective/upgrade/*
+omit =
+    */tests/*

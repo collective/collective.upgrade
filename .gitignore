@@ -82,3 +82,10 @@ develop-eggs
 var
 include
 lib
+
+# scripts-buildout environment #
+################################
+.plone-version
+.python-version
+pyvenv.cfg
+CACHEDIR.TAG
