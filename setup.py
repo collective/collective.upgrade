@@ -17,6 +17,7 @@ install_requires = [
 ]
 
 tests_require = [
+    "plone.app.caching",
     "plone.app.contenttypes",
     "plone.app.robotframework",
     "plone.app.testing",
@@ -24,6 +25,7 @@ tests_require = [
     "plone.testing",
     "Products.DateRecurringIndex",
     "Products.PlonePAS",
+    "plonetheme.barceloneta",
     "robotsuite",
 ]
 

@@ -86,7 +86,7 @@ Zope = [
 ]
 python-dateutil = ['dateutil']
 pytest-plone = ['pytest', 'zope.pytestlayer', 'plone.testing', 'plone.app.testing']
-ignore-packages = ['collective.setdefaulteditor', 'experimental.broken', 'plone.app.folder', 'Products.Archetypes', 'Products.PluginIndexes', 'Products.ResourceRegistries']
+ignore-packages = ['collective.setdefaulteditor', 'experimental.broken', 'plone.app.caching', 'plone.app.folder', 'plonetheme.barceloneta', 'Products.Archetypes', 'Products.PluginIndexes', 'Products.ResourceRegistries']
 
 ##
 # Add extra configuration options in .meta.toml:
