@@ -1,3 +1,6 @@
+.. image:: https://github.com/collective/collective.upgrade/actions/workflows/meta.yml/badge.svg?branch=master
+    :target: https://github.com/collective/collective.upgrade/actions/workflows/meta.yml
+
 collective.upgrade
 ==================
 

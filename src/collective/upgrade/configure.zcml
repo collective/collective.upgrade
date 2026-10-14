@@ -1,6 +1,9 @@
 <configure xmlns="http://namespaces.zope.org/zope">
 
-  <include package="Products.CMFCore" file="permissions.zcml" />
+  <include
+      package="Products.CMFCore"
+      file="permissions.zcml"
+      />
 
   <include file="upgraders.zcml" />
   <include file="steps.zcml" />

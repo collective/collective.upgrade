@@ -1,21 +1,20 @@
-# encoding: utf-8
+from AccessControl import owner
+from Products.CMFCore.utils import getToolByName
+from Products.PluggableAuthService.interfaces.plugins import IGroupEnumerationPlugin
+from Products.PluggableAuthService.interfaces.plugins import IGroupsPlugin
+from Products.PluggableAuthService.interfaces.plugins import IPropertiesPlugin
+from Products.PluggableAuthService.interfaces.plugins import IUserEnumerationPlugin
 
 import csv
 import io
 import logging
 import mimetypes
-
 import transaction
-from AccessControl import owner
-from Products.CMFCore.utils import getToolByName
-from Products.PluggableAuthService.interfaces.plugins import (
-    IGroupEnumerationPlugin, IGroupsPlugin, IPropertiesPlugin,
-    IUserEnumerationPlugin)
 
 logger = logging.getLogger("collective.upgrade.pas")
 
 
-class Reconciler(object):
+class Reconciler:
 
     filename = "reconcile_{0}s.csv"
 
@@ -47,11 +46,11 @@ class ExportReconciler(Reconciler):
         dest_properties_plugin=None,
         dest_groups_plugin=None,
     ):
-        super(ExportReconciler, self).__init__(context, principal_type)
+        super().__init__(context, principal_type)
         self.acl_users = getToolByName(self.site, "acl_users")
         self.plugins = self.acl_users._getOb("plugins")
 
-        self.get_rows = getattr(self, "get_{0}_rows".format(self.principal_type))
+        self.get_rows = getattr(self, f"get_{self.principal_type}_rows")
 
         if principal_type == "user":
             if not dest_users_plugin:
@@ -80,7 +79,7 @@ class ExportReconciler(Reconciler):
         try:
             content_type = mimetypes.guess_type(self.filename)
             writer = csv.DictWriter(csvfile, self.fieldnames)
-            writer.writerow(dict((name, name) for name in self.fieldnames))
+            writer.writerow({name: name for name in self.fieldnames})
             writer.writerows(self.get_rows())
 
             if not hasattr(self.context, "openDataFile"):
@@ -229,7 +228,7 @@ class ImportReconciler(Reconciler):
         self.plugins = self.acl_users._getOb("plugins")
 
         getPrincipalById = getattr(
-            self.acl_users, "get{0}ById".format(self.principal_type.capitalize())
+            self.acl_users, f"get{self.principal_type.capitalize()}ById"
         )
         rows = {}
         for row in reader:
@@ -323,7 +322,7 @@ class ImportReconciler(Reconciler):
             self.site.ZopeFindAndApply(self.site, apply_func=import_ofs_obj)
 
 
-class DataFile(object):
+class DataFile:
 
     def __init__(self, file_):
         self.size = file_.tell()

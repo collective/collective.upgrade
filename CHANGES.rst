@@ -2,8 +2,12 @@ Changelog
 =========
 
 
-2.0 (unreleased)
-----------------
+2.0.0 (unreleased)
+------------------
+
+- Add Plone 6.2 support and tests, fix the remaining Plone 6 incompatibilities,
+  based on the work of @laulaz, @bsuttor, @szakitibi and @remdub on ``plone61``.
+  [chris-adam]
 
 - Switch to PEP 420 native namespace package.
   [remdub]
@@ -13,6 +17,9 @@ Changelog
 
 - Add Plone 6.1 compatibility, drop Plone 4 / 5 compatibility
   [bsuttor, laulaz, szakitibi]
+
+- Added plone.meta configuration (tox, pre-commit, GitHub Actions).
+  [chris-adam]
 
 
 1.7 (2022-03-01)

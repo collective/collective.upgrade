@@ -1,17 +1,16 @@
-# encoding: utf-8
-
-import contextlib
-import logging
-
-import transaction
-import zodbupdate.main
 from Acquisition import aq_base
-from zope import globalrequest, interface
+from collective.upgrade import interfaces
+from zope import globalrequest
+from zope import interface
 from zope.component import hooks
 from zope.publisher import browser
 from ZPublisher import utils
 
-from collective.upgrade import interfaces
+import codecs
+import contextlib
+import logging
+import transaction
+import zodbupdate.main
 
 formatter = logging.Formatter(
     "%(asctime)s %(levelname)s %(name)s %(message)s", "%Y-%m-%d %H:%M:%S"
@@ -27,13 +26,15 @@ class Upgrader(browser.BrowserView):
     log_template = "{context}: {msg}"
 
     def __init__(self, context, request=None):
-        super(Upgrader, self).__init__(context, request)
+        super().__init__(context, request)
 
     def __call__(self):
         """Do the actual upgrade work."""
         if self.request.form.pop("submitted"):
             self.request.response.setHeader("Content-Type", "text/plain")
-            handler = logging.StreamHandler(self.request.response)
+            # the response stream takes bytes
+            stream = codecs.getwriter("utf-8")(self.request.response)
+            handler = logging.StreamHandler(stream)
             handler.addFilter(zodbupdate.main.duplicate_filter)
             handler.setFormatter(formatter)
             root = logging.getLogger()
@@ -43,7 +44,7 @@ class Upgrader(browser.BrowserView):
             finally:
                 root.removeHandler(handler)
             return self.request.response
-        return super(Upgrader, self).__call__()
+        return super().__call__()
 
     def upgrade(self):
         raise NotImplementedError('Subclasses should override "__call__()"')
@@ -73,9 +74,7 @@ def transaction_note(context, request=None, note=None):
     if note is not None:
         t = transaction.get()
         if (len(t.description) + len(note)) >= 65533:
-            logger.warning(
-                "Transaction note too large omitting {0!r}".format(str(note))
-            )
+            logger.warning(f"Transaction note too large omitting {str(note)!r}")
         else:
             t.note(str(note))
 

@@ -1,13 +1,10 @@
-# encoding: utf-8
-
+from collective.upgrade import utils
 from Products.CMFCore.utils import getToolByName
 from Products.GenericSetup.upgrade import _upgrade_registry
 from zope.component import hooks
 from zope.event import notify
 from zope.globalrequest import setRequest
 from zope.traversing.interfaces import BeforeTraverseEvent
-
-from collective.upgrade import utils
 
 
 class PortalUpgrader(utils.Upgrader):
@@ -23,7 +20,7 @@ class PortalUpgrader(utils.Upgrader):
         if getattr(self.context, "portal_languages", None):
             self.context.portal_languages(self.context, self.context.REQUEST)
         self.setup = getToolByName(self.context, "portal_setup")
-        self.log("Upgrading {0}".format(self.context))
+        self.log(f"Upgrading {self.context}")
         # setup BrowserLayer, see: https://dev.plone.org/ticket/11673
         notify(BeforeTraverseEvent(self.context, self.context.REQUEST))
 
@@ -42,7 +39,7 @@ class PortalUpgrader(utils.Upgrader):
         if upgrade_profiles:
             self.upgradeExtensions(upgrade_profiles, **kw)
 
-        self.log("Upgraded {0}".format(self.context))
+        self.log(f"Upgraded {self.context}")
 
     def upgradeProfile(self, profile_id, **kw):
         upgrades = self.listUpgrades(profile_id)
@@ -71,8 +68,7 @@ class PortalUpgrader(utils.Upgrader):
     def flattenUpgrades(self, profile_id):
         for info in self.setup.listUpgrades(profile_id):
             if isinstance(info, list):
-                for subinfo in info:
-                    yield subinfo
+                yield from info
             else:
                 yield info
 
@@ -81,7 +77,9 @@ class PortalUpgrader(utils.Upgrader):
         step = None
         if steps_to_run:
             self.log(
-                "Upgrading profile %r to %r" % (profile_id, steps_to_run[0]["sdest"])
+                "Upgrading profile {!r} to {!r}".format(
+                    profile_id, steps_to_run[0]["sdest"]
+                )
             )
         for info in steps_to_run:
             step = _upgrade_registry.getUpgradeStep(profile_id, info["id"])
@@ -89,9 +87,9 @@ class PortalUpgrader(utils.Upgrader):
                 msg = "profile {0} from {ssource} to {sdest}: {title}".format(
                     profile_id, **info
                 )
-                self.log("Running upgrade step for {0}.".format(msg))
+                self.log(f"Running upgrade step for {msg}.")
                 step.doStep(self.setup)
-                self.log("Finished upgrade step for {0}.".format(msg))
+                self.log(f"Finished upgrade step for {msg}.")
 
         # We update the profile version to the last one we have reached
         # with running an upgrade step.
@@ -104,7 +102,9 @@ class PortalUpgrader(utils.Upgrader):
                 % (steps_to_run, profile_id, ".".join(step.dest))
             )
 
-        self.commit("Upgraded profile %r to %r" % (profile_id, ".".join(step.dest)))
+        self.commit(
+            "Upgraded profile {!r} to {!r}".format(profile_id, ".".join(step.dest))
+        )
 
     def upgradeExtensions(self, profile_ids, **kw):
         for profile_id in profile_ids:
