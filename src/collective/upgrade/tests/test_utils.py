@@ -1,29 +1,35 @@
-# -*- coding: utf-8 -*-
-import io
-import logging
-import re
-import unittest
-
-import transaction
 from Acquisition import aq_base
-from plone.app.testing import (SITE_OWNER_NAME, SITE_OWNER_PASSWORD,
-                               TEST_USER_ID, TEST_USER_NAME,
-                               TEST_USER_PASSWORD, login, setRoles)
-from zExceptions import Unauthorized
-from zodbupdate.main import duplicate_filter
-from zope.component import getSiteManager, queryUtility
-from zope.component.hooks import setSite
-from zope.globalrequest import clearRequest, setRequest
-from zope.interface.verify import verifyObject
-from zope.testing.loggingsupport import InstalledHandler
-
 from collective.upgrade.interfaces import IUpgrader
 from collective.upgrade.ploneupgrader import HiddenProfiles
 from collective.upgrade.testing import COLLECTIVE_UPGRADE_FUNCTIONAL_TESTING
-from collective.upgrade.tests.helpers import messages, transaction_notes
+from collective.upgrade.tests.helpers import messages
+from collective.upgrade.tests.helpers import transaction_notes
 from collective.upgrade.tests.upgrades import PROFILE_ID
-from collective.upgrade.utils import (Upgrader, overrideComponents,
-                                      transaction_note)
+from collective.upgrade.utils import overrideComponents
+from collective.upgrade.utils import transaction_note
+from collective.upgrade.utils import Upgrader
+from plone.app.testing import login
+from plone.app.testing import setRoles
+from plone.app.testing import SITE_OWNER_NAME
+from plone.app.testing import SITE_OWNER_PASSWORD
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_NAME
+from plone.app.testing import TEST_USER_PASSWORD
+from zExceptions import Unauthorized
+from zodbupdate.main import duplicate_filter
+from zope.component import getSiteManager
+from zope.component import queryUtility
+from zope.component.hooks import setSite
+from zope.globalrequest import clearRequest
+from zope.globalrequest import setRequest
+from zope.interface.verify import verifyObject
+from zope.testing.loggingsupport import InstalledHandler
+
+import io
+import logging
+import re
+import transaction
+import unittest
 
 try:
     from plone.base.interfaces import INonInstallable
@@ -57,7 +63,7 @@ class TestUpgrader(unittest.TestCase):
         browser = Browser(self.app)
         browser.handleErrors = False
         if user is not None:
-            browser.addHeader("Authorization", "Basic {0}:{1}".format(user, password))
+            browser.addHeader("Authorization", f"Basic {user}:{password}")
         return browser
 
     def test___call__(self):
@@ -78,11 +84,11 @@ class TestUpgrader(unittest.TestCase):
         ]
         self.assertEqual(lines[0], "{0}: Upgrading {0}".format(portal))
         self.assertIn(
-            "{0}: Nothing to upgrade for profile 'Products.CMFPlone:plone'".format(portal),
+            f"{portal}: Nothing to upgrade for profile 'Products.CMFPlone:plone'",
             lines,
         )
         self.assertIn(
-            "{0}: Running upgrade step for profile {1} from 2 to 3: "
+            "{}: Running upgrade step for profile {} from 2 to 3: "
             "Step from 2 to 3.".format(portal, PROFILE_ID),
             lines,
         )
@@ -155,7 +161,7 @@ class TestUpgrader(unittest.TestCase):
         self.upgrader.log("Careful", level=logging.WARNING, template="{msg}!")
         self.assertEqual(
             [(record.levelno, record.getMessage()) for record in self.log.records],
-            [(logging.INFO, "{0}: Hello".format(portal)), (logging.WARNING, "Careful!")],
+            [(logging.INFO, f"{portal}: Hello"), (logging.WARNING, "Careful!")],
         )
 
     def test_commit(self):
@@ -167,7 +173,9 @@ class TestUpgrader(unittest.TestCase):
         notes = transaction_notes(self.app)
         self.assertEqual(notes[-2], "/plone\nCheckpointing upgrade")
         self.assertEqual(notes[-1], "/plone\nUpgraded the news")
-        self.assertEqual(messages(self.log), ["Checkpointing upgrade", "Upgraded the news"])
+        self.assertEqual(
+            messages(self.log), ["Checkpointing upgrade", "Upgraded the news"]
+        )
 
 
 class TestUtils(unittest.TestCase):
@@ -187,9 +195,13 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(transaction.get().description, "/plone\nUpgraded the news")
         # a note exceeding the maximum length is omitted
         transaction_note(self.portal, note="x" * 65533)
-        self.assertEqual(transaction.get().description, "/plone\nUpgraded the news\n/plone")
+        self.assertEqual(
+            transaction.get().description, "/plone\nUpgraded the news\n/plone"
+        )
         self.assertTrue(
-            messages(self.log)[-1].startswith("Transaction note too large omitting 'xxx")
+            messages(self.log)[-1].startswith(
+                "Transaction note too large omitting 'xxx"
+            )
         )
         self.assertEqual(self.log.records[-1].levelno, logging.WARNING)
 

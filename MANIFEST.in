@@ -1,7 +1,8 @@
-include *.py
-include *.rst
+include *.cfg *.rst *.in .coveragerc Makefile requirements-*.txt run-portal-upgrades
 recursive-include src *.csv
 recursive-include src *.pp
+recursive-include src *.robot
 recursive-include src *.rst
 recursive-include src *.xml
 recursive-include src *.zcml
+global-exclude *.pyc

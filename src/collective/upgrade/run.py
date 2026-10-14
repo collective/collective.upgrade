@@ -1,14 +1,11 @@
-# encoding: utf-8
+from collective.upgrade import utils
 
 import argparse
 import logging
 import pdb  # noqa
 import sys
-
 import transaction
 import zodbupdate.main
-
-from collective.upgrade import utils
 
 parser = argparse.ArgumentParser(
     description="Upgrade CMF portals in a Zope 2 application "
@@ -112,9 +109,9 @@ def main(app=None, args=None):
 
     root = logging.getLogger()
     root.setLevel(logging.INFO)
-    (stderr_handler,) = [
+    (stderr_handler,) = (
         h for h in root.handlers if getattr(h, "stream", None) is sys.__stderr__
-    ]
+    )
     stderr_handler.setLevel(logging.INFO)
     stderr_handler.addFilter(zodbupdate.main.duplicate_filter)
 

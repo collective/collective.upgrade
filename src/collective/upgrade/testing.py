@@ -1,22 +1,24 @@
-# encoding: utf-8
-
 """Test fixtures and utilities"""
-
-import logging
-
-from plone.app.contenttypes import testing as ct_testing
-from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
-from plone.app.testing import (FunctionalTesting, IntegrationTesting,
-                               PloneSandboxLayer, applyProfile, login, logout,
-                               setRoles)
-from Products.CMFCore.utils import getToolByName
-from Products.PlonePAS.setuphandlers import activatePluginInterfaces
-from Products.PluggableAuthService.interfaces.plugins import (
-    IGroupEnumerationPlugin, IPropertiesPlugin, IUserEnumerationPlugin)
-from zope.configuration import xmlconfig
 
 from collective.upgrade.tests.upgrades import PROFILE_ID
 from collective.upgrade.utils import logger
+from plone.app.contenttypes import testing as ct_testing
+from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
+from plone.app.testing import applyProfile
+from plone.app.testing import FunctionalTesting
+from plone.app.testing import IntegrationTesting
+from plone.app.testing import login
+from plone.app.testing import logout
+from plone.app.testing import PloneSandboxLayer
+from plone.app.testing import setRoles
+from Products.CMFCore.utils import getToolByName
+from Products.PlonePAS.setuphandlers import activatePluginInterfaces
+from Products.PluggableAuthService.interfaces.plugins import IGroupEnumerationPlugin
+from Products.PluggableAuthService.interfaces.plugins import IPropertiesPlugin
+from Products.PluggableAuthService.interfaces.plugins import IUserEnumerationPlugin
+from zope.configuration import xmlconfig
+
+import logging
 
 try:
     from plone.testing.zope import WSGI_SERVER_FIXTURE as SERVER_FIXTURE

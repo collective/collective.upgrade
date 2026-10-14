@@ -1,14 +1,13 @@
-# encoding: utf-8
-
-from Acquisition import aq_base, aq_parent
+from Acquisition import aq_base
+from Acquisition import aq_parent
+from collective.upgrade import steps
 from Products.CMFCore.utils import getToolByName
 from Products.GenericSetup import utils
 from Products.ZCatalog import ZCatalog
 from ZODB import broken
 from ZODB import interfaces as zodb_ifaces
-from zope import component, interface
-
-from collective.upgrade import steps
+from zope import component
+from zope import interface
 
 
 def cleanupBrokenComponents(context):
@@ -19,7 +18,7 @@ def cleanupBrokenComponents(context):
         if not isinstance(reg.component, broken.Broken):
             continue
 
-        steps.logger.info("Unregistering broken utility %r in %r" % (reg, portal))
+        steps.logger.info(f"Unregistering broken utility {reg!r} in {portal!r}")
         sm.unregisterUtility(
             component=reg.component, provided=reg.provided, name=reg.name
         )
@@ -32,21 +31,21 @@ def cleanupBrokenSetupRegistrations(context):
     for id_, tool in list(required.items()):
         if utils._resolveDottedName(tool["class"]) is None:
             steps.logger.info(
-                "Unregistering missing required tool %r in %r" % (tool, setup)
+                f"Unregistering missing required tool {tool!r} in {setup!r}"
             )
             required.pop(id_)
             setup._p_changed = True
 
     for info in setup.listProfileInfo():
         profile_id = "profile-" + info["id"]
-        # Update a broken import step depdendency in the
+        # Update a broken import step dependency in the
         # persisent registry which has been fixed in the
         # profile import_steps.xml
-        steps.logger.info("Applying profile context %r in %r" % (profile_id, setup))
+        steps.logger.info(f"Applying profile context {profile_id!r} in {setup!r}")
         setup.applyContextById(profile_id)
 
 
-class Empty(object):
+class Empty:
     pass
 
 
@@ -60,7 +59,7 @@ def cleanupBrokenTextIndexes(context):
         ):
             continue
 
-        steps.logger.info("Replacing %r text index in %r" % (index, catalog))
+        steps.logger.info(f"Replacing {index!r} text index in {catalog!r}")
         catalog.manage_delIndex(id_)
         extras = Empty()
         extras.index_type = "Okapi BM25 Rank"
@@ -77,7 +76,7 @@ class CleanupBrokenObjects(steps.CMFEditionsUpgrader):
         self.upgradeObjects()
 
         # Cleanup broken CMFEditions versions
-        super(CleanupBrokenObjects, self).upgrade()
+        super().upgrade()
 
     def upgradeObjects(self):
         # Clear the catalogs before walking the objects.  Objects will
@@ -112,7 +111,7 @@ class CleanupBrokenObjects(steps.CMFEditionsUpgrader):
             return
 
         if "__implements__" in obj.__dict__:
-            self.log("Deleting __implements__ instance attributre from %r" % obj)
+            self.log("Deleting __implements__ instance attribute from %r" % obj)
             del obj.__dict__["__implements__"]
             obj._p_changed = True
 

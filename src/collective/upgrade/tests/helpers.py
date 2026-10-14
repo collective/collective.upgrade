@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Helpers shared by the test modules."""
 
 

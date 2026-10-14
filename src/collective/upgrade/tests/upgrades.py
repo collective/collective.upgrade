@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test-only upgrade steps: each one records what ran on the portal."""
 
 from persistent.list import PersistentList

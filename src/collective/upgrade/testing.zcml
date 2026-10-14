@@ -1,19 +1,24 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
-    i18n_domain="collective.upgrade">
+    i18n_domain="collective.upgrade"
+    >
 
   <!-- z3c.autoinclude doesn't run in test layers -->
   <include file="configure.zcml" />
   <!-- opt-in: included by the sites that want the broken cleanups -->
   <include file="broken.zcml" />
-  <include package=".tests" file="upgrades.zcml" />
+  <include
+      package=".tests"
+      file="upgrades.zcml"
+      />
 
   <genericsetup:registerProfile
-    name="testing"
-    title="Test collective.upgrade"
-    directory="profiles/testing"
-    description=""
-    provides="Products.GenericSetup.interfaces.EXTENSION" />
+      name="testing"
+      title="Test collective.upgrade"
+      description=""
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      directory="profiles/testing"
+      />
 
 </configure>

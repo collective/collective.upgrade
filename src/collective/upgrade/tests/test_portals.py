@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
-import unittest
-
-from plone.app.testing import SITE_OWNER_NAME, login
-from zope.testing.loggingsupport import InstalledHandler
-
 from collective.upgrade.ploneupgrader import PloneUpgrader
 from collective.upgrade.portals import PortalsUpgrader
 from collective.upgrade.testing import COLLECTIVE_UPGRADE_FUNCTIONAL_TESTING
 from collective.upgrade.tests.helpers import messages
 from collective.upgrade.tests.upgrades import PROFILE_ID
+from plone.app.testing import login
+from plone.app.testing import SITE_OWNER_NAME
+from zope.testing.loggingsupport import InstalledHandler
+
+import unittest
 
 
 class TestPortalsUpgrader(unittest.TestCase):
@@ -29,7 +28,7 @@ class TestPortalsUpgrader(unittest.TestCase):
         portal = str(self.portal)
         # every portal of the Zope root
         self.upgrader.upgrade()
-        self.assertIn("{0}: Upgrading all portals".format(self.app), messages(self.log))
+        self.assertIn(f"{self.app}: Upgrading all portals", messages(self.log))
         self.assertIn("{0}: Upgraded {0}".format(portal), messages(self.log))
         self.assertEqual(self.setup.getLastVersionForProfile(PROFILE_ID), ("3",))
         # only the given paths, with the other options
@@ -37,7 +36,7 @@ class TestPortalsUpgrader(unittest.TestCase):
         self.log.clear()
         self.upgrader.upgrade(paths=["plone"], upgrade_all_profiles=False)
         self.assertEqual(
-            messages(self.log)[0], "{0}: Upgrading portals: ['plone']".format(self.app)
+            messages(self.log)[0], f"{self.app}: Upgrading portals: ['plone']"
         )
         self.assertIn("{0}: Upgraded {0}".format(portal), messages(self.log))
         self.assertEqual(self.setup.getLastVersionForProfile(PROFILE_ID), ("1",))
@@ -45,10 +44,10 @@ class TestPortalsUpgrader(unittest.TestCase):
         self.assertEqual(self.setup.getLastVersionForProfile(PROFILE_ID), ("3",))
 
     def test_walkUpgraders(self):
-        walked = dict(
-            (upgrader.context.getId(), upgrader)
+        walked = {
+            upgrader.context.getId(): upgrader
             for upgrader in self.upgrader.walkUpgraders(self.app)
-        )
+        }
         # the portal, and every other object manager, walked in turn (Plone 4: also
         # Control_Panel)
         self.assertIsInstance(walked["plone"], PloneUpgrader)

@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-import doctest
-import unittest
-
+from collective.upgrade import testing
 from plone.testing import layered
 
-from collective.upgrade import testing
+import doctest
+import unittest
 
 optionflags = doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE | doctest.REPORT_NDIFF
 

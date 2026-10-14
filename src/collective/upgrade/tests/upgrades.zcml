@@ -1,64 +1,74 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
-    i18n_domain="collective.upgrade">
+    i18n_domain="collective.upgrade"
+    >
 
   <!-- Installed at version 1 by the test fixture -->
   <genericsetup:registerProfile
       name="upgrades"
       title="collective.upgrade tests: pending upgrades"
-      directory="profiles/upgrades"
       description="Version 3, installed at version 1 by the test fixture"
-      provides="Products.GenericSetup.interfaces.EXTENSION" />
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      directory="profiles/upgrades"
+      />
 
   <genericsetup:upgradeSteps
+      profile="collective.upgrade.tests:upgrades"
       source="1"
       destination="2"
-      profile="collective.upgrade.tests:upgrades">
+      >
     <genericsetup:upgradeStep
         title="First step from 1 to 2"
-        handler=".upgrades.step_1_to_2_a" />
+        handler=".upgrades.step_1_to_2_a"
+        />
     <genericsetup:upgradeStep
         title="Second step from 1 to 2"
-        handler=".upgrades.step_1_to_2_b" />
+        handler=".upgrades.step_1_to_2_b"
+        />
   </genericsetup:upgradeSteps>
 
   <genericsetup:upgradeStep
       title="Step from 2 to 3"
+      profile="collective.upgrade.tests:upgrades"
       source="2"
       destination="3"
-      profile="collective.upgrade.tests:upgrades"
-      handler=".upgrades.step_2_to_3" />
+      handler=".upgrades.step_2_to_3"
+      />
 
   <!-- Never installed -->
   <genericsetup:registerProfile
       name="not_installed"
       title="collective.upgrade tests: not installed"
-      directory="profiles/not_installed"
       description="Never installed"
-      provides="Products.GenericSetup.interfaces.EXTENSION" />
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      directory="profiles/not_installed"
+      />
 
   <genericsetup:upgradeStep
       title="Step of a profile that is not installed"
+      profile="collective.upgrade.tests:not_installed"
       source="1"
       destination="2"
-      profile="collective.upgrade.tests:not_installed"
-      handler=".upgrades.step_not_installed" />
+      handler=".upgrades.step_not_installed"
+      />
 
   <!-- A step with a checker: no version is recorded after it -->
   <genericsetup:registerProfile
       name="checker"
       title="collective.upgrade tests: step with a checker"
-      directory="profiles/checker"
       description="Installed at version 1 by the tests that need it"
-      provides="Products.GenericSetup.interfaces.EXTENSION" />
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      directory="profiles/checker"
+      />
 
   <genericsetup:upgradeStep
       title="Step with a checker"
+      profile="collective.upgrade.tests:checker"
       source="1"
       destination="2"
-      profile="collective.upgrade.tests:checker"
+      handler=".upgrades.step_checker"
       checker=".upgrades.always_proposed"
-      handler=".upgrades.step_checker" />
+      />
 
 </configure>

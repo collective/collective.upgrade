@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-import unittest
-
-from Products.GenericSetup.interfaces import EXTENSION
-from zope.component import queryMultiAdapter
-
 from collective.upgrade.ploneupgrader import PloneUpgrader
 from collective.upgrade.portals import PortalsUpgrader
 from collective.upgrade.testing import COLLECTIVE_UPGRADE_INTEGRATION_TESTING
+from Products.GenericSetup.interfaces import EXTENSION
+from zope.component import queryMultiAdapter
+
+import unittest
 
 BASELINE = "Products.CMFPlone:plone"
 
@@ -27,11 +25,15 @@ class TestUpgradersZcml(unittest.TestCase):
     def test_views(self):
         request = self.layer["request"]
         self.assertIsInstance(
-            queryMultiAdapter((self.layer["portal"], request), name="collective.upgrade.form"),
+            queryMultiAdapter(
+                (self.layer["portal"], request), name="collective.upgrade.form"
+            ),
             PloneUpgrader,
         )
         self.assertIsInstance(
-            queryMultiAdapter((self.layer["app"], request), name="collective.upgrade.form"),
+            queryMultiAdapter(
+                (self.layer["app"], request), name="collective.upgrade.form"
+            ),
             PortalsUpgrader,
         )
 

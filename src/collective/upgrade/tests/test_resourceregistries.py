@@ -1,21 +1,20 @@
-# -*- coding: utf-8 -*-
+from collective.upgrade.testing import COLLECTIVE_UPGRADE_INTEGRATION_TESTING
+from Products.GenericSetup.interfaces import IBody
+from zope.component import queryMultiAdapter
+
 import io
 import tarfile
 import unittest
 
-from Products.GenericSetup.interfaces import IBody
-from zope.component import queryMultiAdapter
-
-from collective.upgrade.testing import COLLECTIVE_UPGRADE_INTEGRATION_TESTING
-
 try:
-    from Products.GenericSetup.context import SetupEnviron
-    from Products.ResourceRegistries.exportimport.cssregistry import \
-        CSSRegistryNodeAdapter
-    from Products.ResourceRegistries.exportimport.jsregistry import \
-        JSRegistryNodeAdapter
-
     from collective.upgrade import resourceregistries
+    from Products.GenericSetup.context import SetupEnviron
+    from Products.ResourceRegistries.exportimport.cssregistry import (
+        CSSRegistryNodeAdapter,
+    )
+    from Products.ResourceRegistries.exportimport.jsregistry import (
+        JSRegistryNodeAdapter,
+    )
 except ImportError:  # Plone 5.2+
     resourceregistries = None
 
@@ -26,7 +25,8 @@ def exported(result, filename):
 
 
 @unittest.skipIf(
-    resourceregistries is None, "Products.ResourceRegistries is not installed (Plone 5.2+)"
+    resourceregistries is None,
+    "Products.ResourceRegistries is not installed (Plone 5.2+)",
 )
 class TestResourceRegistries(unittest.TestCase):
 
@@ -45,7 +45,7 @@ class TestResourceRegistries(unittest.TestCase):
         result = self.setup.runExportStep("cssregistry-bbb")
         xml = exported(result, "cssregistry-bbb.xml")
         self.assertIn('<object name="portal_css" meta_type="Stylesheets Registry"', xml)
-        self.assertIn('<stylesheet ', xml)
+        self.assertIn("<stylesheet ", xml)
 
     def test_importBBBCSSRegistry(self):
         css = self.portal.portal_css
@@ -66,8 +66,10 @@ class TestResourceRegistries(unittest.TestCase):
     def test_exportBBBJSRegistry(self):
         result = self.setup.runExportStep("jsregistry-bbb")
         xml = exported(result, "jsregistry-bbb.xml")
-        self.assertIn('<object name="portal_javascripts" meta_type="JavaScripts Registry"', xml)
-        self.assertIn('<javascript ', xml)
+        self.assertIn(
+            '<object name="portal_javascripts" meta_type="JavaScripts Registry"', xml
+        )
+        self.assertIn("<javascript ", xml)
 
     def test_importBBBJSRegistry(self):
         js = self.portal.portal_javascripts

@@ -1,10 +1,6 @@
-# encoding: utf-8
-
-import logging
-import re
-
-import transaction
-from Acquisition import aq_base, aq_parent
+from Acquisition import aq_base
+from Acquisition import aq_parent
+from collective.upgrade import utils
 from plone.base.utils import get_installer
 from plone.uuid import interfaces as uuid_ifaces
 from Products.CMFCore.utils import getToolByName
@@ -12,7 +8,9 @@ from Products.PluginIndexes.FieldIndex import FieldIndex
 from Products.ZCatalog.ProgressHandler import ZLogHandler
 from zope.component import getUtility
 
-from collective.upgrade import utils
+import logging
+import re
+import transaction
 
 logger = logging.getLogger("collective.upgrade.steps")
 
@@ -33,7 +31,7 @@ def deleteCustomSkinObjs(context, *obj_ids):
         return
 
     skins.custom.manage_delObjects(del_ids)
-    logger.info("Deleted custom skin objects from %r: %r" % (skins.custom, del_ids))
+    logger.info(f"Deleted custom skin objects from {skins.custom!r}: {del_ids!r}")
 
 
 def cleanupSkinLayers(context, remove_layers=_default_layers):
@@ -57,7 +55,9 @@ def cleanupSkinLayers(context, remove_layers=_default_layers):
         diff = list(set(layers).difference(found))
         if diff:
             logger.info(
-                "Removing layers from theme %r for %r: %r" % (theme, skins, diff)
+                "Removing layers from theme {!r} for {!r}: {!r}".format(
+                    theme, skins, diff
+                )
             )
             skins.addSkinSelection(theme, ",".join(found), test=1)
 
@@ -99,7 +99,7 @@ def uninstallAddOns(context, addons=None):
             )
             installer.uninstall_product(addon)
         else:
-            logger.info("Uninstalling the %r add-on for %r" % (addon, setup))
+            logger.info(f"Uninstalling the {addon!r} add-on for {setup!r}")
 
         for profile in profiles:
             version = setup.getLastVersionForProfile(profile)
@@ -107,7 +107,9 @@ def uninstallAddOns(context, addons=None):
                 # Already unset by the uninstall profile
                 continue
             logger.info(
-                "Clearing the %r profile version %r for %r" % (profile, version, setup)
+                "Clearing the {!r} profile version {!r} for {!r}".format(
+                    profile, version, setup
+                )
             )
             setup.unsetLastVersionForProfile(profile)
 
@@ -124,8 +126,7 @@ class CMFEditionsUpgrader(utils.Upgrader):
             )
             return
 
-        from Products.CMFEditions.interfaces.IArchivist import \
-            IVersionAwareReference
+        from Products.CMFEditions.interfaces.IArchivist import IVersionAwareReference
 
         self.reference_iface = IVersionAwareReference
 
@@ -167,13 +168,12 @@ class CMFEditionsFolderMigrator(CMFEditionsUpgrader):
         except ImportError:  # Plone 5.2+
             self.log("No plone.app.folder, skipping the CMFEditions folder migration")
             return
-        from Products.BTreeFolder2.BTreeFolder2 import \
-            BTreeFolder2Base as BTreeFolder
+        from Products.BTreeFolder2.BTreeFolder2 import BTreeFolder2Base as BTreeFolder
 
         self.folder_class = BTreeFolder
         self.folder_migrator = BTreeMigrationView(self.context, None)
 
-        super(CMFEditionsFolderMigrator, self).upgrade()
+        super().upgrade()
 
     def upgradeObj(self, obj):
         if isinstance(obj, self.folder_class):
@@ -225,7 +225,7 @@ def fixDuplicateUIDs(context):
             path = catalog.getpath(rid)
             obj = context.unrestrictedTraverse(path, None)
             if obj is None:
-                logger.info("Removing missing object %r from %r" % (path, catalog))
+                logger.info(f"Removing missing object {path!r} from {catalog!r}")
                 catalog.uncatalog_object(path)
                 continue
             objs.append(obj)
@@ -243,11 +243,11 @@ def fixDuplicateUIDs(context):
             new_uid = getUtility(uuid_ifaces.IUUIDGenerator)()
             uuid_ifaces.IMutableUUID(obj).set(new_uid)
             obj.reindexObject(idxs=["UID"])
-            logger.info("Assigned new UID %r to %r" % (new_uid, obj))
+            logger.info(f"Assigned new UID {new_uid!r} to {obj!r}")
 
 
 def setDefaultEditor(context, wanted_editor="", dry_run=False):
-    """Use the deault editor for all users."""
+    """Use the default editor for all users."""
     from collective.setdefaulteditor.utils import set_editor_for_all
 
     # Assumes the zope.component.hooks site has already been set
@@ -278,7 +278,9 @@ class ReferenceTargetCleaner(utils.Upgrader):
             if ref.getTargetObject() is None:
                 ref_id = uuid_ifaces.IUUID(ref)
                 self.log(
-                    "Removing reference %r with missing target: %r" % (ref_id, ref)
+                    "Removing reference {!r} with missing target: {!r}".format(
+                        ref_id, ref
+                    )
                 )
                 aq_parent(ref)._delOb(ref_id)
 

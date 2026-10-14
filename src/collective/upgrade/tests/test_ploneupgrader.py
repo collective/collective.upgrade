@@ -1,20 +1,23 @@
-# -*- coding: utf-8 -*-
-import unittest
-
+from collective.upgrade.ploneupgrader import HiddenProfiles
+from collective.upgrade.ploneupgrader import PloneUpgrader
+from collective.upgrade.testing import COLLECTIVE_UPGRADE_FUNCTIONAL_TESTING
+from collective.upgrade.testing import COLLECTIVE_UPGRADE_INTEGRATION_TESTING
+from collective.upgrade.tests.helpers import messages
+from collective.upgrade.tests.upgrades import CHECKER_PROFILE_ID
+from collective.upgrade.tests.upgrades import link_integrity_checks
+from collective.upgrade.tests.upgrades import NOT_INSTALLED_PROFILE_ID
+from collective.upgrade.tests.upgrades import PROFILE_ID
+from collective.upgrade.tests.upgrades import runs
 from persistent.list import PersistentList
-from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, login, setRoles
+from plone.app.testing import login
+from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_NAME
 from Products.CMFCore.utils import getToolByName
 from zope.component import getUtility
 from zope.testing.loggingsupport import InstalledHandler
 
-from collective.upgrade.ploneupgrader import HiddenProfiles, PloneUpgrader
-from collective.upgrade.testing import (COLLECTIVE_UPGRADE_FUNCTIONAL_TESTING,
-                                        COLLECTIVE_UPGRADE_INTEGRATION_TESTING)
-from collective.upgrade.tests.helpers import messages
-from collective.upgrade.tests.upgrades import (CHECKER_PROFILE_ID,
-                                               NOT_INSTALLED_PROFILE_ID,
-                                               PROFILE_ID,
-                                               link_integrity_checks, runs)
+import unittest
 
 try:
     from plone.base.interfaces import INonInstallable
@@ -31,7 +34,9 @@ class TestHiddenProfiles(unittest.TestCase):
     def test_getNonInstallableProfiles(self):
         utility = getUtility(INonInstallable, name="collective.upgrade")
         self.assertIsInstance(utility, HiddenProfiles)
-        self.assertEqual(utility.getNonInstallableProfiles(), ["collective.upgrade:blank"])
+        self.assertEqual(
+            utility.getNonInstallableProfiles(), ["collective.upgrade:blank"]
+        )
         self.assertEqual(utility.getNonInstallableProducts(), [])
 
 
@@ -58,19 +63,21 @@ class TestPloneUpgrader(unittest.TestCase):
             steps = [steps]
         self.setup.setLastVersionForProfile(BASELINE, steps[0]["source"])
         self.upgrader.upgrade()
-        self.assertEqual(self.setup.getLastVersionForProfile(BASELINE), steps[0]["dest"])
+        self.assertEqual(
+            self.setup.getLastVersionForProfile(BASELINE), steps[0]["dest"]
+        )
         self.assertEqual(self.setup.getLastVersionForProfile(PROFILE_ID), ("3",))
         log = messages(self.log)
         portal = str(self.portal)
         baseline = log.index(
-            "{0}: Upgrading profile {1!r} to {2!r}".format(
+            "{}: Upgrading profile {!r} to {!r}".format(
                 portal, BASELINE, steps[0]["sdest"]
             )
         )
         extension = [
             index
             for index, message in enumerate(log)
-            if message.endswith("{0}' to '2'".format(PROFILE_ID))
+            if message.endswith(f"{PROFILE_ID}' to '2'")
         ][0]
         self.assertLess(baseline, extension)
         # Plone 4: the resource registries are cooked after the upgrades
@@ -88,7 +95,8 @@ class TestPloneUpgrader(unittest.TestCase):
         # disabled during the upgrade, then restored
         self.upgrader.upgradeProfile(PROFILE_ID, enable_link_integrity_checks=False)
         self.assertEqual(
-            [checks for step, version, checks in runs(self.portal)], [False, False, False]
+            [checks for step, version, checks in runs(self.portal)],
+            [False, False, False],
         )
         self.assertEqual(link_integrity_checks(self.portal), orig)
         # not given: left as is

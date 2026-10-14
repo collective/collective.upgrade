@@ -2,15 +2,15 @@
 BBB support for ResourceRegistries to be removed when support is deprecated.
 """
 
-import contextlib
-import os
-
+from collective.upgrade import utils
 from Products.GenericSetup import interfaces as setup_ifaces
 from Products.ResourceRegistries import interfaces as res_ifaces
-from Products.ResourceRegistries.exportimport import (cssregistry, jsregistry,
-                                                      resourceregistry)
+from Products.ResourceRegistries.exportimport import cssregistry
+from Products.ResourceRegistries.exportimport import jsregistry
+from Products.ResourceRegistries.exportimport import resourceregistry
 
-from collective.upgrade import utils
+import contextlib
+import os
 
 
 @contextlib.contextmanager

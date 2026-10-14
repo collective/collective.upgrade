@@ -1,31 +1,34 @@
-# -*- coding: utf-8 -*-
-import os
-import shutil
-import tempfile
-import unittest
-from unittest import mock
-
-import transaction
-from OFS.Folder import Folder
-from OFS.Image import manage_addFile
-from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, login, setRoles
-from plone.base.utils import get_installer
-from plone.registry.interfaces import IRegistry
-from plone.uuid.interfaces import ATTRIBUTE_NAME, IUUID
-from Products.CMFCore.utils import getToolByName
-from Products.DateRecurringIndex.index import DateRecurringIndex
-from Products.GenericSetup.tool import SetupTool
-from Products.PluginIndexes.interfaces import IDateRangeIndex
-from ZODB.DB import DB
-from ZODB.FileStorage import FileStorage
-from zope.component import getUtility
-from zope.globalrequest import clearRequest, setRequest
-from zope.testing.loggingsupport import InstalledHandler
-
 from collective.upgrade import steps
 from collective.upgrade.testing import COLLECTIVE_UPGRADE_FUNCTIONAL_TESTING
 from collective.upgrade.tests.helpers import messages
 from collective.upgrade.tests.upgrades import PROFILE_ID
+from OFS.Folder import Folder
+from OFS.Image import manage_addFile
+from plone.app.testing import login
+from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_NAME
+from plone.base.utils import get_installer
+from plone.registry.interfaces import IRegistry
+from plone.uuid.interfaces import ATTRIBUTE_NAME
+from plone.uuid.interfaces import IUUID
+from Products.CMFCore.utils import getToolByName
+from Products.DateRecurringIndex.index import DateRecurringIndex
+from Products.GenericSetup.tool import SetupTool
+from Products.PluginIndexes.interfaces import IDateRangeIndex
+from unittest import mock
+from ZODB.DB import DB
+from ZODB.FileStorage import FileStorage
+from zope.component import getUtility
+from zope.globalrequest import clearRequest
+from zope.globalrequest import setRequest
+from zope.testing.loggingsupport import InstalledHandler
+
+import os
+import shutil
+import tempfile
+import transaction
+import unittest
 
 
 class TestSteps(unittest.TestCase):
@@ -45,7 +48,9 @@ class TestSteps(unittest.TestCase):
         self.addCleanup(self.log.uninstall)
 
     def test_catalogReindex(self):
-        document = self.portal[self.portal.invokeFactory("Document", "document", title="Old")]
+        document = self.portal[
+            self.portal.invokeFactory("Document", "document", title="Old")
+        ]
         catalog = self.portal.portal_catalog
         self.assertEqual(catalog(id="document")[0].Title, "Old")
         document.title = "New"
@@ -62,13 +67,15 @@ class TestSteps(unittest.TestCase):
         self.assertNotIn("logo.png", custom.objectIds())
         # manage_delObjects empties the list before it is logged
         self.assertEqual(
-            messages(self.log), ["Deleted custom skin objects from {0!r}: []".format(custom)]
+            messages(self.log), [f"Deleted custom skin objects from {custom!r}: []"]
         )
 
     def test_cleanupSkinLayers(self):
         skins = self.portal.portal_skins
         for theme in skins.getSkinSelections():
-            skins.addSkinSelection(theme, skins.getSkinPath(theme) + ",collective_removed")
+            skins.addSkinSelection(
+                theme, skins.getSkinPath(theme) + ",collective_removed"
+            )
         # missing layers are removed
         steps.cleanupSkinLayers(self.setup)
         for theme in skins.getSkinSelections():
@@ -84,7 +91,7 @@ class TestSteps(unittest.TestCase):
             steps.cleanupSkinLayers(self.setup, remove_layers=["custom"])
         self.assertEqual(
             str(cm.exception),
-            "{0!r} theme layer 'collective_removed' is missing but not listed to be "
+            "{!r} theme layer 'collective_removed' is missing but not listed to be "
             "removed".format(theme),
         )
 
@@ -96,12 +103,14 @@ class TestSteps(unittest.TestCase):
         # with its uninstall profile; an add-on that isn't installed is skipped
         steps.uninstallAddOns(self.setup, addons=["plone.session", "plone.app.caching"])
         self.assertFalse(installer.is_product_installed("plone.session"))
-        self.assertEqual(self.setup.getLastVersionForProfile("plone.session:default"), "unknown")
+        self.assertEqual(
+            self.setup.getLastVersionForProfile("plone.session:default"), "unknown"
+        )
         self.assertNotIn("plone.bundles/plone-session.enabled", registry)
         self.assertEqual(
             messages(self.log),
             [
-                "Uninstalling the 'plone.session' add-on for {0!r} using the "
+                "Uninstalling the 'plone.session' add-on for {!r} using the "
                 "'plone.session:uninstall' profile".format(self.setup)
             ],
         )
@@ -112,24 +121,27 @@ class TestSteps(unittest.TestCase):
         self.assertEqual(
             messages(self.log),
             [
-                "Uninstalling the 'collective.upgrade.tests' add-on for {0!r}".format(self.setup),
-                "Clearing the {0!r} profile version ('1',) for {1!r}".format(PROFILE_ID, self.setup),
+                f"Uninstalling the 'collective.upgrade.tests' add-on for {self.setup!r}",
+                f"Clearing the {PROFILE_ID!r} profile version ('1',) for {self.setup!r}",
             ],
         )
         # no add-ons given: the installed ones whose profiles are no longer registered
         self.log.clear()
         self.setup.setLastVersionForProfile("collective.removed:default", "1000")
         steps.uninstallAddOns(self.setup)
-        self.assertEqual(self.setup.getLastVersionForProfile("collective.removed:default"), "unknown")
+        self.assertEqual(
+            self.setup.getLastVersionForProfile("collective.removed:default"), "unknown"
+        )
         self.assertNotEqual(
-            self.setup.getLastVersionForProfile("plone.app.contenttypes:default"), "unknown"
+            self.setup.getLastVersionForProfile("plone.app.contenttypes:default"),
+            "unknown",
         )
         self.assertEqual(
             messages(self.log),
             [
-                "Uninstalling the 'collective.removed' add-on for {0!r}".format(self.setup),
+                f"Uninstalling the 'collective.removed' add-on for {self.setup!r}",
                 "Clearing the 'collective.removed:default' profile version ('1000',) "
-                "for {0!r}".format(self.setup),
+                "for {!r}".format(self.setup),
             ],
         )
 
@@ -140,9 +152,14 @@ class TestSteps(unittest.TestCase):
         steps.migrateCMFEditionsFolderVersions(self.setup)
         self.assertEqual(
             messages(self.log),
-            ["{0}: No plone.app.folder, skipping the CMFEditions folder migration".format(self.setup)],
+            [
+                f"{self.setup}: No plone.app.folder, skipping the CMFEditions folder migration"
+            ],
         )
-        self.assertEqual(self.portal.portal_repository.retrieve(document, 0).object.getId(), "document")
+        self.assertEqual(
+            self.portal.portal_repository.retrieve(document, 0).object.getId(),
+            "document",
+        )
 
     def test_fixDuplicateUIDs(self):
         first = self.portal[self.portal.invokeFactory("Document", "first")]
@@ -166,14 +183,16 @@ class TestSteps(unittest.TestCase):
         self.assertEqual(IUUID(first), uid)
         self.assertNotEqual(IUUID(copy), uid)
         self.assertEqual([brain.getObject() for brain in catalog(UID=uid)], [first])
-        self.assertEqual([brain.getObject() for brain in catalog(UID=IUUID(copy))], [copy])
+        self.assertEqual(
+            [brain.getObject() for brain in catalog(UID=IUUID(copy))], [copy]
+        )
         self.assertEqual(
             messages(self.log),
             [
-                "Multiple objects found for UID {0!r}, assuming {1!r} is the original".format(
+                "Multiple objects found for UID {!r}, assuming {!r} is the original".format(
                     uid, first
                 ),
-                "Assigned new UID {0!r} to {1!r}".format(IUUID(copy), copy),
+                f"Assigned new UID {IUUID(copy)!r} to {copy!r}",
             ],
         )
 
@@ -183,7 +202,7 @@ class TestSteps(unittest.TestCase):
         self.assertEqual(
             messages(self.log),
             [
-                "{0}: No Products.Archetypes, skipping the reference targets "
+                "{}: No Products.Archetypes, skipping the reference targets "
                 "cleanup".format(self.portal)
             ],
         )
@@ -206,7 +225,9 @@ class TestSteps(unittest.TestCase):
         steps.pack_zodb(folder)
         self.assertEqual(len(db.history(folder._p_oid, size=10)), 1)
         notes = [record.description for record in db.storage.iterator()]
-        self.assertTrue(notes[-1].endswith(b"Committing changes prior to packing the ZODB"))
+        self.assertTrue(
+            notes[-1].endswith(b"Committing changes prior to packing the ZODB")
+        )
         self.assertEqual(folder.title, "Newer")
 
     def test_cookResourceRegisties(self):
@@ -232,7 +253,7 @@ class TestSteps(unittest.TestCase):
             steps.resetProfiles(self.setup, extension_profiles=[PROFILE_ID])
             self.assertEqual(
                 messages(self.log),
-                [base, "Importing the {0!r} extension profile".format(PROFILE_ID)],
+                [base, f"Importing the {PROFILE_ID!r} extension profile"],
             )
             self.assertEqual(self.setup.getLastVersionForProfile(PROFILE_ID), ("3",))
         # without extension profiles: the ones selected by default when adding a site

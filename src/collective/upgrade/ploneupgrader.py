@@ -1,18 +1,16 @@
-# encoding: utf-8
-
+from collective.upgrade import upgrader
 from plone.base import interfaces as plone_ifaces
 from plone.registry.interfaces import IRegistry
 from Products.CMFCore.utils import getToolByName
-from zope import component, interface
+from zope import component
+from zope import interface
 from zope.component import getUtility
-
-from collective.upgrade import upgrader
 
 _marker = object()
 
 
 @interface.implementer(plone_ifaces.INonInstallable)
-class HiddenProfiles(object):
+class HiddenProfiles:
     """
     Exclude utility or upgrade profiles on the Plone add-on control panel.
     """
@@ -42,7 +40,7 @@ class PloneUpgrader(upgrader.PortalUpgrader):
         migration = getToolByName(self.context, "portal_migration")
         migration.getInstanceVersion()
 
-        result = super(PloneUpgrader, self).upgrade(**kw)
+        result = super().upgrade(**kw)
 
         # BBB Support for Plone < 5.2
         resource_tools_exist = False
@@ -52,12 +50,12 @@ class PloneUpgrader(upgrader.PortalUpgrader):
                 resource_tool.cookResources()
                 resource_tools_exist = True
         if resource_tools_exist:
-            self.log("Refreshed resource registries for {0}".format(self.context))
+            self.log(f"Refreshed resource registries for {self.context}")
 
         return result
 
     def upgradeProfile(self, profile_id, enable_link_integrity_checks=_marker, **kw):
-        upgradeProfile = super(PloneUpgrader, self).upgradeProfile
+        upgradeProfile = super().upgradeProfile
 
         registry = getUtility(IRegistry)
         orig = registry.get("plone.enable_link_integrity_checks", _marker)

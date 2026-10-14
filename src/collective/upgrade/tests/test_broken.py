@@ -1,20 +1,20 @@
-# -*- coding: utf-8 -*-
-import unittest
-
 from Acquisition import aq_base
+from collective.upgrade import broken
+from collective.upgrade.testing import COLLECTIVE_UPGRADE_INTEGRATION_TESTING
+from collective.upgrade.tests.helpers import messages
 from OFS.Uninstalled import Broken
-from plone.app.testing import TEST_USER_ID, setRoles
+from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
 from plone.uuid.interfaces import IUUID
 from Products.CMFCore.utils import getToolByName
 from ZODB.broken import persistentBroken
 from ZODB.interfaces import IBroken
 from zope.component import getSiteManager
-from zope.interface import Interface, alsoProvides
+from zope.interface import alsoProvides
+from zope.interface import Interface
 from zope.testing.loggingsupport import InstalledHandler
 
-from collective.upgrade import broken
-from collective.upgrade.testing import COLLECTIVE_UPGRADE_INTEGRATION_TESTING
-from collective.upgrade.tests.helpers import messages
+import unittest
 
 
 def broken_object(module, name, container=None, id=None):
@@ -44,10 +44,14 @@ class TestBroken(unittest.TestCase):
         sm = getSiteManager(self.portal)
         utility = broken_object("collective.removed.utility", "Utility")
         sm.registerUtility(utility, Interface, name="collective.removed")
-        self.assertIs(aq_base(sm.queryUtility(Interface, name="collective.removed")), utility)
+        self.assertIs(
+            aq_base(sm.queryUtility(Interface, name="collective.removed")), utility
+        )
         broken.cleanupBrokenComponents(self.setup)
         self.assertIsNone(sm.queryUtility(Interface, name="collective.removed"))
-        self.assertTrue(messages(self.log)[0].startswith("Unregistering broken utility "))
+        self.assertTrue(
+            messages(self.log)[0].startswith("Unregistering broken utility ")
+        )
 
     def test_cleanupBrokenSetupRegistrations(self):
         toolset = self.setup.getToolsetRegistry()
@@ -109,10 +113,15 @@ class TestCleanupBrokenObjects(unittest.TestCase):
         self.other = self.portal[self.portal.invokeFactory("Document", "other")]
         self.portal.portal_repository.save(self.document)
         # last: a savepoint can't store new broken objects
-        broken_object("collective.removed.content", "RemovedItem", self.folder, "removed")
+        broken_object(
+            "collective.removed.content", "RemovedItem", self.folder, "removed"
+        )
         self.transforms = getToolByName(self.portal, "portal_transforms")
         self.transform = broken_object(
-            "collective.removed.transforms", "removed_to_html", self.transforms, "removed_to_html"
+            "collective.removed.transforms",
+            "removed_to_html",
+            self.transforms,
+            "removed_to_html",
         )
         self.registered = list(list(self.transforms._mtmap.values())[0].values())[0]
         self.registered.append(self.transform)
@@ -130,8 +139,10 @@ class TestCleanupBrokenObjects(unittest.TestCase):
                 message
                 for message in log
                 if message.startswith(
-                    "{0}: Begin cleaning up CMFEditions objects in "
-                    "<ZVCStorageTool at /plone/portal_historiesstorage".format(self.folder)
+                    "{}: Begin cleaning up CMFEditions objects in "
+                    "<ZVCStorageTool at /plone/portal_historiesstorage".format(
+                        self.folder
+                    )
                 )
             ]
         )
@@ -146,14 +157,15 @@ class TestCleanupBrokenObjects(unittest.TestCase):
         self.assertNotIn("removed", self.folder.objectIds())
         # every catalog is cleared, then the walked objects are indexed again
         self.assertEqual(
-            [brain.getObject() for brain in catalog(portal_type="Document")], [self.document]
+            [brain.getObject() for brain in catalog(portal_type="Document")],
+            [self.document],
         )
         self.assertEqual(catalog(portal_type="Document")[0].Title, "Cleaned")
         self.assertIn(self.other, self.portal.objectValues())
         log = messages(self.log)
         self.assertTrue(
             log[0].startswith(
-                "{0}: Clearing the <CatalogTool at /plone/portal_catalog".format(self.folder)
+                f"{self.folder}: Clearing the <CatalogTool at /plone/portal_catalog"
             )
         )
 
@@ -176,10 +188,12 @@ class TestCleanupBrokenObjects(unittest.TestCase):
         self.assertEqual(self.upgrader.delRemovedObj(removed, "/removed"), "removed")
         self.assertNotIn("removed", self.folder.objectIds())
         self.assertEqual(
-            messages(self.log), ["{0}: Deleting broken object: /removed".format(self.folder)]
+            messages(self.log), [f"{self.folder}: Deleting broken object: /removed"]
         )
         # a broken transform is unregistered too
-        self.upgrader.delRemovedObj(self.transforms["removed_to_html"], "/removed_to_html")
+        self.upgrader.delRemovedObj(
+            self.transforms["removed_to_html"], "/removed_to_html"
+        )
         self.assertNotIn("removed_to_html", self.transforms.objectIds())
         self.assertNotIn(self.transform, self.registered)
 

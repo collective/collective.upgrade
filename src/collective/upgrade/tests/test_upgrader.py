@@ -1,16 +1,19 @@
-# -*- coding: utf-8 -*-
-import unittest
-
+from collective.upgrade.testing import COLLECTIVE_UPGRADE_FUNCTIONAL_TESTING
+from collective.upgrade.tests.helpers import messages
+from collective.upgrade.tests.helpers import transaction_notes
+from collective.upgrade.tests.upgrades import CHECKER_PROFILE_ID
+from collective.upgrade.tests.upgrades import NOT_INSTALLED_PROFILE_ID
+from collective.upgrade.tests.upgrades import PROFILE_ID
+from collective.upgrade.tests.upgrades import runs
+from collective.upgrade.upgrader import PortalUpgrader
 from persistent.list import PersistentList
-from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, login, setRoles
+from plone.app.testing import login
+from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_NAME
 from zope.testing.loggingsupport import InstalledHandler
 
-from collective.upgrade.testing import COLLECTIVE_UPGRADE_FUNCTIONAL_TESTING
-from collective.upgrade.tests.helpers import messages, transaction_notes
-from collective.upgrade.tests.upgrades import (CHECKER_PROFILE_ID,
-                                               NOT_INSTALLED_PROFILE_ID,
-                                               PROFILE_ID, runs)
-from collective.upgrade.upgrader import PortalUpgrader
+import unittest
 
 BASELINE = "Products.CMFPlone:plone"
 
@@ -51,14 +54,14 @@ class TestPortalUpgrader(unittest.TestCase):
         )
         log = messages(self.log)
         self.assertEqual(log[0], "{0}: Upgrading {0}".format(portal))
-        self.assertIn("{0}: Nothing to upgrade for profile {1!r}".format(portal, BASELINE), log)
+        self.assertIn(f"{portal}: Nothing to upgrade for profile {BASELINE!r}", log)
         self.assertEqual(log[-1], "{0}: Upgraded {0}".format(portal))
         # upgrade_portal=False skips the baseline profile
         self.reset()
         self.upgrader.upgrade(upgrade_portal=False)
         self.assertEqual(len(runs(self.portal)), 3)
         self.assertNotIn(
-            "{0}: Nothing to upgrade for profile {1!r}".format(portal, BASELINE),
+            f"{portal}: Nothing to upgrade for profile {BASELINE!r}",
             messages(self.log),
         )
         # only the given profiles
@@ -66,7 +69,9 @@ class TestPortalUpgrader(unittest.TestCase):
         self.setup.setLastVersionForProfile(CHECKER_PROFILE_ID, "1")
         self.upgrader.upgrade(upgrade_all_profiles=False, upgrade_profiles=[PROFILE_ID])
         self.assertEqual(len(runs(self.portal)), 3)
-        self.assertEqual(self.setup.getLastVersionForProfile(CHECKER_PROFILE_ID), ("1",))
+        self.assertEqual(
+            self.setup.getLastVersionForProfile(CHECKER_PROFILE_ID), ("1",)
+        )
         # nothing but the baseline profile
         self.reset()
         self.upgrader.upgrade(upgrade_all_profiles=False)
@@ -91,23 +96,23 @@ class TestPortalUpgrader(unittest.TestCase):
         self.assertEqual(
             messages(self.log),
             [
-                "{0}: Upgrading profile {1!r} to '2'".format(portal, PROFILE_ID),
-                "{0}: Running upgrade step for profile {1} from 1 to 2: "
+                f"{portal}: Upgrading profile {PROFILE_ID!r} to '2'",
+                "{}: Running upgrade step for profile {} from 1 to 2: "
                 "First step from 1 to 2.".format(portal, PROFILE_ID),
-                "{0}: Finished upgrade step for profile {1} from 1 to 2: "
+                "{}: Finished upgrade step for profile {} from 1 to 2: "
                 "First step from 1 to 2.".format(portal, PROFILE_ID),
-                "{0}: Running upgrade step for profile {1} from 1 to 2: "
+                "{}: Running upgrade step for profile {} from 1 to 2: "
                 "Second step from 1 to 2.".format(portal, PROFILE_ID),
-                "{0}: Finished upgrade step for profile {1} from 1 to 2: "
+                "{}: Finished upgrade step for profile {} from 1 to 2: "
                 "Second step from 1 to 2.".format(portal, PROFILE_ID),
-                "Upgraded profile {0!r} to '2'".format(PROFILE_ID),
-                "{0}: Upgrading profile {1!r} to '3'".format(portal, PROFILE_ID),
-                "{0}: Running upgrade step for profile {1} from 2 to 3: "
+                f"Upgraded profile {PROFILE_ID!r} to '2'",
+                f"{portal}: Upgrading profile {PROFILE_ID!r} to '3'",
+                "{}: Running upgrade step for profile {} from 2 to 3: "
                 "Step from 2 to 3.".format(portal, PROFILE_ID),
-                "{0}: Finished upgrade step for profile {1} from 2 to 3: "
+                "{}: Finished upgrade step for profile {} from 2 to 3: "
                 "Step from 2 to 3.".format(portal, PROFILE_ID),
-                "Upgraded profile {0!r} to '3'".format(PROFILE_ID),
-                "{0}: Finished upgrading {1!r} profile".format(portal, PROFILE_ID),
+                f"Upgraded profile {PROFILE_ID!r} to '3'",
+                f"{portal}: Finished upgrading {PROFILE_ID!r} profile",
             ],
         )
         # up to date
@@ -115,18 +120,24 @@ class TestPortalUpgrader(unittest.TestCase):
         self.upgrader.upgradeProfile(PROFILE_ID)
         self.assertEqual(
             messages(self.log),
-            ["{0}: Nothing to upgrade for profile {1!r}".format(portal, PROFILE_ID)],
+            [f"{portal}: Nothing to upgrade for profile {PROFILE_ID!r}"],
         )
 
     def test_listUpgrades(self):
         # only the steps up to the next destination
         self.assertEqual(
-            [(info["title"], info["dest"]) for info in self.upgrader.listUpgrades(PROFILE_ID)],
+            [
+                (info["title"], info["dest"])
+                for info in self.upgrader.listUpgrades(PROFILE_ID)
+            ],
             [("First step from 1 to 2", ("2",)), ("Second step from 1 to 2", ("2",))],
         )
         self.reset("2")
         self.assertEqual(
-            [(info["title"], info["dest"]) for info in self.upgrader.listUpgrades(PROFILE_ID)],
+            [
+                (info["title"], info["dest"])
+                for info in self.upgrader.listUpgrades(PROFILE_ID)
+            ],
             [("Step from 2 to 3", ("3",))],
         )
         self.reset("3")
@@ -141,7 +152,10 @@ class TestPortalUpgrader(unittest.TestCase):
         )
         # GenericSetup lists the steps of a profile that is not installed
         self.assertEqual(
-            [info["title"] for info in self.upgrader.flattenUpgrades(NOT_INSTALLED_PROFILE_ID)],
+            [
+                info["title"]
+                for info in self.upgrader.flattenUpgrades(NOT_INSTALLED_PROFILE_ID)
+            ],
             ["Step of a profile that is not installed"],
         )
 
@@ -154,7 +168,7 @@ class TestPortalUpgrader(unittest.TestCase):
             [
                 note
                 for note in transaction_notes(self.app)
-                if note.endswith("Upgraded profile {0!r} to '2'".format(PROFILE_ID))
+                if note.endswith(f"Upgraded profile {PROFILE_ID!r} to '2'")
             ]
         )
         # a step with a checker doesn't record a version
@@ -164,16 +178,20 @@ class TestPortalUpgrader(unittest.TestCase):
                 CHECKER_PROFILE_ID, self.upgrader.listUpgrades(CHECKER_PROFILE_ID)
             )
         self.assertIn(
-            "finished for profile {0!r} but no new version '2' recorded.".format(
+            "finished for profile {!r} but no new version '2' recorded.".format(
                 CHECKER_PROFILE_ID
             ),
             str(cm.exception),
         )
         self.assertEqual(runs(self.portal)[-1][0], "checker")
-        self.assertEqual(self.setup.getLastVersionForProfile(CHECKER_PROFILE_ID), ("1",))
+        self.assertEqual(
+            self.setup.getLastVersionForProfile(CHECKER_PROFILE_ID), ("1",)
+        )
 
     def test_upgradeExtensions(self):
-        self.upgrader.upgradeExtensions([BASELINE, NOT_INSTALLED_PROFILE_ID, PROFILE_ID])
+        self.upgrader.upgradeExtensions(
+            [BASELINE, NOT_INSTALLED_PROFILE_ID, PROFILE_ID]
+        )
         # the baseline and the profiles that are not installed are skipped
         self.assertEqual(
             [step for step, version, checks in runs(self.portal)],

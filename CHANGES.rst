@@ -18,6 +18,9 @@ Changelog
 - Add Plone 6.1 compatibility, drop Plone 4 / 5 compatibility
   [bsuttor, laulaz, szakitibi]
 
+- Added plone.meta configuration (tox, pre-commit, GitHub Actions).
+  [chris-adam]
+
 
 1.7 (2022-03-01)
 ----------------
