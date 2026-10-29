@@ -19,6 +19,10 @@ report.html
 """
 
 [tox]
+test_environment_variables = """
+    # Playwright (rfbrowser init) does not know ubuntu-latest 26.04 yet
+    PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu24.04-x64
+"""
 test_matrix = {"6.3" = ["*"], "6.2" = ["*"], "6.1" = ["*"]}
 
 [pyproject]
