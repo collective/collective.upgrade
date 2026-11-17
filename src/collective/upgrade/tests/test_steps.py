@@ -13,9 +13,7 @@ from plone.registry.interfaces import IRegistry
 from plone.uuid.interfaces import ATTRIBUTE_NAME
 from plone.uuid.interfaces import IUUID
 from Products.CMFCore.utils import getToolByName
-from Products.DateRecurringIndex.index import DateRecurringIndex
 from Products.GenericSetup.tool import SetupTool
-from Products.PluginIndexes.interfaces import IDateRangeIndex
 from unittest import mock
 from ZODB.DB import DB
 from ZODB.FileStorage import FileStorage
@@ -145,22 +143,6 @@ class TestSteps(unittest.TestCase):
             ],
         )
 
-    def test_migrateCMFEditionsFolderVersions(self):
-        document = self.portal[self.portal.invokeFactory("Document", "document")]
-        self.portal.portal_repository.save(document)
-        # Plone 5.2+: no plone.app.folder, nothing is migrated
-        steps.migrateCMFEditionsFolderVersions(self.setup)
-        self.assertEqual(
-            messages(self.log),
-            [
-                f"{self.setup}: No plone.app.folder, skipping the CMFEditions folder migration"
-            ],
-        )
-        self.assertEqual(
-            self.portal.portal_repository.retrieve(document, 0).object.getId(),
-            "document",
-        )
-
     def test_fixDuplicateUIDs(self):
         first = self.portal[self.portal.invokeFactory("Document", "first")]
         copy = self.portal[self.portal.invokeFactory("Document", "copy_of_first")]
@@ -193,17 +175,6 @@ class TestSteps(unittest.TestCase):
                     uid, first
                 ),
                 f"Assigned new UID {IUUID(copy)!r} to {copy!r}",
-            ],
-        )
-
-    def test_cleanupMissingReferenceTargets(self):
-        # Plone 5.2+: no Archetypes references to clean up
-        steps.cleanupMissingReferenceTargets(self.setup)
-        self.assertEqual(
-            messages(self.log),
-            [
-                "{}: No Products.Archetypes, skipping the reference targets "
-                "cleanup".format(self.portal)
             ],
         )
 
@@ -241,21 +212,12 @@ class TestSteps(unittest.TestCase):
 
     def test_resetProfiles(self):
         base = "Importing the 'profile-Products.CMFPlone:plone' base profile"
-        if IDateRangeIndex.implementedBy(DateRecurringIndex):
-            # Plone 6.2 (Products.DateRecurringIndex 4): the catalog step of the base
-            # profile gives the start and end indexes to the DateRangeIndex importer
-            with self.assertRaises(AttributeError) as cm:
-                steps.resetProfiles(self.setup, extension_profiles=[PROFILE_ID])
-            self.assertEqual(str(cm.exception), "_since_field")
-            self.assertEqual(messages(self.log), [base])
-        else:
-            # Plone 6.1: the base profile, then the extension profiles
+        # Plone 6.2 (Products.DateRecurringIndex 4): the catalog step of the base
+        # profile gives the start and end indexes to the DateRangeIndex importer
+        with self.assertRaises(AttributeError) as cm:
             steps.resetProfiles(self.setup, extension_profiles=[PROFILE_ID])
-            self.assertEqual(
-                messages(self.log),
-                [base, f"Importing the {PROFILE_ID!r} extension profile"],
-            )
-            self.assertEqual(self.setup.getLastVersionForProfile(PROFILE_ID), ("3",))
+        self.assertEqual(str(cm.exception), "_since_field")
+        self.assertEqual(messages(self.log), [base])
         # without extension profiles: the ones selected by default when adding a site
         with mock.patch.object(SetupTool, "runAllImportStepsFromProfile") as run:
             steps.resetProfiles(self.setup)

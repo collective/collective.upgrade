@@ -29,8 +29,8 @@ used directly on production as a first attempt at upgrading portals.
 Versions
 --------
 
-* Version 2.x is for Plone 6.1+ only
-* Version 1.x is for Plone 4 / 5
+* Version 2.x is for Plone 6.2+ only
+* Version 1.x is for Plone 4 / 5 / 6.0 / 6.1
 
 Quick Start
 -----------
@@ -233,12 +233,6 @@ Including ``experimental.broken`` while running the upgrade steps for
 cleaning up broken objects is probably a better idea than not doing
 so.  This will be included automatically if you require the
 ``collective.upgrade [steps]`` extra.
-
-An unregistered upgrade step function,
-``collective.upgrade.steps.setDefaultEditor``, can be registered in ZCML
-to set the default editor for all users.  It requires
-``collective.setdefaulteditor`` which will be included automatically if
-you require the ``collective.upgrade [steps]`` extra.
 
 Helper functions are also available in the ``collective.upgrade.steps``
 module.  These helpers are all meant to be used when writing your own

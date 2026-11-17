@@ -1,0 +1,2 @@
+Rework CSV import/export to use py3 io, with explicit UTF-8 encoding and close the reader.
+[szakitibi]

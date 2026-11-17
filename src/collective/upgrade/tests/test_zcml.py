@@ -70,7 +70,6 @@ class TestStepsZcml(unittest.TestCase):
 
     def test_upgradeSteps(self):
         steps = baseline_steps(self.setup)
-        self.assertIn(("4001", "4002", "Migrate CMFEditions folder versions."), steps)
         self.assertIn(("4100", "4101", "Fix duplicate UIDs."), steps)
 
 

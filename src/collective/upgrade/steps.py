@@ -1,5 +1,4 @@
 from Acquisition import aq_base
-from Acquisition import aq_parent
 from collective.upgrade import utils
 from plone.base.utils import get_installer
 from plone.uuid import interfaces as uuid_ifaces
@@ -160,31 +159,6 @@ class CMFEditionsUpgrader(utils.Upgrader):
                 self.recurse(subobj)
 
 
-class CMFEditionsFolderMigrator(CMFEditionsUpgrader):
-
-    def upgrade(self):
-        try:
-            from plone.app.folder.migration import BTreeMigrationView
-        except ImportError:  # Plone 5.2+
-            self.log("No plone.app.folder, skipping the CMFEditions folder migration")
-            return
-        from Products.BTreeFolder2.BTreeFolder2 import BTreeFolder2Base as BTreeFolder
-
-        self.folder_class = BTreeFolder
-        self.folder_migrator = BTreeMigrationView(self.context, None)
-
-        super().upgrade()
-
-    def upgradeObj(self, obj):
-        if isinstance(obj, self.folder_class):
-            self.folder_migrator.migrate(obj)
-
-
-def migrateCMFEditionsFolderVersions(context):
-    upgrader = CMFEditionsFolderMigrator(context)
-    upgrader.upgrade()
-
-
 copy_id_re = re.compile(r"^copy[0-9]*_of_.*")
 
 
@@ -244,51 +218,6 @@ def fixDuplicateUIDs(context):
             uuid_ifaces.IMutableUUID(obj).set(new_uid)
             obj.reindexObject(idxs=["UID"])
             logger.info(f"Assigned new UID {new_uid!r} to {obj!r}")
-
-
-def setDefaultEditor(context, wanted_editor="", dry_run=False):
-    """Use the default editor for all users."""
-    from collective.setdefaulteditor.utils import set_editor_for_all
-
-    # Assumes the zope.component.hooks site has already been set
-    set_editor_for_all(wanted_editor, dry_run)
-
-
-class ReferenceTargetCleaner(utils.Upgrader):
-    """Walk through all the reference objects and remove those whose
-    targets can't be found."""
-
-    def upgrade(self):
-        try:
-            import Products.Archetypes  # noqa: F401
-        except ImportError:  # Plone 5.2+
-            self.log("No Products.Archetypes, skipping the reference targets cleanup")
-            return
-        self.ref_catalog = getToolByName(self.context, "reference_catalog")
-        self.context.ZopeFindAndApply(
-            self.context, search_sub=1, apply_func=self.upgradeObj
-        )
-
-    def upgradeObj(self, obj, path=None):
-        from Products.Archetypes import interfaces as at_ifaces
-
-        if not at_ifaces.IReferenceable.providedBy(obj):
-            return
-        for ref in self.ref_catalog.getReferences(obj):
-            if ref.getTargetObject() is None:
-                ref_id = uuid_ifaces.IUUID(ref)
-                self.log(
-                    "Removing reference {!r} with missing target: {!r}".format(
-                        ref_id, ref
-                    )
-                )
-                aq_parent(ref)._delOb(ref_id)
-
-
-def cleanupMissingReferenceTargets(context):
-    url = getToolByName(context, "portal_url")
-    upgrader = ReferenceTargetCleaner(url.getPortalObject())
-    upgrader.upgrade()
 
 
 def pack_zodb(context, t=None, days=0):

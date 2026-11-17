@@ -48,11 +48,6 @@ local.cfg
 /venv/
 .installed.txt
 
-# buildout local dev (Makefile)
-.plone-version
-.plone.versioncheck.tracked.json
-.python-version
-CACHEDIR.TAG
 htmlcov/
 *.log
 output.xml

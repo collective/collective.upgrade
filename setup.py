@@ -42,7 +42,6 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Framework :: Plone",
         "Framework :: Plone :: Addon",
-        "Framework :: Plone :: 6.1",
         "Framework :: Plone :: 6.2",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python",
@@ -62,9 +61,7 @@ setup(
     zip_safe=False,
     python_requires=">=3.10",
     install_requires=install_requires,
-    extras_require=dict(
-        test=tests_require, steps=["experimental.broken", "collective.setdefaulteditor"]
-    ),
+    extras_require=dict(test=tests_require, steps=["experimental.broken"]),
     entry_points="""
       # -*- Entry points: -*-
       [console_scripts]

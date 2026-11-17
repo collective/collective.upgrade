@@ -51,17 +51,6 @@
 
   <genericsetup:upgradeSteps
       profile="Products.CMFPlone:plone"
-      source="4001"
-      destination="4002"
-      >
-    <genericsetup:upgradeStep
-        title="Migrate CMFEditions folder versions."
-        handler=".steps.migrateCMFEditionsFolderVersions"
-        />
-  </genericsetup:upgradeSteps>
-
-  <genericsetup:upgradeSteps
-      profile="Products.CMFPlone:plone"
       source="4100"
       destination="4101"
       >
