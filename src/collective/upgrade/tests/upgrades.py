@@ -11,10 +11,7 @@ CHECKER_PROFILE_ID = "collective.upgrade.tests:checker"
 
 
 def link_integrity_checks(portal):
-    """Plone 4: site_properties, Plone 6: registry."""
-    properties = getToolByName(portal, "portal_properties", None)
-    if properties is not None:
-        return properties.site_properties.getProperty("enable_link_integrity_checks")
+    """The link integrity checks setting of the registry."""
     return getUtility(IRegistry).get("plone.enable_link_integrity_checks")
 
 

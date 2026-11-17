@@ -12,7 +12,6 @@ from plone.base.utils import get_installer
 from plone.registry.interfaces import IRegistry
 from plone.uuid.interfaces import ATTRIBUTE_NAME
 from plone.uuid.interfaces import IUUID
-from Products.CMFCore.utils import getToolByName
 from Products.GenericSetup.tool import SetupTool
 from unittest import mock
 from ZODB.DB import DB
@@ -200,15 +199,6 @@ class TestSteps(unittest.TestCase):
             notes[-1].endswith(b"Committing changes prior to packing the ZODB")
         )
         self.assertEqual(folder.title, "Newer")
-
-    def test_cookResourceRegisties(self):
-        css = getToolByName(self.portal, "portal_css", None)
-        if css is not None:  # Plone 4
-            css.registerStylesheet("upgraded.css", skipCooking=True)
-            self.assertNotIn("upgraded.css", css.concatenatedresources)
-        steps.cookResourceRegisties(self.setup)
-        if css is not None:
-            self.assertIn("upgraded.css", css.concatenatedresources)
 
     def test_resetProfiles(self):
         base = "Importing the 'profile-Products.CMFPlone:plone' base profile"

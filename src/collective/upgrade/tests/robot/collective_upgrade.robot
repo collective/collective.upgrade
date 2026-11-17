@@ -1,7 +1,7 @@
 *** Settings ***
-Documentation  collective.upgrade keywords, built on the ui_plone${PLONE_MAJOR}.robot keywords.
+Documentation  collective.upgrade keywords, built on the ui_plone6.robot keywords.
 ...            The only browser entry point is the upgrade form, a text/plain log stream.
-Resource  ui_plone${PLONE_MAJOR}.robot
+Resource  ui_plone6.robot
 
 
 *** Variables ***

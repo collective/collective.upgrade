@@ -230,23 +230,6 @@ def pack_zodb(context, t=None, days=0):
     db.pack(t, days)
 
 
-def cookResourceRegisties(context, ids=None):
-    """
-    Cook all JavaScript and CSS resources in all resource registries.
-
-    This can address the issue where sometimes the resource registries viewlet
-    fails to render correctly.
-
-    Has no Plone 6 equivalent.
-    Might remain useful for objects implementing the legacy interface.
-    """
-    url = getToolByName(context, "portal_url")
-    portal = url.getPortalObject()
-    for obj in portal.objectValues():
-        if hasattr(obj, "cookResources"):
-            obj.cookResources()
-
-
 def resetProfiles(context, extension_profiles=None):
     """
     Reset the site to its initial profile state.

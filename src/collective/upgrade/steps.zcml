@@ -44,11 +44,6 @@
     <depends name="toolset" />
   </genericsetup:importStep>
 
-  <include
-      file="resourceregistries.zcml"
-      zcml:condition="installed Products.ResourceRegistries"
-      />
-
   <genericsetup:upgradeSteps
       profile="Products.CMFPlone:plone"
       source="4100"

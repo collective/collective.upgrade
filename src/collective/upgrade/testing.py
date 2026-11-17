@@ -11,6 +11,7 @@ from plone.app.testing import login
 from plone.app.testing import logout
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import setRoles
+from plone.testing.zope import WSGI_SERVER_FIXTURE as SERVER_FIXTURE
 from Products.CMFCore.utils import getToolByName
 from Products.PlonePAS.setuphandlers import activatePluginInterfaces
 from Products.PluggableAuthService.interfaces.plugins import IGroupEnumerationPlugin
@@ -19,11 +20,6 @@ from Products.PluggableAuthService.interfaces.plugins import IUserEnumerationPlu
 from zope.configuration import xmlconfig
 
 import logging
-
-try:
-    from plone.testing.zope import WSGI_SERVER_FIXTURE as SERVER_FIXTURE
-except ImportError:  # Plone 4
-    from plone.testing.z2 import ZSERVER_FIXTURE as SERVER_FIXTURE
 
 
 class UpgradeTesting(PloneSandboxLayer):
@@ -44,10 +40,6 @@ class UpgradeTesting(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         acl_users = getToolByName(portal, "acl_users")
-        # Plone 4: the plone.app.contenttypes 1.1 fixture adds a portal "admin"
-        # user, absent from the pas.rst reconciliations
-        if "admin" in acl_users.source_users.listUserIds():
-            acl_users.source_users.removeUser("admin")
 
         # Pending upgrades: steps 1 to 2 (two steps) and 2 to 3
         applyProfile(portal, PROFILE_ID)

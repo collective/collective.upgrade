@@ -21,7 +21,7 @@ test_environment_variables = """
 test_matrix = {"6.3" = ["*"], "6.2" = ["*"]}
 
 [pyproject]
-dependencies_ignores = "['experimental.broken', 'plone.app.caching', 'plonetheme.barceloneta', 'Products.PluginIndexes', 'Products.ResourceRegistries']"
+dependencies_ignores = "['experimental.broken', 'plone.app.caching', 'plonetheme.barceloneta', 'Products.PluginIndexes']"
 extra_lines = """
 [tool.towncrier]
 filename = "CHANGES.rst"
