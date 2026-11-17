@@ -65,11 +65,11 @@ setup(
     extras_require=dict(
         test=tests_require, steps=["experimental.broken", "collective.setdefaulteditor"]
     ),
-    scripts=["run-portal-upgrades"],
     entry_points="""
       # -*- Entry points: -*-
       [console_scripts]
       upgrade-portals = collective.upgrade.run:main
+      run-portal-upgrades = collective.upgrade.run:run_portal_upgrades
 
       [z3c.autoinclude.plugin]
       target = plone

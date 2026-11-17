@@ -1,4 +1,4 @@
-include *.cfg *.rst *.in .coveragerc Makefile requirements-*.txt run-portal-upgrades
+include *.cfg *.rst *.in .coveragerc Makefile requirements-*.txt
 recursive-include src *.csv
 recursive-include src *.pp
 recursive-include src *.robot

@@ -72,157 +72,16 @@ class ExportReconciler(Reconciler):
 
     def export_rows(self):
         if hasattr(self.context, "openDataFile"):
-            csvfile = self.context.openDataFile(self.filename)
-        else:
-            csvfile = io.StringIO()
-
-        try:
-            content_type = mimetypes.guess_type(self.filename)
-            writer = csv.DictWriter(csvfile, self.fieldnames)
-            writer.writerow({name: name for name in self.fieldnames})
-            writer.writerows(self.get_rows())
-
-            if not hasattr(self.context, "openDataFile"):
-                csvfile.seek(0)
-                self.context.writeDataFile(self.filename, csvfile.read(), content_type)
-
-        finally:
-            csvfile.close()
-
-    def get_user_rows(self):
-        seen = set()
-        # Temporarily disable the destination plugins from listing
-        savepoint = transaction.savepoint(optimistic=True)
-        try:
-            self.plugins.deactivatePlugin(
-                IUserEnumerationPlugin, self.dest_users.getId()
-            )
-            if self.dest_properties.getId() in self.plugins.listPluginIds(
-                IUserEnumerationPlugin
-            ):
-                self.plugins.deactivatePlugin(
-                    IUserEnumerationPlugin, self.dest_properties.getId()
-                )
-
-            # Look for matches for the source users
-            for info in self.acl_users.searchUsers():
-                if info["id"] in seen:
-                    continue
-                seen.add(info["id"])
-                result = {"Source Plugin ID": info["pluginid"], "Source ID": info["id"]}
-
-                # Exact user id match
-                matches = self.dest_users.enumerateUsers(
-                    id=info["id"], exact_match=True
-                )
-                if len(matches) == 1:
-                    result["Destination Plugin ID"] = matches[0].get(
-                        "pluginid", self.dest_users.getId()
-                    )
-                    result["Destination ID"] = matches[0]["id"]
-                    yield result
-                    continue
-
-                # Match on properties
-                user = self.acl_users.getUserById(info["id"])
-                value = None
-                if user is not None:
-                    for prop in self.user_properties:
-                        prop_result = result.copy()
-                        value = None
-                        for sheet_id in user.listPropertysheets():
-                            sheet = user.getPropertysheet(sheet_id)
-                            if sheet.hasProperty(prop):
-                                value = sheet.getProperty(prop)
-                                if value:
-                                    break
-                        else:
-                            continue
-                        matches = self.dest_properties.enumerateUsers(**{prop: value})
-                        if matches:
-                            prop_result["Destination Plugin ID"] = matches[0].get(
-                                "pluginid", self.dest_users.getId()
-                            )
-                            prop_result["Destination ID"] = matches[0]["id"]
-                            if len(matches) > 1:
-                                prop_result["Destination Duplicate IDs"] = " ".join(
-                                    match["id"] for match in matches[1:]
-                                )
-                            yield prop_result
-
-                # No match
-                if not value:
-                    yield result
-
-        # Restore disabled plugins
-        finally:
-            savepoint.rollback()
-
-    def get_group_rows(self):
-        seen = set()
-        # Temporarily disable the destination plugins from listing
-        savepoint = transaction.savepoint(optimistic=True)
-        try:
-            self.plugins.deactivatePlugin(
-                IGroupEnumerationPlugin, self.dest_groups.getId()
-            )
-
-            # Look for matches for the source groups
-            for info in self.acl_users.searchGroups():
-                if info["id"] in seen:
-                    continue
-                seen.add(info["id"])
-                result = {"Source Plugin ID": info["pluginid"], "Source ID": info["id"]}
-
-                # Exact group id match
-                matches = self.dest_groups.enumerateGroups(
-                    id=info["id"], exact_match=True
-                )
-                if len(matches) == 1:
-                    result["Destination Plugin ID"] = matches[0].get(
-                        "pluginid", self.dest_groups.getId()
-                    )
-                    result["Destination ID"] = matches[0]["id"]
-                    yield result
-                    continue
-
-                # Match on group title
-                if info.get("title"):
-                    matches = self.dest_groups.enumerateGroups(title=info["title"])
-                    if matches:
-                        result["Destination Plugin ID"] = matches[0].get(
-                            "pluginid", self.dest_groups.getId()
-                        )
-                        result["Destination ID"] = matches[0]["id"]
-                        if len(matches) > 1:
-                            result["Destination Duplicate IDs"] = " ".join(
-                                match["id"] for match in matches[1:]
-                            )
-                        yield result
-                        continue
-
-                # No match
-                yield result
-
-        # Restore disabled plugins
-        finally:
-            savepoint.rollback()
-
-
-class ImportReconciler(Reconciler):
-
-    def import_rows(self):
-        if hasattr(self.context, "openDataFile"):
-            csvfile = self.context.openDataFile(self.filename)
-            if csvfile is None:
+            binary_csvfile = self.context.openDataFile(self.filename)
+            if binary_csvfile is None:
                 return
+            csvfile = io.TextIOWrapper(binary_csvfile, encoding="utf-8", newline="")
         else:
             datafile = self.context.readDataFile(self.filename)
             if datafile is None:
                 return
-            csvfile = io.StringIO(datafile)
-        decoded_file = io.TextIOWrapper(csvfile, encoding="utf-8")
-        reader = csv.DictReader(decoded_file)
+            csvfile = io.StringIO(datafile.decode("utf-8"), newline="")
+        reader = csv.DictReader(csvfile)
 
         self.acl_users = getToolByName(self.site, "acl_users")
         self.plugins = self.acl_users._getOb("plugins")

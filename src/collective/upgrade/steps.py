@@ -64,10 +64,10 @@ def cleanupSkinLayers(context, remove_layers=_default_layers):
 
 def uninstallAddOns(context, addons=None):
     """
-    Uninstall the given add-ons using the cleanest method possible.
+    Uninstall the given add-ons.
 
-    If no add-ons are specified then all missing add-ons are
-    uninstalled.
+    If no add-ons are specified then all installed add-ons whose
+    underlying product is no longer installable are uninstalled.
     """
     installer = get_installer(context)
     setup = getToolByName(context, "portal_setup")
@@ -307,6 +307,9 @@ def cookResourceRegisties(context, ids=None):
 
     This can address the issue where sometimes the resource registries viewlet
     fails to render correctly.
+
+    Has no Plone 6 equivalent.
+    Might remain useful for objects implementing the legacy interface.
     """
     url = getToolByName(context, "portal_url")
     portal = url.getPortalObject()
