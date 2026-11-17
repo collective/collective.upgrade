@@ -9,6 +9,8 @@ Changelog
   based on the work of @laulaz, @bsuttor, @szakitibi and @remdub on ``plone61``.
   [chris-adam]
 
+- Dropped support for Plone versions below 6.2. [chris-adam]
+
 - Switch to PEP 420 native namespace package.
   [remdub]
 

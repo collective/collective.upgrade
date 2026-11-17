@@ -48,7 +48,6 @@ class TestPortalsUpgrader(unittest.TestCase):
             upgrader.context.getId(): upgrader
             for upgrader in self.upgrader.walkUpgraders(self.app)
         }
-        # the portal, and every other object manager, walked in turn (Plone 4: also
-        # Control_Panel)
+        # the portal, and every other object manager, walked in turn
         self.assertIsInstance(walked["plone"], PloneUpgrader)
         self.assertIsInstance(walked["acl_users"], PortalsUpgrader)

@@ -13,16 +13,11 @@ from plone.app.testing import login
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
-from Products.CMFCore.utils import getToolByName
+from plone.base.interfaces import INonInstallable
 from zope.component import getUtility
 from zope.testing.loggingsupport import InstalledHandler
 
 import unittest
-
-try:
-    from plone.base.interfaces import INonInstallable
-except ImportError:  # Plone 4
-    from Products.CMFPlone.interfaces import INonInstallable
 
 BASELINE = "Products.CMFPlone:plone"
 
@@ -80,14 +75,9 @@ class TestPloneUpgrader(unittest.TestCase):
             if message.endswith(f"{PROFILE_ID}' to '2'")
         ][0]
         self.assertLess(baseline, extension)
-        # Plone 4: the resource registries are cooked after the upgrades
         refreshed = "{0}: Refreshed resource registries for {0}".format(portal)
-        if getToolByName(self.portal, "portal_css", None) is not None:
-            self.assertEqual(log[-1], refreshed)
-            self.assertEqual(log[-2], "{0}: Upgraded {0}".format(portal))
-        else:
-            self.assertNotIn(refreshed, log)
-            self.assertEqual(log[-1], "{0}: Upgraded {0}".format(portal))
+        self.assertNotIn(refreshed, log)
+        self.assertEqual(log[-1], "{0}: Upgraded {0}".format(portal))
 
     def test_upgradeProfile(self):
         orig = link_integrity_checks(self.portal)

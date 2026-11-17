@@ -15,6 +15,8 @@ from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
+from plone.base.interfaces import INonInstallable
+from plone.testing.zope import Browser
 from zExceptions import Unauthorized
 from zodbupdate.main import duplicate_filter
 from zope.component import getSiteManager
@@ -30,16 +32,6 @@ import logging
 import re
 import transaction
 import unittest
-
-try:
-    from plone.base.interfaces import INonInstallable
-except ImportError:  # Plone 4
-    from Products.CMFPlone.interfaces import INonInstallable
-
-try:
-    from plone.testing.zope import Browser
-except ImportError:  # Plone 4
-    from plone.testing.z2 import Browser
 
 LINE = re.compile(r"^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d INFO collective\.upgrade ")
 
@@ -69,7 +61,7 @@ class TestUpgrader(unittest.TestCase):
     def test___call__(self):
         portal = str(self.portal)
         # the log is streamed to the response (read from the response of a direct
-        # call: the Plone 4 test browser only reads the body, not the stream)
+        # call: the test browser only reads the body, not the stream)
         response = self.request.response
         response.stdout = io.BytesIO()
         self.request.form["submitted"] = "1"

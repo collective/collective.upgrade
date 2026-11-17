@@ -12,10 +12,7 @@ from plone.base.utils import get_installer
 from plone.registry.interfaces import IRegistry
 from plone.uuid.interfaces import ATTRIBUTE_NAME
 from plone.uuid.interfaces import IUUID
-from Products.CMFCore.utils import getToolByName
-from Products.DateRecurringIndex.index import DateRecurringIndex
 from Products.GenericSetup.tool import SetupTool
-from Products.PluginIndexes.interfaces import IDateRangeIndex
 from unittest import mock
 from ZODB.DB import DB
 from ZODB.FileStorage import FileStorage
@@ -231,31 +228,17 @@ class TestSteps(unittest.TestCase):
         self.assertEqual(folder.title, "Newer")
 
     def test_cookResourceRegisties(self):
-        css = getToolByName(self.portal, "portal_css", None)
-        if css is not None:  # Plone 4
-            css.registerStylesheet("upgraded.css", skipCooking=True)
-            self.assertNotIn("upgraded.css", css.concatenatedresources)
+        # no resource registries in Plone 6: nothing to cook
         steps.cookResourceRegisties(self.setup)
-        if css is not None:
-            self.assertIn("upgraded.css", css.concatenatedresources)
 
     def test_resetProfiles(self):
         base = "Importing the 'profile-Products.CMFPlone:plone' base profile"
-        if IDateRangeIndex.implementedBy(DateRecurringIndex):
-            # Plone 6.2 (Products.DateRecurringIndex 4): the catalog step of the base
-            # profile gives the start and end indexes to the DateRangeIndex importer
-            with self.assertRaises(AttributeError) as cm:
-                steps.resetProfiles(self.setup, extension_profiles=[PROFILE_ID])
-            self.assertEqual(str(cm.exception), "_since_field")
-            self.assertEqual(messages(self.log), [base])
-        else:
-            # Plone 6.1: the base profile, then the extension profiles
+        # Products.DateRecurringIndex 4: the catalog step of the base profile gives
+        # the start and end indexes to the DateRangeIndex importer
+        with self.assertRaises(AttributeError) as cm:
             steps.resetProfiles(self.setup, extension_profiles=[PROFILE_ID])
-            self.assertEqual(
-                messages(self.log),
-                [base, f"Importing the {PROFILE_ID!r} extension profile"],
-            )
-            self.assertEqual(self.setup.getLastVersionForProfile(PROFILE_ID), ("3",))
+        self.assertEqual(str(cm.exception), "_since_field")
+        self.assertEqual(messages(self.log), [base])
         # without extension profiles: the ones selected by default when adding a site
         with mock.patch.object(SetupTool, "runAllImportStepsFromProfile") as run:
             steps.resetProfiles(self.setup)

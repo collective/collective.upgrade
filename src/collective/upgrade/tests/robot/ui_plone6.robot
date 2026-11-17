@@ -1,7 +1,5 @@
 *** Settings ***
-Documentation  Plone 6 Classic UI keywords. Same keyword names and arguments as ui_plone4.robot.
-...            Robot Framework 3.0 syntax: shared with the Plone 4.3 (Python 2) environment.
-...            Selectors checked on Plone 6.1 (collective.contact.contactlist).
+Documentation  Plone 6 Classic UI keywords.
 ...            Checked on Plone 6.2 (collective.upgrade): The login form is shown,
 ...            The access is refused.
 Resource  plone/app/robotframework/selenium.robot
@@ -55,7 +53,7 @@ The personal action is not available
     Page should not contain element  css=#personaltools-${action_id}
 
 The modal is open
-    [Documentation]  Overlay (Plone 4) or modal (Plone 6) showing a form
+    [Documentation]  Modal showing a form
     Wait until element is visible  ${MODAL} form
 
 Modal element
