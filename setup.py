@@ -23,7 +23,6 @@ tests_require = [
     "plone.app.testing",
     "plone.registry",
     "plone.testing",
-    "Products.DateRecurringIndex",
     "Products.PlonePAS",
     "plonetheme.barceloneta",
     "robotsuite",
