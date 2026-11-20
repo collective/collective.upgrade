@@ -1,0 +1,2 @@
+Replace ``pkg_resources`` namespace with PEP 420 native namespace. Support Plone 6.2 and 6.3 on Python 3.10+. When you use ``collective.upgrade`` with other packages in the ``collective`` namespace, and you get a ``ModuleNotFoundError``, you may need to install ``horse-with-no-namespace``, or use ``zc.buildout`` 5.
+[szakitibi, remdub] (plone/Products.CMFPlone#3928)

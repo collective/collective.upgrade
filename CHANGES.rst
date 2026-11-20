@@ -2,11 +2,7 @@ Changelog
 =========
 
 
-1.8 (unreleased)
-----------------
-
-- Nothing changed yet.
-
+.. towncrier release notes start
 
 1.7 (2022-03-01)
 ----------------

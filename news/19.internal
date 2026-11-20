@@ -1,0 +1,2 @@
+Added plone.meta configuration (tox, pre-commit, GitHub Actions), removed obsolete Plone 4 ``buildout.cfg`` and ``bootstrap.py``.
+[chris-adam, remdub]

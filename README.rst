@@ -1,3 +1,6 @@
+.. image:: https://github.com/collective/collective.upgrade/actions/workflows/meta.yml/badge.svg?branch=master
+    :target: https://github.com/collective/collective.upgrade/actions/workflows/meta.yml
+
 collective.upgrade
 ==================
 
@@ -22,6 +25,12 @@ There is no "dry run" option as that is contrary to it's purpose.  As
 such, it should *never* be used on a ZODB that has not been backed up
 along with the BLOBs *immediately before* use.  Neither should it be
 used directly on production as a first attempt at upgrading portals.  
+
+Versions
+--------
+
+* Version 2.x is for Plone 6.2+ only
+* Version 1.x is for Plone 4 / 5 / 6.0 / 6.1
 
 Quick Start
 -----------
@@ -225,12 +234,6 @@ cleaning up broken objects is probably a better idea than not doing
 so.  This will be included automatically if you require the
 ``collective.upgrade [steps]`` extra.
 
-An unregistered upgrade step function,
-``collective.upgrade.steps.setDefaultEditor``, can be registered in ZCML
-to set the default editor for all users.  It requires
-``collective.setdefaulteditor`` which will be included automatically if
-you require the ``collective.upgrade [steps]`` extra.
-
 Helper functions are also available in the ``collective.upgrade.steps``
 module.  These helpers are all meant to be used when writing your own
 upgrades steps.  See the ``collective.upgrade.steps`` source for
@@ -241,5 +244,3 @@ details:
   * cleanup missing skin/theme layers
   * uninstall add-ons
   * pack the ZODB pruning old revision history
-  * BBB import/export steps for resource registries before the Plone 5 switch to
-    using plone.app.registry

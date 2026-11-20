@@ -1,75 +1,58 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
-    i18n_domain="plone">
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    i18n_domain="plone"
+    >
 
   <genericsetup:registerProfile
       name="blank"
       title="Blank import for all steps"
-      description="Useful with purge_old=True for resetting a site to an
-                   empty/unconfigured state."
+      description="Useful with purge_old=True for resetting a site to an                    empty/unconfigured state."
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
-  <genericsetup:exportStep name="reconcile_users"
+  <genericsetup:exportStep
+      name="reconcile_users"
       title="Reconcile Users"
-      description="Reconcile users between two PluggableAuthService
-                   plugins. Useful, for example, to migrate users from
-                   the local storage plugins to an LDAP plugin added
-                   later."
+      description="Reconcile users between two PluggableAuthService                    plugins. Useful, for example, to migrate users from                    the local storage plugins to an LDAP plugin added                    later."
       handler=".pas.reconcileUsersExport"
       />
 
-  <genericsetup:exportStep name="reconcile_groups"
+  <genericsetup:exportStep
+      name="reconcile_groups"
       title="Reconcile Groups"
-      description="Reconcile groups between two PluggableAuthService
-                   plugins. Useful, for example, to migrate groups from
-                   the local storage plugins to an LDAP plugin added
-                   later."
+      description="Reconcile groups between two PluggableAuthService                    plugins. Useful, for example, to migrate groups from                    the local storage plugins to an LDAP plugin added                    later."
       handler=".pas.reconcileGroupsExport"
       />
 
-  <genericsetup:importStep name="reconcile_users"
+  <genericsetup:importStep
+      name="reconcile_users"
       title="Reconcile Users"
-      description="Reconcile users between two PluggableAuthService
-                   plugins. Useful, for example, to migrate users from
-                   the local storage plugins to an LDAP plugin added
-                   later."
-      handler=".pas.reconcileUsersImport">
-      <depends name="toolset"/>
+      description="Reconcile users between two PluggableAuthService                    plugins. Useful, for example, to migrate users from                    the local storage plugins to an LDAP plugin added                    later."
+      handler=".pas.reconcileUsersImport"
+      >
+    <depends name="toolset" />
   </genericsetup:importStep>
 
-  <genericsetup:importStep name="reconcile_groups"
+  <genericsetup:importStep
+      name="reconcile_groups"
       title="Reconcile Groups"
-      description="Reconcile groups between two PluggableAuthService
-                   plugins. Useful, for example, to migrate groups from
-                   the local storage plugins to an LDAP plugin added
-                   later."
-      handler=".pas.reconcileGroupsImport">
-      <depends name="toolset"/>
+      description="Reconcile groups between two PluggableAuthService                    plugins. Useful, for example, to migrate groups from                    the local storage plugins to an LDAP plugin added                    later."
+      handler=".pas.reconcileGroupsImport"
+      >
+    <depends name="toolset" />
   </genericsetup:importStep>
 
-  <include
-      zcml:condition="installed Products.ResourceRegistries"
-      file="resourceregistries.zcml" />
-
   <genericsetup:upgradeSteps
-      source="4001"
-      destination="4002"
-      profile="Products.CMFPlone:plone">
-    <genericsetup:upgradeStep
-        title="Migrate CMFEditions folder versions."
-        handler=".steps.migrateCMFEditionsFolderVersions" />
-  </genericsetup:upgradeSteps>
-
-  <genericsetup:upgradeSteps
+      profile="Products.CMFPlone:plone"
       source="4100"
       destination="4101"
-      profile="Products.CMFPlone:plone">
+      >
     <genericsetup:upgradeStep
         title="Fix duplicate UIDs."
-        handler=".steps.fixDuplicateUIDs" />
+        handler=".steps.fixDuplicateUIDs"
+        />
   </genericsetup:upgradeSteps>
 
 </configure>

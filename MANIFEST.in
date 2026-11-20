@@ -1,8 +1,9 @@
-include *.py
-include buildout.cfg
-include *.rst
+include *.rst *.in .coveragerc
+recursive-include news *
 recursive-include src *.csv
 recursive-include src *.pp
+recursive-include src *.robot
 recursive-include src *.rst
 recursive-include src *.xml
 recursive-include src *.zcml
+global-exclude *.pyc
