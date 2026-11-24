@@ -9,11 +9,42 @@ Changelog
 
 - Nothing changed yet.
 
+Breaking changes:
+
+
+3.0.0 (2026-11-24)
+------------------
+
+- Drop support for Plone <6.2 including the replacement or cleanup of the Archetypes, portal_quickinstaller, resourceregistry, CMFEditionsFolderMigrator, ReferenceTargetCleaner, collective.setdefaulteditor related code, along with the buildout/Makefile development setup (use ``tox``).
+  [laulaz, szakitibi] (`#18 <https://github.com/collective/collective.upgrade/issues/18>`_)
+
+- Drop support for Python 2 and Python 3 versions older than 3.10.
+  [szakitibi] (`#18 <https://github.com/collective/collective.upgrade/issues/18>`_)
+
+- Replace ``pkg_resources`` namespace with PEP 420 native namespace. Support Plone 6.2 and 6.3 on Python 3.10+. When you use ``collective.upgrade`` with other packages in the ``collective`` namespace, and you get a ``ModuleNotFoundError``, you may need to install ``horse-with-no-namespace``, or use ``zc.buildout`` 5.
+  [szakitibi, remdub] (plone/Products.CMFPlone#3928) (`#18 <https://github.com/collective/collective.upgrade/issues/18>`_)
+
+
+New features:
+
+- Add Plone 6.2 support and tests, fix the remaining Plone 6 incompatibilities, based on the work of @laulaz, @bsuttor, @szakitibi and @remdub.
+  [chris-adam] (`#19 <https://github.com/collective/collective.upgrade/issues/19>`_)
+
+
+Bug fixes:
+
+- Fix missing ``@@plone-addsite`` case for Plone 6.1+ - see plone/Products.CMFPlone#3981.
+  [szakitibi] (`#18 <https://github.com/collective/collective.upgrade/issues/18>`_)
+- Rework CSV import/export to use py3 io, with explicit UTF-8 encoding and close the reader.
+  [szakitibi] (`#18 <https://github.com/collective/collective.upgrade/issues/18>`_)
+- Replace no longer supported ``scripts=["run-portal-upgrades"]`` with ``console_scripts``, fix missing ``Manager`` role.
+  [szakitibi] (`#18 <https://github.com/collective/collective.upgrade/issues/18>`_)
+- Portal_properties is no longer a persistent tool.
+  [bsuttor] (`#18 <https://github.com/collective/collective.upgrade/issues/18>`_)
+
 
 2.0.0 (2026-11-24)
 ------------------
-
-Released from the ``plone61`` branch, for Plone 6.1.
 
 - Switch to PEP 420 native namespace package.
   [remdub]
