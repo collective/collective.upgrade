@@ -2,7 +2,7 @@ import os
 
 from setuptools import find_namespace_packages, setup
 
-version = "2.0.dev0"
+version = "2.0.0"
 
 install_requires = [
     "setuptools",
